@@ -1,4 +1,5 @@
-                                ## ControlTotal - Sistema de Inventario y Ventas
+<h2 align="center">ControlTotal <br> Sistema de Inventario y Ventas</h2>
+
 
 El proyecto consiste en desarrollar un sistema de inventario y ventas utilizando Python, MySQL, Streamlit y las librerías NumPy, Pandas, Matplotlib, Scipy y Geopandas. Este sistema permitirá a los pequeños y medianos negocios llevar un mejor control de sus productos, ventas y clientes.
 
