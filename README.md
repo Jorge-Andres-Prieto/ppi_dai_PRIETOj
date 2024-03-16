@@ -12,9 +12,10 @@ Los pequeños y medianos negocios necesitan herramientas que les permitan optimi
 * **Analizar sus datos:** ventas por producto, por cliente, por periodo de tiempo, etc.
 * **Mejorar la toma de decisiones:** gracias a la información que proporciona el sistema.
 
-![Python](https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1)
-![MySQL](url_de_la_imagen_mysql)
-![Streamlit](url_de_la_imagen_streamlit)
+<img src="[url_de_la_imagen_python](https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1)" alt="Python" width="200">
+<img src="url_de_la_imagen_mysql" alt="MySQL" width="200">
+<img src="url_de_la_imagen_streamlit" alt="Streamlit" width="200">
+
 
 **Uso de las librerías:**
 
