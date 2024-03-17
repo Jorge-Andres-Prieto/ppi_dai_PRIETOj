@@ -13,12 +13,12 @@ Los pequeños y medianos negocios necesitan herramientas que les permitan optimi
 * **Mejorar la toma de decisiones:** gracias a la información que proporciona el sistema.
 
 <div style="display: flex; justify-content: center;">
-    <div style="margin-right: 20px; text-align: center;">
+    <div style="text-align: center; margin-right: 20px;">
         <img src="https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Python" width="250">
         <br>
         Python
     </div>
-    <div style="margin-right: 20px; text-align: center;">
+    <div style="text-align: center; margin-right: 20px;">
         <img src="https://img.freepik.com/vector-gratis/programador-trabajando-sql_52683-22997.jpg?w=740&t=st=1710632981~exp=1710633581~hmac=1663f1348d1ac8a5e5ec42821202ffd2dbab9bc1b9bf8d75d6e1a254337f6aff" alt="MySQL" width="250">
         <br>
         MySQL
@@ -29,6 +29,7 @@ Los pequeños y medianos negocios necesitan herramientas que les permitan optimi
         Streamlit
     </div>
 </div>
+
 
 
 **Uso de las librerías:**
