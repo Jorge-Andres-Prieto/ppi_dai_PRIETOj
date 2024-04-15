@@ -13,8 +13,8 @@ class User(Base):
     password = Column(String, nullable=False)
     role = Column(String, nullable=False)
 
-# Utiliza la URL de la base de datos de las variables de entorno para mayor seguridad
-DATABASE_URL = os.getenv("DATABASE_URL", "postgres://datos_usuarios_user:NNgnrDUS7HG3zQPuffAWnG3pyDvevRs2@dpg-coe966gl6cac73bvqv3g-a.oregon-postgres.render.com/datos_usuarios")
+# Combina las partes de la URL de la base de datos
+DATABASE_URL = f"postgresql://{os.getenv('DB_USERNAME')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
 engine = create_engine(DATABASE_URL)
 
 Session = sessionmaker(bind=engine)
