@@ -47,6 +47,15 @@ def user_login(username, password):
 
 # App de Streamlit
 def main():
+    if 'logged_in' not in st.session_state:
+        st.session_state['logged_in'] = False
+
+    if st.session_state['logged_in']:
+        manage_users()
+    else:
+        login()
+
+def login():
     st.title("Control Total")
     
     username = st.text_input("Nombre de usuario")
@@ -55,10 +64,9 @@ def main():
     if st.button("Iniciar sesión"):
         user = user_login(username, password)
         if user:
-            if user.role == "Admin":
-                manage_users()
-            else:
-                st.header("WELCOM")
+            st.session_state['logged_in'] = True
+            st.session_state['role'] = user.role
+            st.experimental_rerun()
         else:
             st.error("Usuario o contraseña incorrectos")
 
@@ -69,56 +77,47 @@ def manage_users():
         '¿Qué deseas hacer?',
         ('Crear Usuario', 'Buscar Usuario', 'Actualizar Usuario', 'Eliminar Usuario')
     )
-    
+
     if option == 'Crear Usuario':
-        create_user_ui()
+        with st.container():
+            username = st.text_input("Nombre de Usuario")
+            password = st.text_input("Contraseña", type="password")
+            role = st.selectbox("Rol", ["Admin", "Empleado"])
+            full_name = st.text_input("Nombre Completo")
+            phone_number = st.text_input("Número de Celular")
+            if st.button("Crear"):
+                result = create_user(username, password, role, full_name, phone_number)
+                st.success(result)
+
     elif option == 'Buscar Usuario':
-        search_user_ui()
+        with st.container():
+            search_name = st.text_input("Nombre a buscar")
+            if st.button("Buscar"):
+                users = read_user_by_name(search_name)
+                if users:
+                    for user in users:
+                        st.write(f"ID: {user.id}, Nombre: {user.full_name}, Usuario: {user.username}, Rol: {user.role}, Teléfono: {user.phone_number}")
+                else:
+                    st.write("No se encontraron usuarios")
+
     elif option == 'Actualizar Usuario':
-        update_user_ui()
+        with st.container():
+            update_id = st.number_input("ID del Usuario a actualizar", step=1)
+            new_username = st.text_input("Nuevo Nombre de Usuario", placeholder="Dejar en blanco si no desea cambiar")
+            new_password = st.text_input("Nueva Contraseña", type="password", placeholder="Dejar en blanco si no desea cambiar")
+            new_role = st.selectbox("Nuevo Rol", ["", "Admin", "Empleado"], index=0, format_func=lambda x: x if x else "Dejar en blanco")
+            new_full_name = st.text_input("Nuevo Nombre Completo", placeholder="Dejar en blanco si no desea cambiar")
+            new_phone_number = st.text_input("Nuevo Número de Celular", placeholder="Dejar en blanco si no desea cambiar")
+            if st.button("Actualizar"):
+                result = update_user(update_id, new_username or None, new_password or None, new_role if new_role else None, new_full_name or None, new_phone_number or None)
+                st.success(result)
+
     elif option == 'Eliminar Usuario':
-        delete_user_ui()
-
-def create_user_ui():
-    with st.container():
-        username = st.text_input("Nombre de Usuario")
-        password = st.text_input("Contraseña", type="password")
-        role = st.selectbox("Rol", ["Admin", "Empleado"])
-        full_name = st.text_input("Nombre Completo")
-        phone_number = st.text_input("Número de Celular")
-        if st.button("Crear"):
-            result = create_user(username, password, role, full_name, phone_number)
-            st.success(result)
-
-def search_user_ui():
-    with st.container():
-        search_name = st.text_input("Nombre a buscar")
-        if st.button("Buscar"):
-            users = read_user_by_name(search_name)
-            if users:
-                for user in users:
-                    st.write(f"ID: {user.id}, Nombre: {user.full_name}, Usuario: {user.username}, Rol: {user.role}, Teléfono: {user.phone_number}")
-            else:
-                st.write("No se encontraron usuarios")
-
-def update_user_ui():
-    with st.container():
-        update_id = st.number_input("ID del Usuario a actualizar", step=1)
-        new_username = st.text_input("Nuevo Nombre de Usuario", placeholder="Dejar en blanco si no desea cambiar")
-        new_password = st.text_input("Nueva Contraseña", type="password", placeholder="Dejar en blanco si no desea cambiar")
-        new_role = st.selectbox("Nuevo Rol", ["", "Admin", "Empleado"], index=0, format_func=lambda x: x if x else "Dejar en blanco")
-        new_full_name = st.text_input("Nuevo Nombre Completo", placeholder="Dejar en blanco si no desea cambiar")
-        new_phone_number = st.text_input("Nuevo Número de Celular", placeholder="Dejar en blanco si no desea cambiar")
-        if st.button("Actualizar"):
-            result = update_user(update_id, new_username or None, new_password or None, new_role if new_role else None, new_full_name or None, new_phone_number or None)
-            st.success(result)
-
-def delete_user_ui():
-    with st.container():
-        del_id = st.number_input("ID del Usuario a eliminar", step=1)
-        if st.button("Eliminar"):
-            result = delete_user(del_id)
-            st.success(result)
+        with st.container():
+            del_id = st.number_input("ID del Usuario a eliminar", step=1)
+            if st.button("Eliminar"):
+                result = delete_user(del_id)
+                st.success(result)
 
 if __name__ == "__main__":
     main()
