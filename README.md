@@ -36,7 +36,6 @@
 </ul>
 
 <h3 id="contacto">Contacto</h3>
-<p>Para más información o seguir mi trabajo, puedes visitar los siguientes enlaces:</p>
 <p align="center">
   <a href="https://github.com/tuUsuarioGitHub"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub" width="50" style="margin-right: 20px;"></a>
   <a href="https://linkedin.com/in/tuUsuarioLinkedIn"><img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn" width="50" style="margin-right: 20px;"></a>
