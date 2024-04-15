@@ -13,8 +13,8 @@ class User(Base):
     password = Column(String, nullable=False)
     role = Column(String, nullable=False)
 
-# Conexión a la base de datos PostgreSQL
-DATABASE_URL = st.secrets["DATABASE_URL"]
+# Conexión a la base de datos PostgreSQL usando la variable de entorno
+DATABASE_URL = st.secrets["database"]["DATABASE_URL"]
 engine = create_engine(DATABASE_URL, echo=True)
 Session = sessionmaker(bind=engine)
 Base.metadata.create_all(engine)
