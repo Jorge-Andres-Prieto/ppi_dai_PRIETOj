@@ -48,4 +48,4 @@
   <a href="https://www.upwork.com/freelancers/~0142bd1ae6229261b5"><img src="https://w7.pngwing.com/pngs/257/806/png-transparent-upwork-freelancer-android-android-text-trademark-rectangle-thumbnail.png" alt="Upwork" width="50" style="margin-right: 20px;"></a>
   <a href="https://www.reddit.com/user/Flestar/"><img src="https://w7.pngwing.com/pngs/647/198/png-transparent-reddit-hd-logo-thumbnail.png" alt="Reddit" width="50" style="margin-right: 20px;"></a>
 </p>
-.
+
