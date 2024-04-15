@@ -77,7 +77,7 @@ def delete_user(id):
     finally:
         session.close()
 
-st.title("Sistema de Gestión de Usuarios")
+st.title("Gestión de Usuarios")
 
 option = st.sidebar.selectbox(
     '¿Qué deseas hacer?',
