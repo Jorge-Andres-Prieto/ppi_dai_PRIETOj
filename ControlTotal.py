@@ -1,9 +1,9 @@
+import os
 import streamlit as st
 from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# Definición de la base de datos
 Base = declarative_base()
 
 class User(Base):
@@ -13,8 +13,10 @@ class User(Base):
     password = Column(String, nullable=False)
     role = Column(String, nullable=False)
 
-# Configuración del motor de base de datos y sesión
-engine = create_engine('sqlite:///mydatabase.db')
+# Utiliza la URL de la base de datos de las variables de entorno para mayor seguridad
+DATABASE_URL = os.getenv("DATABASE_URL", "postgres://datos_usuarios_user:NNgnrDUS7HG3zQPuffAWnG3pyDvevRs2@dpg-coe966gl6cac73bvqv3g-a.oregon-postgres.render.com/datos_usuarios")
+engine = create_engine(DATABASE_URL)
+
 Session = sessionmaker(bind=engine)
 Base.metadata.create_all(engine)
 
