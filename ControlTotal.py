@@ -19,8 +19,6 @@ class User(Base):
 DATABASE_URL = "postgresql://datos_usuarios_user:NNgnrDUS7HG3zQPuffAWnG3pyDvevRs2@dpg-coe966gl6cac73bvqv3g-a.oregon-postgres.render.com/datos_usuarios"
 engine = create_engine(DATABASE_URL, echo=True)
 Session = sessionmaker(bind=engine)
-
-# Crear las tablas si no existen
 Base.metadata.create_all(engine)
 
 def create_user(username, password, role, full_name, phone_number):
@@ -44,18 +42,18 @@ def read_user_by_name(name):
     finally:
         session.close()
 
-def update_user(id, new_username, new_password, new_role, new_full_name, new_phone_number):
+def update_user(full_name, new_username=None, new_password=None, new_role=None, new_full_name=None, new_phone_number=None):
     session = Session()
     try:
-        user = session.query(User).filter(User.id == id).first()
+        user = session.query(User).filter(User.full_name.ilike(full_name)).first()
         if user:
-            user.username = new_username
-            user.password = new_password
-            user.role = new_role
-            user.full_name = new_full_name
-            user.phone_number = new_phone_number
+            user.username = new_username if new_username else user.username
+            user.password = new_password if new_password else user.password
+            user.role = new_role if new_role else user.role
+            user.full_name = new_full_name if new_full_name else user.full_name
+            user.phone_number = new_phone_number if new_phone_number else user.phone_number
             session.commit()
-            return f"Usuario {id} actualizado con éxito."
+            return f"Usuario '{full_name}' actualizado con éxito."
         return "Usuario no encontrado."
     finally:
         session.close()
@@ -103,15 +101,23 @@ elif option == 'Buscar Usuario':
 
 elif option == 'Actualizar Usuario':
     with st.container():
-        id = st.number_input("ID del Usuario a actualizar", step=1)
-        new_username = st.text_input("Nuevo Nombre de Usuario")
-        new_password = st.text_input("Nueva Contraseña", type="password")
-        new_role = st.selectbox("Nuevo Rol", ["Admin", "Empleado"])
-        new_full_name = st.text_input("Nuevo Nombre Completo")
-        new_phone_number = st.text_input("Nuevo Número de Celular")
-        if st.button("Actualizar"):
-            result = update_user(id, new_username, new_password, new_role, new_full_name, new_phone_number)
-            st.success(result)
+        search_name = st.text_input("Nombre del Usuario a actualizar")
+        if st.button("Buscar para actualizar"):
+            users = read_user_by_name(search_name)
+            if users:
+                user_options = [user.full_name for user in users]
+                selected_user = st.selectbox("Seleccione un usuario para actualizar", user_options)
+                username = st.text_input("Nuevo Nombre de Usuario", value="")
+                password = st.text_input("Nueva Contraseña", type="password", value="")
+                role = st.text_input("Nuevo Rol", value="")
+                full_name = st.text_input("Nuevo Nombre Completo", value="")
+                phone_number = st.text_input("Nuevo Número de Celular", value="")
+                
+                if st.button("Actualizar Usuario"):
+                    result = update_user(selected_user, username if username else None, password if password else None, role if role else None, full_name if full_name else None, phone_number if phone_number else None)
+                    st.success(result)
+            else:
+                st.write("No se encontraron usuarios")
 
 elif option == 'Eliminar Usuario':
     with st.container():
