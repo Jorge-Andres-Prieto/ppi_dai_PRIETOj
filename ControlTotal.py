@@ -38,35 +38,33 @@ def read_user_by_username(username):
     session = Session()
     try:
         user = session.query(User).filter(User.username == username).first()
-        if user:
-            print(f"Usuario encontrado: {user.username}")  # Debugging
-            return user
-        else:
-            print(f"No se encontró usuario con el nombre de usuario: {username}")  # Debugging
-            return None
+        return user
     finally:
         session.close()
 
-def update_user(username, new_password=None, new_role=None, new_full_name=None, new_phone_number=None):
+def update_user(username, new_password, new_role, new_full_name, new_phone_number):
     session = Session()
     user = read_user_by_username(username)
     if user:
-        user.password = new_password if new_password and new_password.strip() else user.password
-        user.role = new_role if new_role and new_role.strip() else user.role
-        user.full_name = new_full_name if new_full_name and new_full_name.strip() else user.full_name
-        user.phone_number = new_phone_number if new_phone_number and new_phone_number.strip() else user.phone_number
+        user.password = new_password if new_password else user.password
+        user.role = new_role if new_role else user.role
+        user.full_name = new_full_name if new_full_name else user.full_name
+        user.phone_number = new_phone_number if new_phone_number else user.phone_number
         session.commit()
         return f"Usuario '{username}' actualizado con éxito."
     return "Usuario no encontrado."
 
 def delete_user(id):
     session = Session()
-    user = session.query(User).filter(User.id == id).first()
-    if user:
-        session.delete(user)
-        session.commit()
-        return f"Usuario {id} eliminado con éxito."
-    return "Usuario no encontrado."
+    try:
+        user = session.query(User).filter(User.id == id).first()
+        if user:
+            session.delete(user)
+            session.commit()
+            return f"Usuario {id} eliminado con éxito."
+        return "Usuario no encontrado."
+    finally:
+        session.close()
 
 st.title("Sistema de Gestión de Usuarios")
 
@@ -92,13 +90,13 @@ elif option == 'Buscar Usuario':
         if st.button("Buscar"):
             user = read_user_by_username(username)
             if user:
-                st.write(f"ID: {user.id}, Nombre: {user.full_name}, Usuario: {user.username}, Rol: {user.role}, Teléfono: {user.phone_number}")
+                st.write(f"ID: {user.id}, Nombre de Usuario: {user.username}, Rol: {user.role}, Nombre Completo: {user.full_name}, Teléfono: {user.phone_number}")
             else:
                 st.write("Usuario no encontrado")
 
 elif option == 'Actualizar Usuario':
     with st.container():
-        username = st.text_input("Nombre de Usuario a actualizar").strip()
+        username = st.text_input("Nombre de Usuario a actualizar")
         if st.button("Buscar Usuario"):
             user = read_user_by_username(username)
             if user:
@@ -106,7 +104,6 @@ elif option == 'Actualizar Usuario':
                 new_role = st.text_input("Nuevo Rol")
                 new_full_name = st.text_input("Nuevo Nombre Completo")
                 new_phone_number = st.text_input("Nuevo Número de Celular")
-                
                 if st.button("Actualizar Usuario"):
                     result = update_user(username, new_password, new_role, new_full_name, new_phone_number)
                     st.success(result)
@@ -115,11 +112,7 @@ elif option == 'Actualizar Usuario':
 
 elif option == 'Eliminar Usuario':
     with st.container():
-        username = st.text_input("Nombre de Usuario a eliminar")
+        id = st.number_input("ID del Usuario a eliminar", step=1)
         if st.button("Eliminar"):
-            user = read_user_by_username(username)
-            if user:
-                result = delete_user(user.id)
-                st.success(result)
-            else:
-                st.error("Usuario no encontrado")
+            result = delete_user(id)
+            st.success(result)
