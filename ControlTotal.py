@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 from sqlalchemy import create_engine, Column, Integer, String, exc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -26,8 +27,12 @@ Base.metadata.create_all(engine)
 def authenticate_user(username, password):
     session = Session()
     try:
-        user = session.query(User).filter(User.username == username, User.password == password).one_or_none()
-        return user
+        query = session.query(User.username, User.password, User.role).all()
+        df_users = pd.DataFrame(query, columns=['username', 'password', 'role'])
+        user_row = df_users[(df_users['username'] == username) & (df_users['password'] == password)]
+        if not user_row.empty:
+            return user_row.iloc[0].to_dict()
+        return None
     finally:
         session.close()
 
@@ -36,8 +41,9 @@ def login():
     user = authenticate_user(st.session_state.username, st.session_state.password)
     if user:
         st.session_state['authenticated'] = True
-        st.session_state['role'] = user.role
-        st.session_state['username'] = user.username
+        st.session_state['role'] = user['role']
+        st.session_state['username'] = user['username']
+        st.experimental_rerun()
     else:
         st.error("Usuario o contraseña incorrectos")
         st.session_state['authenticated'] = False
@@ -54,9 +60,6 @@ if not st.session_state['authenticated']:
     st.session_state.username = st.text_input("Usuario")
     st.session_state.password = st.text_input("Contraseña", type="password")
     if st.button("Ingresar", on_click=login):
-        if st.session_state['authenticated']:
-            st.experimental_rerun()  # Rerun the app after successful login
-    else:
         st.stop()
 
 # Pantallas de Usuario
