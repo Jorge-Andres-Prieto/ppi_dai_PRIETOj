@@ -24,7 +24,11 @@ Los pequeños y medianos negocios necesitan herramientas que les permitan optimi
 
 **Uso de las librerías:**
 
-* Usaré **NumPy** para realizar operaciones matemáticas y manipulación eficiente de matrices y vectores. Por ejemplo, aprovecharé NumPy para calcular valores promedio de inventario, sumar productos en stock, y gestionar cálculos numéricos relacionados con el análisis de ventas.
+* **NumPy**
+Funcionalidades Clave:
+- Realizar operaciones matemáticas básicas y manipulación de matrices y vectores.
+- Cálculos numéricos como el valor promedio de inventario y la suma de productos en stock.
+- Apoyar en el análisis numérico de ventas, ayudando en el cálculo de métricas como ventas totales, promedios y otras estadísticas básicas.
 
 * **Pandas** será esencial para manipular y analizar datos tabulares de manera efectiva. Planeo utilizar Pandas para cargar datos desde mi base de datos MySQL, realizar consultas SQL directamente desde Python, limpiar y preprocesar datos, y generar análisis detallados sobre ventas, productos y clientes.
 
