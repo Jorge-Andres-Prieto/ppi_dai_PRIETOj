@@ -40,9 +40,7 @@
 <p align="center">
   <a href="https://github.com/tuUsuarioGitHub"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub" width="50" style="margin-right: 20px;"></a>
   <a href="https://linkedin.com/in/tuUsuarioLinkedIn"><img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn" width="50" style="margin-right: 20px;"></a>
-  <a href="https://www.fiverr.com/"><img src="https://upload.wikimedia.org/wikipedia/commons/3/39/Fiverr_logo.svg" alt="Fiverr" width="50" style="margin-right: 20px;"></a>
-  <a href="https://www.upwork.com/"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c9/Upwork_Logo.svg" alt="Upwork" width="50" style="margin-right: 20px;"></a>
-  <a href="https://stackoverflow.com/"><img src="https://cdn.sstatic.net/Sites/stackoverflow/company/img/logos/so/so-logo.svg" alt="Stack Overflow" width="50" style="margin-right: 20px;"></a>
-  <a href="https://www.reddit.com/"><img src="https://upload.wikimedia.org/wikipedia/en/thumb/5/58/Reddit_logo_new.svg/2560px-Reddit_logo_new.svg.png" alt="Reddit" width="50" style="margin-right: 20px;"></a>
-  <a href="mailto:jprietoj@unal.edu.co"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Gmail_Icon.svg" alt="Email" width="50" style="margin-right: 20px;"></a>
+<a href="https://www.fiverr.com/"><img src="https://upload.wikimedia.org/wikipedia/commons/3/39/Fiverr_logo.svg" alt="Fiverr" width="50" style="margin-right: 20px;"></a>
+<a href="https://www.upwork.com/"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c9/Upwork_Logo.svg" alt="Upwork" width="50" style="margin-right: 20px;"></a>
+<a href="https://www.reddit.com/"><img src="https://upload.wikimedia.org/wikipedia/en/5/58/Reddit_logo_new.svg" alt="Reddit" width="50" style="margin-right: 20px;"></a>
 </p>
