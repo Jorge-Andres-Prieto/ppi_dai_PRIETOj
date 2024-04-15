@@ -24,23 +24,17 @@ Los pequeños y medianos negocios necesitan herramientas que les permitan optimi
 
 **Uso de las librerías:**
 
-* **NumPy**
-Funcionalidades Clave:
-- Realizar operaciones matemáticas básicas y manipulación de matrices y vectores.
-- Cálculos numéricos como el valor promedio de inventario y la suma de productos en stock.
-- Apoyar en el análisis numérico de ventas, ayudando en el cálculo de métricas como ventas totales, promedios y otras estadísticas básicas.
+* Usaré **NumPy** para manejar operaciones matemáticas básicas y la manipulación de matrices y vectores. Esta librería me permite realizar cálculos como el valor promedio de inventario y la suma de productos en stock, facilitando así el análisis numérico de las ventas y la generación de métricas clave.
 
-* **Pandas** será esencial para manipular y analizar datos tabulares de manera efectiva. Planeo utilizar Pandas para cargar datos desde mi base de datos MySQL, realizar consultas SQL directamente desde Python, limpiar y preprocesar datos, y generar análisis detallados sobre ventas, productos y clientes.
+* Con **Pandas**, manipularé y analizaré datos tabulares de manera eficiente. Me permite realizar consultas SQL directamente desde Python y es fundamental para limpiar y preprocesar datos, asegurando que la información sea precisa. También utilizaré Pandas para generar análisis detallados sobre ventas y productos, lo que me ayuda a tomar decisiones basadas en datos concretos.
 
-* Con **Matplotlib** crearé visualizaciones dinámicas y gráficos interactivos para explorar y presentar los datos. Por ejemplo, generaré gráficos de tendencias de ventas, distribuciones de productos, y análisis de precios, facilitando así la interpretación de la información por parte de los usuarios.
+* Utilizaré **Matplotlib** para crear gráficos que representen las ventas diarias, mensuales y anuales. Estos gráficos facilitan la visualización de tendencias y el rendimiento de las ventas, permitiendo a los usuarios comprender rápidamente las fluctuaciones y el progreso en diferentes periodos.
 
-* Para realizar análisis estadísticos avanzados, como pruebas de hipótesis o análisis de series temporales, aprovecharé las capacidades de **Scipy**. Esto me permitirá obtener insights más profundos sobre el comportamiento de ventas y otros aspectos importantes del negocio.
+* Aprovecharé **SciPy** para realizar análisis estadísticos avanzados, incluyendo pruebas de hipótesis y análisis de series temporales. Esta librería me proporciona herramientas para obtener insights más profundos sobre las tendencias de ventas y el comportamiento de los consumidores, ayudando en la planificación estratégica del negocio.
 
-* Dado que trabajaré con datos geoespaciales, **Geopandas** será de gran utilidad para manipular y visualizar este tipo de información. Utilizaré Geopandas para analizar la ubicación geográfica de clientes, sucursales y almacenes, lo que proporcionará una perspectiva adicional para la toma de decisiones.
+* Utilizaré **GeoPandas** para optimizar las rutas de entrega a través del análisis geoespacial. Esta librería me permite planificar las rutas más eficaces, reduciendo costos y tiempos de entrega, lo cual es crucial para la logística de mi negocio.
 
-Además, planeo utilizar **MySQL** como sistema de gestión de bases de datos para almacenar y administrar eficientemente los datos de ControlTotal. Esto incluirá información detallada sobre productos, ventas, clientes y más, garantizando una gestión de datos robusta y escalable.
-
-Para desarrollar la interfaz de usuario de ControlTotal, utilizaré **Streamlit**. Esta herramienta me permitirá crear una aplicación web interactiva de manera sencilla y rápida, donde los usuarios podrán acceder y analizar los datos de inventario y ventas de forma intuitiva y práctica.
+Para desarrollar la interfaz de usuario de **ControlTotal**, utilizaré **Streamlit**. Esta herramienta me permitirá crear una aplicación web interactiva de manera sencilla y rápida, donde los usuarios podrán acceder y analizar los datos de inventario y ventas de forma intuitiva y práctica.
 
 
 **Información personal:**
