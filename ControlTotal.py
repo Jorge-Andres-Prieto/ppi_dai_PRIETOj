@@ -4,6 +4,7 @@ from sqlalchemy import create_engine, Column, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
+# Definición del modelo de la base de datos
 Base = declarative_base()
 
 class User(Base):
@@ -13,48 +14,51 @@ class User(Base):
     password = Column(String, nullable=False)
     role = Column(String, nullable=False)
 
-# Combina las partes de la URL de la base de datos
-DATABASE_URL = f"postgresql://{os.getenv('DB_USERNAME')}:{os.getenv('DB_PASSWORD')}@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
-engine = create_engine(DATABASE_URL)
-
+# Configuración de la base de datos
+DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@host:port/dbname")
+engine = create_engine(DATABASE_URL, echo=True, connect_args={"options": "-c timezone=utc"})
 Session = sessionmaker(bind=engine)
 Base.metadata.create_all(engine)
 
 def get_user(username):
     session = Session()
-    user = session.query(User).filter_by(username=username).first()
-    session.close()
+    try:
+        user = session.query(User).filter_by(username=username).first()
+    finally:
+        session.close()
     return user
 
 def add_or_update_user(username, password, role):
     session = Session()
-    user = session.query(User).filter_by(username=username).first()
-    if user:
-        user.password = password
-        user.role = role
-    else:
-        user = User(username=username, password=password, role=role)
-        session.add(user)
-    session.commit()
-    session.close()
+    try:
+        user = session.query(User).filter_by(username=username).first()
+        if user:
+            user.password = password
+            user.role = role
+        else:
+            new_user = User(username=username, password=password, role=role)
+            session.add(new_user)
+        session.commit()
+    finally:
+        session.close()
 
 def delete_user(username):
     session = Session()
-    user = session.query(User).filter_by(username=username).first()
-    if user:
-        session.delete(user)
-        session.commit()
-    session.close()
+    try:
+        user = session.query(User).filter_by(username=username).first()
+        if user:
+            session.delete(user)
+            session.commit()
+    finally:
+        session.close()
 
 def verify_login(username, password):
-    """ Verifica las credenciales del usuario. """
     user = get_user(username)
     if user and user.password == password:
         return True, user.role
     return False, None
 
 def app_admin():
-    """ Interfaz de administrador para gestionar usuarios. """
     st.subheader("Administración de Usuarios")
     user_to_add = st.text_input("Usuario a añadir/modificar:")
     pass_to_add = st.text_input("Contraseña:", type="password")
@@ -69,13 +73,10 @@ def app_admin():
         st.success(f"Usuario {user_to_delete} eliminado")
 
 def app_empleado():
-    """ Interfaz de empleado. """
     st.subheader("Bienvenido Empleado")
 
 def main():
     st.title("Sistema de Login")
-
-    # Gestionar sesión de usuario
     if 'username' not in st.session_state or 'role' not in st.session_state:
         username = st.sidebar.text_input("Usuario")
         password = st.sidebar.text_input("Contraseña", type="password")
