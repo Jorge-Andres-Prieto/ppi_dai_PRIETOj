@@ -44,19 +44,28 @@ def read_user_by_name(name):
     finally:
         session.close()
 
-def update_user(username, new_username=None, new_password=None, new_role=None, new_full_name=None, new_phone_number=None):
+def update_user_by_name(old_username, new_username=None, new_password=None, new_role=None, new_full_name=None, new_phone_number=None):
     session = Session()
     try:
-        user = session.query(User).filter(User.username == username).first()
+        user = session.query(User).filter(User.username == old_username).one_or_none()
         if user:
-            user.username = new_username if new_username else user.username
-            user.password = new_password if new_password else user.password
-            user.role = new_role if new_role else user.role
-            user.full_name = new_full_name if new_full_name else user.full_name
-            user.phone_number = new_phone_number if new_phone_number else user.phone_number
+            if new_username:
+                user.username = new_username
+            if new_password:
+                user.password = new_password
+            if new_role:
+                user.role = new_role
+            if new_full_name:
+                user.full_name = new_full_name
+            if new_phone_number:
+                user.phone_number = new_phone_number
             session.commit()
-            return f"Usuario {username} actualizado con éxito."
-        return "Usuario no encontrado."
+            return f"Usuario '{old_username}' actualizado con éxito."
+        return "Usuario no encontrado o múltiples entradas coinciden."
+    except exc.NoResultFound:
+        return "No se encontró el usuario."
+    except exc.MultipleResultsFound:
+        return "Más de un usuario encontrado con el mismo nombre."
     finally:
         session.close()
 
@@ -103,14 +112,14 @@ elif option == 'Buscar Usuario':
 
 elif option == 'Actualizar Usuario':
     with st.container():
-        username = st.text_input("Nombre de Usuario actual")
-        new_username = st.text_input("Nuevo Nombre de Usuario")
-        new_password = st.text_input("Nueva Contraseña", type="password")
-        new_role = st.selectbox("Nuevo Rol", ["Admin", "Empleado"])
-        new_full_name = st.text_input("Nuevo Nombre Completo")
-        new_phone_number = st.text_input("Nuevo Número de Celular")
+        old_username = st.text_input("Nombre de Usuario Actual")
+        new_username = st.text_input("Nuevo Nombre de Usuario", placeholder="Dejar en blanco si no desea cambiar")
+        new_password = st.text_input("Nueva Contraseña", type="password", placeholder="Dejar en blanco si no desea cambiar")
+        new_role = st.selectbox("Nuevo Rol", ["", "Admin", "Empleado"], index=0, format_func=lambda x: x if x else "Dejar en blanco")
+        new_full_name = st.text_input("Nuevo Nombre Completo", placeholder="Dejar en blanco si no desea cambiar")
+        new_phone_number = st.text_input("Nuevo Número de Celular", placeholder="Dejar en blanco si no desea cambiar")
         if st.button("Actualizar"):
-            result = update_user(username, new_username, new_password, new_role, new_full_name, new_phone_number)
+            result = update_user_by_name(old_username, new_username or None, new_password or None, new_role if new_role else None, new_full_name or None, new_phone_number or None)
             st.success(result)
 
 elif option == 'Eliminar Usuario':
