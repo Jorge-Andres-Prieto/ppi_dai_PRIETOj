@@ -23,104 +23,116 @@ Session = sessionmaker(bind=engine)
 # Crear las tablas si no existen
 Base.metadata.create_all(engine)
 
-def create_user(username, password, role, full_name, phone_number):
+def authenticate_user(username, password):
     session = Session()
     try:
-        new_user = User(username=username, password=password, role=role, full_name=full_name, phone_number=phone_number)
-        session.add(new_user)
-        session.commit()
-        return f"Usuario {username} creado con éxito."
-    except exc.IntegrityError:
-        session.rollback()
-        return "Error: el nombre de usuario ya existe."
+        user = session.query(User).filter(User.username == username, User.password == password).one_or_none()
+        return user
     finally:
         session.close()
 
-def read_user_by_name(name):
-    session = Session()
-    try:
-        users = session.query(User).filter(User.full_name.ilike(f"%{name}%")).all()
-        return users
-    finally:
-        session.close()
+# Gestión de la sesión
+if 'authenticated' not in st.session_state:
+    st.session_state['authenticated'] = False
+    st.session_state['role'] = None
 
-def update_user(id, new_username=None, new_password=None, new_role=None, new_full_name=None, new_phone_number=None):
-    session = Session()
-    try:
-        user = session.query(User).filter(User.id == id).one_or_none()
+# Pantalla de Login
+if not st.session_state['authenticated']:
+    st.title("Control Total")
+    username = st.text_input("Usuario")
+    password = st.text_input("Contraseña", type="password")
+    if st.button("Ingresar"):
+        user = authenticate_user(username, password)
         if user:
-            if new_username:
-                user.username = new_username
-            if new_password:
-                user.password = new_password
-            if new_role:
-                user.role = new_role
-            if new_full_name:
-                user.full_name = new_full_name
-            if new_phone_number:
-                user.phone_number = new_phone_number
-            session.commit()
-            return f"Usuario {id} actualizado con éxito."
-        return "Usuario no encontrado."
-    finally:
-        session.close()
+            st.session_state['authenticated'] = True
+            st.session_state['role'] = user.role
+            st.experimental_set_query_params(role=user.role)
+        else:
+            st.error("Usuario o contraseña incorrectos")
+    else:
+        st.stop()
 
-def delete_user(id):
-    session = Session()
-    try:
-        user = session.query(User).filter(User.id == id).first()
-        if user:
-            session.delete(user)
-            session.commit()
-            return f"Usuario {id} eliminado con éxito."
-        return "Usuario no encontrado."
-    finally:
-        session.close()
+# Pantallas de Usuario
+if st.session_state['authenticated']:
+    if st.session_state['role'] == 'Admin':
+        st.title("Gestión de Usuarios")
 
-st.title("Sistema de Gestión de Usuarios")
+        option = st.sidebar.selectbox(
+            '¿Qué deseas hacer?',
+            ('Crear Usuario', 'Buscar Usuario', 'Actualizar Usuario', 'Eliminar Usuario')
+        )
 
-option = st.sidebar.selectbox(
-    '¿Qué deseas hacer?',
-    ('Crear Usuario', 'Buscar Usuario', 'Actualizar Usuario', 'Eliminar Usuario')
-)
+        if option == 'Crear Usuario':
+            username = st.text_input("Nombre de Usuario")
+            password = st.text_input("Contraseña", type="password")
+            role = st.selectbox("Rol", ["Admin", "Empleado"])
+            full_name = st.text_input("Nombre Completo")
+            phone_number = st.text_input("Número de Celular")
+            if st.button("Crear"):
+                session = Session()
+                try:
+                    new_user = User(username=username, password=password, role=role, full_name=full_name, phone_number=phone_number)
+                    session.add(new_user)
+                    session.commit()
+                    st.success(f"Usuario {username} creado con éxito.")
+                except exc.IntegrityError:
+                    session.rollback()
+                    st.error("Error: el nombre de usuario ya existe.")
+                finally:
+                    session.close()
 
-if option == 'Crear Usuario':
-    with st.container():
-        username = st.text_input("Nombre de Usuario")
-        password = st.text_input("Contraseña", type="password")
-        role = st.selectbox("Rol", ["Admin", "Empleado"])
-        full_name = st.text_input("Nombre Completo")
-        phone_number = st.text_input("Número de Celular")
-        if st.button("Crear"):
-            result = create_user(username, password, role, full_name, phone_number)
-            st.success(result)
+        elif option == 'Buscar Usuario':
+            search_name = st.text_input("Nombre a buscar")
+            if st.button("Buscar"):
+                session = Session()
+                try:
+                    users = session.query(User).filter(User.full_name.ilike(f"%{search_name}%")).all()
+                    if users:
+                        for user in users:
+                            st.write(f"ID: {user.id}, Nombre: {user.full_name}, Usuario: {user.username}, Rol: {user.role}, Teléfono: {user.phone_number}")
+                    else:
+                        st.write("No se encontraron usuarios")
+                finally:
+                    session.close()
 
-elif option == 'Buscar Usuario':
-    with st.container():
-        search_name = st.text_input("Nombre a buscar")
-        if st.button("Buscar"):
-            users = read_user_by_name(search_name)
-            if users:
-                for user in users:
-                    st.write(f"ID: {user.id}, Nombre: {user.full_name}, Usuario: {user.username}, Rol: {user.role}, Teléfono: {user.phone_number}")
-            else:
-                st.write("No se encontraron usuarios")
+        elif option == 'Actualizar Usuario':
+            update_id = st.number_input("ID del Usuario a actualizar", step=1)
+            new_username = st.text_input("Nuevo Nombre de Usuario")
+            new_password = st.text_input("Nueva Contraseña", type="password")
+            new_role = st.selectbox("Nuevo Rol", ["Admin", "Empleado"])
+            new_full_name = st.text_input("Nuevo Nombre Completo")
+            new_phone_number = st.text_input("Nuevo Número de Celular")
+            if st.button("Actualizar"):
+                session = Session()
+                try:
+                    user = session.query(User).filter(User.id == update_id).one_or_none()
+                    if user:
+                        user.username = new_username
+                        user.password = new_password
+                        user.role = new_role
+                        user.full_name = new_full_name
+                        user.phone_number = new_phone_number
+                        session.commit()
+                        st.success(f"Usuario {update_id} actualizado con éxito.")
+                    else:
+                        st.error("Usuario no encontrado.")
+                finally:
+                    session.close()
 
-elif option == 'Actualizar Usuario':
-    with st.container():
-        update_id = st.number_input("ID del Usuario a actualizar", step=1)
-        new_username = st.text_input("Nuevo Nombre de Usuario", placeholder="Dejar en blanco si no desea cambiar")
-        new_password = st.text_input("Nueva Contraseña", type="password", placeholder="Dejar en blanco si no desea cambiar")
-        new_role = st.selectbox("Nuevo Rol", ["", "Admin", "Empleado"], index=0, format_func=lambda x: x if x else "Dejar en blanco")
-        new_full_name = st.text_input("Nuevo Nombre Completo", placeholder="Dejar en blanco si no desea cambiar")
-        new_phone_number = st.text_input("Nuevo Número de Celular", placeholder="Dejar en blanco si no desea cambiar")
-        if st.button("Actualizar"):
-            result = update_user(update_id, new_username or None, new_password or None, new_role if new_role else None, new_full_name or None, new_phone_number or None)
-            st.success(result)
+        elif option == 'Eliminar Usuario':
+            del_id = st.number_input("ID del Usuario a eliminar", step=1)
+            if st.button("Eliminar"):
+                session = Session()
+                try:
+                    user = session.query(User).filter(User.id == del_id).one_or_none()
+                    if user:
+                        session.delete(user)
+                        session.commit()
+                        st.success(f"Usuario {del_id} eliminado con éxito.")
+                    else:
+                        st.error("Usuario no encontrado.")
+                finally:
+                    session.close()
 
-elif option == 'Eliminar Usuario':
-    with st.container():
-        del_id = st.number_input("ID del Usuario a eliminar", step=1)
-        if st.button("Eliminar"):
-            result = delete_user(del_id)
-            st.success(result)
+    elif st.session_state['role'] == 'Empleado':
+        st.title("WELCOME")
