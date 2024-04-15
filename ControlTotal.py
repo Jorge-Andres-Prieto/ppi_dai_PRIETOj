@@ -61,11 +61,7 @@ def update_user_by_name(old_username, new_username=None, new_password=None, new_
                 user.phone_number = new_phone_number
             session.commit()
             return f"Usuario '{old_username}' actualizado con éxito."
-        return "Usuario no encontrado o múltiples entradas coinciden."
-    except exc.NoResultFound:
-        return "No se encontró el usuario."
-    except exc.MultipleResultsFound:
-        return "Más de un usuario encontrado con el mismo nombre."
+        return "Usuario no encontrado."
     finally:
         session.close()
 
