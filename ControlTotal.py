@@ -20,8 +20,7 @@ DATABASE_URL = "postgresql://datos_usuarios_user:NNgnrDUS7HG3zQPuffAWnG3pyDvevRs
 engine = create_engine(DATABASE_URL, echo=True)
 Session = sessionmaker(bind=engine)
 
-# Eliminar y recrear las tablas al inicio de cada sesión
-Base.metadata.drop_all(engine)
+# Crear las tablas si no existen
 Base.metadata.create_all(engine)
 
 def create_user(username, password, role, full_name, phone_number):
