@@ -1,10 +1,9 @@
-import os
 import streamlit as st
-from sqlalchemy import create_engine, Column, Integer, String
+from sqlalchemy import create_engine, Column, Integer, String, exc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# Definición del modelo de la base de datos
+# Definición del modelo de base de datos
 Base = declarative_base()
 
 class User(Base):
@@ -14,89 +13,86 @@ class User(Base):
     password = Column(String, nullable=False)
     role = Column(String, nullable=False)
 
-# Configuración de la base de datos
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://user:password@host:port/dbname")
-engine = create_engine(DATABASE_URL, echo=True, connect_args={"options": "-c timezone=utc"})
+# Conexión a la base de datos PostgreSQL
+DATABASE_URL = st.secrets["DATABASE_URL"]
+engine = create_engine(DATABASE_URL, echo=True)
 Session = sessionmaker(bind=engine)
 Base.metadata.create_all(engine)
 
-def get_user(username):
+# Funciones CRUD
+def create_user(username, password, role):
     session = Session()
     try:
-        user = session.query(User).filter_by(username=username).first()
-    finally:
-        session.close()
-    return user
-
-def add_or_update_user(username, password, role):
-    session = Session()
-    try:
-        user = session.query(User).filter_by(username=username).first()
-        if user:
-            user.password = password
-            user.role = role
-        else:
-            new_user = User(username=username, password=password, role=role)
-            session.add(new_user)
+        new_user = User(username=username, password=password, role=role)
+        session.add(new_user)
         session.commit()
+        return f"Usuario {username} creado con éxito."
+    except exc.IntegrityError:
+        return "Error: el nombre de usuario ya existe."
     finally:
         session.close()
 
-def delete_user(username):
+def read_users():
     session = Session()
     try:
-        user = session.query(User).filter_by(username=username).first()
+        users = session.query(User).all()
+        return users
+    finally:
+        session.close()
+
+def update_user(id, new_username, new_password, new_role):
+    session = Session()
+    try:
+        user = session.query(User).filter(User.id == id).first()
+        if user:
+            user.username = new_username
+            user.password = new_password
+            user.role = new_role
+            session.commit()
+            return f"Usuario {id} actualizado con éxito."
+        return "Usuario no encontrado."
+    finally:
+        session.close()
+
+def delete_user(id):
+    session = Session()
+    try:
+        user = session.query(User).filter(User.id == id).first()
         if user:
             session.delete(user)
             session.commit()
+            return f"Usuario {id} eliminado con éxito."
+        return "Usuario no encontrado."
     finally:
         session.close()
 
-def verify_login(username, password):
-    user = get_user(username)
-    if user and user.password == password:
-        return True, user.role
-    return False, None
+# Interfaz de Streamlit
+st.title("Sistema de Gestión de Usuarios")
 
-def app_admin():
-    st.subheader("Administración de Usuarios")
-    user_to_add = st.text_input("Usuario a añadir/modificar:")
-    pass_to_add = st.text_input("Contraseña:", type="password")
-    role_to_add = st.selectbox("Rol:", ['Admin', 'Empleado'])
-    if st.button("Añadir/Modificar Usuario"):
-        add_or_update_user(user_to_add, pass_to_add, role_to_add)
-        st.success(f"Usuario {user_to_add} añadido/modificado como {role_to_add}")
+if st.checkbox("Crear Usuario"):
+    username = st.text_input("Nombre de Usuario", key="create_username")
+    password = st.text_input("Contraseña", type="password", key="create_password")
+    role = st.selectbox("Rol", ["Admin", "Empleado"], key="create_role")
+    if st.button("Crear"):
+        result = create_user(username, password, role)
+        st.success(result)
 
-    user_to_delete = st.selectbox("Eliminar Usuario:", [user.username for user in Session().query(User).all()])
+if st.checkbox("Mostrar Usuarios"):
+    users = read_users()
+    for user in users:
+        st.text(f"ID: {user.id}, Nombre: {user.username}, Rol: {user.role}")
+
+if st.checkbox("Actualizar Usuario"):
+    id = st.number_input("ID del Usuario a actualizar", step=1, key="update_id")
+    new_username = st.text_input("Nuevo Nombre de Usuario", key="update_username")
+    new_password = st.text_input("Nueva Contraseña", type="password", key="update_password")
+    new_role = st.selectbox("Nuevo Rol", ["Admin", "Empleado"], key="update_role")
+    if st.button("Actualizar"):
+        result = update_user(id, new_username, new_password, new_role)
+        st.success(result)
+
+if st.checkbox("Eliminar Usuario"):
+    del_id = st.number_input("ID del Usuario a eliminar", step=1, key="delete_id")
     if st.button("Eliminar"):
-        delete_user(user_to_delete)
-        st.success(f"Usuario {user_to_delete} eliminado")
-
-def app_empleado():
-    st.subheader("Bienvenido Empleado")
-
-def main():
-    st.title("Sistema de Login")
-    if 'username' not in st.session_state or 'role' not in st.session_state:
-        username = st.sidebar.text_input("Usuario")
-        password = st.sidebar.text_input("Contraseña", type="password")
-        if st.sidebar.button("Login"):
-            authenticated, role = verify_login(username, password)
-            if authenticated:
-                st.session_state['username'] = username
-                st.session_state['role'] = role
-                st.sidebar.success("Login exitoso")
-            else:
-                st.sidebar.error("Usuario o contraseña incorrectos")
-
-    if 'username' in st.session_state and 'role' in st.session_state:
-        if st.session_state['role'] == 'Admin':
-            app_admin()
-        elif st.session_state['role'] == 'Empleado':
-            app_empleado()
-        if st.sidebar.button("Logout"):
-            del st.session_state['username']
-            del st.session_state['role']
-
-if __name__ == "__main__":
-    main()
+        result = delete_user(del_id)
+        st.success(result)
