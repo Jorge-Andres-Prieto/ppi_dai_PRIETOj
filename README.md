@@ -40,7 +40,8 @@
 <p align="center">
   <a href="https://github.com/tuUsuarioGitHub"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub" width="50" style="margin-right: 20px;"></a>
   <a href="https://linkedin.com/in/tuUsuarioLinkedIn"><img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn" width="50" style="margin-right: 20px;"></a>
-<a href="https://www.fiverr.com/"><img src="https://upload.wikimedia.org/wikipedia/commons/3/39/Fiverr_logo.svg" alt="Fiverr" width="50" style="margin-right: 20px;"></a>
-<a href="https://www.upwork.com/"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c9/Upwork_Logo.svg" alt="Upwork" width="50" style="margin-right: 20px;"></a>
-<a href="https://www.reddit.com/"><img src="https://upload.wikimedia.org/wikipedia/en/5/58/Reddit_logo_new.svg" alt="Reddit" width="50" style="margin-right: 20px;"></a>
+  <a href="https://www.fiverr.com/"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/Fiverr_logo.png/320px-Fiverr_logo.png" alt="Fiverr" width="50" style="margin-right: 20px;"></a>
+  <a href="https://www.upwork.com/"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Upwork_logo.png/320px-Upwork_logo.png" alt="Upwork" width="50" style="margin-right: 20px;"></a>
+  <a href="https://www.reddit.com/"><img src="https://upload.wikimedia.org/wikipedia/en/thumb/8/82/Reddit_logo_and_wordmark.svg/1920px-Reddit_logo_and_wordmark.svg.png" alt="Reddit" width="50" style="margin-right: 20px;"></a>
+
 </p>
