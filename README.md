@@ -9,7 +9,7 @@ Los pequeños y medianos negocios necesitan herramientas que les permitan optimi
 
 * **Llevar un control preciso de sus productos:** stock, precios, ubicación, etc.
 * **Gestionar las ventas:** registrar ventas, generar facturas, controlar la caja, etc.
-* **Analizar sus datos:** ventas por producto, por cliente, por periodo de tiempo, etc.
+* **Analizar sus datos:** ventas por producto, por periodo de tiempo, etc.
 * **Mejorar la toma de decisiones:** gracias a la información que proporciona el sistema.
 
 <p align="center">
