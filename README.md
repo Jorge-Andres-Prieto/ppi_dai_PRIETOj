@@ -35,11 +35,11 @@
   <li><strong>GeoPandas:</strong> para optimizar las rutas de entrega a través del análisis geoespacial.</li>
 </ul>
 
-<p align="center"<h3 id="contacto">Contacto</h3>>
+<p align="center"<h3 id="**contacto**">Contacto</h3>
 <p align="center">
-  <a href="https://github.com/tuUsuarioGitHub"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub" width="50" style="margin-right: 20px;"></a>
-  <a href="https://linkedin.com/in/tuUsuarioLinkedIn"><img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn" width="50" style="margin-right: 20px;"></a>
-  <a href="https://www.fiverr.com/"><img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/fiverr-icon.png" alt="Fiverr" width="50" style="margin-right: 20px;"></a>
-  <a href="https://www.upwork.com/"><img src="https://w7.pngwing.com/pngs/257/806/png-transparent-upwork-freelancer-android-android-text-trademark-rectangle-thumbnail.png" alt="Upwork" width="50" style="margin-right: 20px;"></a>
-  <a href="https://www.reddit.com/"><img src="https://w7.pngwing.com/pngs/647/198/png-transparent-reddit-hd-logo-thumbnail.png" alt="Reddit" width="50" style="margin-right: 20px;"></a>
+  <a href="https://github.com/Jorge-Andres-Prieto/ppi_pl_PRIETOj"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub" width="50" style="margin-right: 20px;"></a>
+  <a href="https://www.linkedin.com/in/andr%C3%A9s-jim%C3%A9nez-b36ab2250/"><img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn" width="50" style="margin-right: 20px;"></a>
+  <a href="https://www.fiverr.com/andres__jimenez?up_rollout=true"><img src="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/fiverr-icon.png" alt="Fiverr" width="50" style="margin-right: 20px;"></a>
+  <a href="https://www.upwork.com/freelancers/~0142bd1ae6229261b5"><img src="https://w7.pngwing.com/pngs/257/806/png-transparent-upwork-freelancer-android-android-text-trademark-rectangle-thumbnail.png" alt="Upwork" width="50" style="margin-right: 20px;"></a>
+  <a href="https://www.reddit.com/user/Flestar/"><img src="https://w7.pngwing.com/pngs/647/198/png-transparent-reddit-hd-logo-thumbnail.png" alt="Reddit" width="50" style="margin-right: 20px;"></a>
 </p>
