@@ -38,7 +38,12 @@ def read_user_by_username(username):
     session = Session()
     try:
         user = session.query(User).filter(User.username == username).first()
-        return user
+        if user:
+            print(f"Usuario encontrado: {user.username}")  # Debugging
+            return user
+        else:
+            print(f"No se encontró usuario con el nombre de usuario: {username}")  # Debugging
+            return None
     finally:
         session.close()
 
@@ -46,10 +51,10 @@ def update_user(username, new_password=None, new_role=None, new_full_name=None, 
     session = Session()
     user = read_user_by_username(username)
     if user:
-        user.password = new_password if new_password else user.password
-        user.role = new_role if new_role else user.role
-        user.full_name = new_full_name if new_full_name else user.full_name
-        user.phone_number = new_phone_number if new_phone_number else user.phone_number
+        user.password = new_password if new_password and new_password.strip() else user.password
+        user.role = new_role if new_role and new_role.strip() else user.role
+        user.full_name = new_full_name if new_full_name and new_full_name.strip() else user.full_name
+        user.phone_number = new_phone_number if new_phone_number and new_phone_number.strip() else user.phone_number
         session.commit()
         return f"Usuario '{username}' actualizado con éxito."
     return "Usuario no encontrado."
@@ -93,17 +98,17 @@ elif option == 'Buscar Usuario':
 
 elif option == 'Actualizar Usuario':
     with st.container():
-        username = st.text_input("Nombre de Usuario a actualizar")
+        username = st.text_input("Nombre de Usuario a actualizar").strip()
         if st.button("Buscar Usuario"):
             user = read_user_by_username(username)
             if user:
-                new_password = st.text_input("Nueva Contraseña", type="password", value="")
-                new_role = st.text_input("Nuevo Rol", value="")
-                new_full_name = st.text_input("Nuevo Nombre Completo", value="")
-                new_phone_number = st.text_input("Nuevo Número de Celular", value="")
+                new_password = st.text_input("Nueva Contraseña", type="password")
+                new_role = st.text_input("Nuevo Rol")
+                new_full_name = st.text_input("Nuevo Nombre Completo")
+                new_phone_number = st.text_input("Nuevo Número de Celular")
                 
                 if st.button("Actualizar Usuario"):
-                    result = update_user(username, new_password if new_password else None, new_role if new_role else None, new_full_name if new_full_name else None, new_phone_number if new_phone_number else None)
+                    result = update_user(username, new_password, new_role, new_full_name, new_phone_number)
                     st.success(result)
             else:
                 st.error("Usuario no encontrado")
