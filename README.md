@@ -40,7 +40,7 @@
 <p align="center">
   <a href="https://github.com/tuUsuarioGitHub"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub" width="50" style="margin-right: 20px;"></a>
   <a href="https://linkedin.com/in/tuUsuarioLinkedIn"><img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn" width="50" style="margin-right: 20px;"></a>
-  <a href="https://www.fiverr.com/"><img src="https://i.imgur.com/j1MN5O2.png" alt="Fiverr" width="50" style="margin-right: 20px;"></a>
+  <a href="https://uxwing.com/wp-content/themes/uxwing/download/brands-and-social-media/fiverr-icon.png" alt="Fiverr" width="50" style="margin-right: 20px;"></a>
   <a href="https://www.upwork.com/"><img src="https://i.imgur.com/L8KmMnB.png" alt="Upwork" width="50" style="margin-right: 20px;"></a>
   <a href="https://www.reddit.com/"><img src="https://i.imgur.com/0rFwhPl.png" alt="Reddit" width="50" style="margin-right: 20px;"></a>
 
