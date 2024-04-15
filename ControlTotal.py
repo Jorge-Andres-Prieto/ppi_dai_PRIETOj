@@ -1,7 +1,7 @@
 import streamlit as st
 from sqlalchemy import create_engine, Column, Integer, String, exc
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+from sqlalchemy.orm import sessionmaker
 
 # Definición del modelo de base de datos
 Base = declarative_base()
@@ -18,15 +18,29 @@ class User(Base):
 # Conexión a la base de datos PostgreSQL
 DATABASE_URL = "postgresql://datos_usuarios_user:NNgnrDUS7HG3zQPuffAWnG3pyDvevRs2@dpg-coe966gl6cac73bvqv3g-a.oregon-postgres.render.com/datos_usuarios"
 engine = create_engine(DATABASE_URL, echo=True)
-session_factory = sessionmaker(bind=engine)
+Session = sessionmaker(bind=engine)
 
 # Crear las tablas si no existen
 Base.metadata.create_all(engine)
 
-def authenticate_user(username, password):
-    session = session_factory()
+# Funciones de gestión de usuarios
+def create_user(username, password, role, full_name, phone_number):
+    session = Session()
     try:
-        user = session.query(User).filter(User.username == username, User.password == password).one_or_none()
+        new_user = User(username=username, password=password, role=role, full_name=full_name, phone_number=phone_number)
+        session.add(new_user)
+        session.commit()
+        return f"Usuario {username} creado con éxito."
+    except exc.IntegrityError:
+        session.rollback()
+        return "Error: el nombre de usuario ya existe."
+    finally:
+        session.close()
+
+def user_login(username, password):
+    session = Session()
+    try:
+        user = session.query(User).filter(User.username == username, User.password == password).first()
         return user
     finally:
         session.close()
@@ -34,35 +48,38 @@ def authenticate_user(username, password):
 # App de Streamlit
 def main():
     st.title("Control Total")
-    username = st.sidebar.text_input("Usuario")
-    password = st.sidebar.text_input("Contraseña", type="password")
-    if st.sidebar.button("Iniciar sesión"):
-        user = authenticate_user(username, password)
+    
+    username = st.text_input("Nombre de usuario")
+    password = st.text_input("Contraseña", type="password")
+    
+    if st.button("Iniciar sesión"):
+        user = user_login(username, password)
         if user:
             if user.role == "Admin":
-                app_admin(user)
+                manage_users()
             else:
-                st.success("Bienvenido a WELCOME")
+                st.header("WELCOM")
         else:
             st.error("Usuario o contraseña incorrectos")
 
-def app_admin(user):
+def manage_users():
     st.title("Gestión de Usuarios")
+    
     option = st.sidebar.selectbox(
         '¿Qué deseas hacer?',
         ('Crear Usuario', 'Buscar Usuario', 'Actualizar Usuario', 'Eliminar Usuario')
     )
-
+    
     if option == 'Crear Usuario':
-        create_user_form()
+        create_user_ui()
     elif option == 'Buscar Usuario':
-        search_user()
+        search_user_ui()
     elif option == 'Actualizar Usuario':
-        update_user_form()
+        update_user_ui()
     elif option == 'Eliminar Usuario':
-        delete_user_form()
+        delete_user_ui()
 
-def create_user_form():
+def create_user_ui():
     with st.container():
         username = st.text_input("Nombre de Usuario")
         password = st.text_input("Contraseña", type="password")
@@ -73,7 +90,7 @@ def create_user_form():
             result = create_user(username, password, role, full_name, phone_number)
             st.success(result)
 
-def search_user():
+def search_user_ui():
     with st.container():
         search_name = st.text_input("Nombre a buscar")
         if st.button("Buscar"):
@@ -84,7 +101,7 @@ def search_user():
             else:
                 st.write("No se encontraron usuarios")
 
-def update_user_form():
+def update_user_ui():
     with st.container():
         update_id = st.number_input("ID del Usuario a actualizar", step=1)
         new_username = st.text_input("Nuevo Nombre de Usuario", placeholder="Dejar en blanco si no desea cambiar")
@@ -96,7 +113,7 @@ def update_user_form():
             result = update_user(update_id, new_username or None, new_password or None, new_role if new_role else None, new_full_name or None, new_phone_number or None)
             st.success(result)
 
-def delete_user_form():
+def delete_user_ui():
     with st.container():
         del_id = st.number_input("ID del Usuario a eliminar", step=1)
         if st.button("Eliminar"):
