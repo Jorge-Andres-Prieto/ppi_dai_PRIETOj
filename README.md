@@ -1,8 +1,17 @@
 <h2 align="center">ControlTotal <br> Sistema de Inventario y Ventas</h2>
 
+<p><strong>Tabla de Contenido:</strong></p>
+<ul>
+  <li><a href="#descripcion">Descripción de la App</a></li>
+  <li><a href="#justificacion">Justificación de la Idea</a></li>
+  <li><a href="#uso-librerias">Uso de las Librerías</a></li>
+  <li><a href="#contacto">Contacto</a></li>
+</ul>
+
+<h3 id="descripcion">Descripción de la App</h3>
 <p>El proyecto consiste en desarrollar un sistema de inventario y ventas utilizando Python, MySQL, Streamlit y las librerías NumPy, Pandas, Matplotlib, Scipy y Geopandas. Este sistema permitirá a los pequeños y medianos negocios llevar un mejor control de sus productos, ventas y clientes.</p>
 
-<p><strong>Justificación de la idea:</strong></p>
+<h3 id="justificacion">Justificación de la Idea</h3>
 <p>Los pequeños y medianos negocios necesitan herramientas que les permitan optimizar la gestión de su negocio. Un sistema de inventario y ventas puede ayudarles a:</p>
 <ul>
   <li>Llevar un control preciso de sus productos: stock, precios, ubicación, etc.</li>
@@ -17,11 +26,7 @@
   <img src="https://cdn.pixabay.com/photo/2018/05/18/15/30/web-design-3411373_1280.jpg" alt="Streamlit" width="250">
 </p>
 
-<p align="center">
-  Python &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MySQL &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Streamlit
-</p>
-
-<p><strong>Uso de las librerías:</strong></p>
+<h3 id="uso-librerias">Uso de las Librerías</h3>
 <ul>
   <li><strong>NumPy:</strong> para manejar operaciones matemáticas básicas y la manipulación de matrices y vectores.</li>
   <li><strong>Pandas:</strong> para manipular y analizar datos tabulares de manera eficiente, realizar consultas SQL directamente desde Python, y generar análisis detallados sobre ventas y productos.</li>
@@ -30,10 +35,9 @@
   <li><strong>GeoPandas:</strong> para optimizar las rutas de entrega a través del análisis geoespacial.</li>
 </ul>
 
-<p>Para desarrollar la interfaz de usuario de <strong>ControlTotal</strong>, utilizaré <strong>Streamlit</strong>. Esta herramienta me permitirá crear una aplicación web interactiva de manera sencilla y rápida, donde los usuarios podrán acceder y analizar los datos de inventario y ventas de forma intuitiva y práctica.</p>
-
-<p><strong>Contacto:</strong></p>
-<ul>
-  <li><a href="https://github.com/tuUsuarioGitHub">GitHub</a></li>
-  <li><a href="https://linkedin.com/in/tuUsuarioLinkedIn">LinkedIn</a></li>
-</ul>
+<h3 id="contacto">Contacto</h3>
+<p>Para más información o seguir mi trabajo, puedes visitar los siguientes enlaces:</p>
+<p align="center">
+  <a href="https://github.com/tuUsuarioGitHub"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub" width="50" style="margin-right: 20px;"></a>
+  <a href="https://linkedin.com/in/tuUsuarioLinkedIn"><img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn" width="50" style="margin-right: 20px;"></a>
+</p>
