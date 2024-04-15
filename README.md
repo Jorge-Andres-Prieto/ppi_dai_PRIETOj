@@ -1,8 +1,9 @@
 <h2 align="center">ControlTotal <br> Sistema de Inventario y Ventas</h2>
 
-<p align="center"<h3 id="Dale clic para ir a la App">Contacto</h3>
+<h3 id="Dale clic para ir a la App" align="center">Dale clic para ir a la App</h3>
+<h3 id="⬇️" align="center">⬇️</h3>
 <p align="center">
-  <a href="https://ppidaiprietoj-crfunfpdb8sph5bpvj9bg9.streamlit.app/"><img src="https://cdn.icon-icons.com/icons2/3915/PNG/512/streamlit_logo_icon_249495.png" alt="GitHub" width="50" style="margin-right: 20px;"></a>
+  <a href="https://ppidaiprietoj-crfunfpdb8sph5bpvj9bg9.streamlit.app/"><img src="https://cdn.icon-icons.com/icons2/3915/PNG/512/streamlit_logo_icon_249495.png" alt="GitHub" width="85" style="margin-right: 20px;"></a>
 
 <p><strong>Tabla de Contenido:</strong></p>
 <ul>
@@ -39,7 +40,7 @@
   <li><strong>GeoPandas:</strong> para optimizar las rutas de entrega a través del análisis geoespacial.</li>
 </ul>
 
-<p align="center"<h3 id="**contacto**">Contacto</h3>
+<p align="center"<h3 id="contacto">Contacto</h3>
 <p align="center">
   <a href="https://github.com/Jorge-Andres-Prieto/ppi_pl_PRIETOj"><img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub" width="50" style="margin-right: 20px;"></a>
   <a href="https://www.linkedin.com/in/andr%C3%A9s-jim%C3%A9nez-b36ab2250/"><img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" alt="LinkedIn" width="50" style="margin-right: 20px;"></a>
