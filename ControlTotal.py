@@ -31,24 +31,31 @@ def authenticate_user(username, password):
     finally:
         session.close()
 
-# Gestión de la sesión
+# Iniciar sesión y almacenar el estado en session_state
+def login():
+    user = authenticate_user(st.session_state.username, st.session_state.password)
+    if user:
+        st.session_state['authenticated'] = True
+        st.session_state['role'] = user.role
+        st.session_state['username'] = user.username
+    else:
+        st.error("Usuario o contraseña incorrectos")
+        st.session_state['authenticated'] = False
+
+# Verificar si se ha autenticado previamente, para mantener sesión activa
 if 'authenticated' not in st.session_state:
     st.session_state['authenticated'] = False
     st.session_state['role'] = None
+    st.session_state['username'] = None
 
 # Pantalla de Login
 if not st.session_state['authenticated']:
     st.title("Control Total")
-    username = st.text_input("Usuario")
-    password = st.text_input("Contraseña", type="password")
-    if st.button("Ingresar"):
-        user = authenticate_user(username, password)
-        if user:
-            st.session_state['authenticated'] = True
-            st.session_state['role'] = user.role
-            st.experimental_set_query_params(role=user.role)
-        else:
-            st.error("Usuario o contraseña incorrectos")
+    st.session_state.username = st.text_input("Usuario")
+    st.session_state.password = st.text_input("Contraseña", type="password")
+    if st.button("Ingresar", on_click=login):
+        if st.session_state['authenticated']:
+            st.experimental_rerun()  # Rerun the app after successful login
     else:
         st.stop()
 
