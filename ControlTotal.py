@@ -34,41 +34,34 @@ def create_user(username, password, role, full_name, phone_number):
     finally:
         session.close()
 
-def read_user_by_name(name):
+def read_user_by_username(username):
     session = Session()
     try:
-        users = session.query(User).filter(User.full_name.ilike(f"%{name}%")).all()
-        return users
+        user = session.query(User).filter(User.username == username).first()
+        return user
     finally:
         session.close()
 
-def update_user(full_name, new_username=None, new_password=None, new_role=None, new_full_name=None, new_phone_number=None):
+def update_user(username, new_password=None, new_role=None, new_full_name=None, new_phone_number=None):
     session = Session()
-    try:
-        user = session.query(User).filter(User.full_name.ilike(full_name)).first()
-        if user:
-            user.username = new_username if new_username else user.username
-            user.password = new_password if new_password else user.password
-            user.role = new_role if new_role else user.role
-            user.full_name = new_full_name if new_full_name else user.full_name
-            user.phone_number = new_phone_number if new_phone_number else user.phone_number
-            session.commit()
-            return f"Usuario '{full_name}' actualizado con éxito."
-        return "Usuario no encontrado."
-    finally:
-        session.close()
+    user = read_user_by_username(username)
+    if user:
+        user.password = new_password if new_password else user.password
+        user.role = new_role if new_role else user.role
+        user.full_name = new_full_name if new_full_name else user.full_name
+        user.phone_number = new_phone_number if new_phone_number else user.phone_number
+        session.commit()
+        return f"Usuario '{username}' actualizado con éxito."
+    return "Usuario no encontrado."
 
 def delete_user(id):
     session = Session()
-    try:
-        user = session.query(User).filter(User.id == id).first()
-        if user:
-            session.delete(user)
-            session.commit()
-            return f"Usuario {id} eliminado con éxito."
-        return "Usuario no encontrado."
-    finally:
-        session.close()
+    user = session.query(User).filter(User.id == id).first()
+    if user:
+        session.delete(user)
+        session.commit()
+        return f"Usuario {id} eliminado con éxito."
+    return "Usuario no encontrado."
 
 st.title("Sistema de Gestión de Usuarios")
 
@@ -90,38 +83,38 @@ if option == 'Crear Usuario':
 
 elif option == 'Buscar Usuario':
     with st.container():
-        search_name = st.text_input("Nombre a buscar")
+        username = st.text_input("Nombre de Usuario a buscar")
         if st.button("Buscar"):
-            users = read_user_by_name(search_name)
-            if users:
-                for user in users:
-                    st.write(f"ID: {user.id}, Nombre: {user.full_name}, Usuario: {user.username}, Rol: {user.role}, Teléfono: {user.phone_number}")
+            user = read_user_by_username(username)
+            if user:
+                st.write(f"ID: {user.id}, Nombre: {user.full_name}, Usuario: {user.username}, Rol: {user.role}, Teléfono: {user.phone_number}")
             else:
-                st.write("No se encontraron usuarios")
+                st.write("Usuario no encontrado")
 
 elif option == 'Actualizar Usuario':
     with st.container():
-        search_name = st.text_input("Nombre del Usuario a actualizar")
-        if st.button("Buscar para actualizar"):
-            users = read_user_by_name(search_name)
-            if users:
-                user_options = [user.full_name for user in users]
-                selected_user = st.selectbox("Seleccione un usuario para actualizar", user_options)
-                username = st.text_input("Nuevo Nombre de Usuario", value="")
-                password = st.text_input("Nueva Contraseña", type="password", value="")
-                role = st.text_input("Nuevo Rol", value="")
-                full_name = st.text_input("Nuevo Nombre Completo", value="")
-                phone_number = st.text_input("Nuevo Número de Celular", value="")
+        username = st.text_input("Nombre de Usuario a actualizar")
+        if st.button("Buscar Usuario"):
+            user = read_user_by_username(username)
+            if user:
+                new_password = st.text_input("Nueva Contraseña", type="password", value="")
+                new_role = st.text_input("Nuevo Rol", value="")
+                new_full_name = st.text_input("Nuevo Nombre Completo", value="")
+                new_phone_number = st.text_input("Nuevo Número de Celular", value="")
                 
                 if st.button("Actualizar Usuario"):
-                    result = update_user(selected_user, username if username else None, password if password else None, role if role else None, full_name if full_name else None, phone_number if phone_number else None)
+                    result = update_user(username, new_password if new_password else None, new_role if new_role else None, new_full_name if new_full_name else None, new_phone_number if new_phone_number else None)
                     st.success(result)
             else:
-                st.write("No se encontraron usuarios")
+                st.error("Usuario no encontrado")
 
 elif option == 'Eliminar Usuario':
     with st.container():
-        del_id = st.number_input("ID del Usuario a eliminar", step=1)
+        username = st.text_input("Nombre de Usuario a eliminar")
         if st.button("Eliminar"):
-            result = delete_user(del_id)
-            st.success(result)
+            user = read_user_by_username(username)
+            if user:
+                result = delete_user(user.id)
+                st.success(result)
+            else:
+                st.error("Usuario no encontrado")
