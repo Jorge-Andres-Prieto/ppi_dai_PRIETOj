@@ -44,10 +44,10 @@ def read_user_by_name(name):
     finally:
         session.close()
 
-def update_user_by_name(old_username, new_username=None, new_password=None, new_role=None, new_full_name=None, new_phone_number=None):
+def update_user(id, new_username=None, new_password=None, new_role=None, new_full_name=None, new_phone_number=None):
     session = Session()
     try:
-        user = session.query(User).filter(User.username == old_username).one_or_none()
+        user = session.query(User).filter(User.id == id).one_or_none()
         if user:
             if new_username:
                 user.username = new_username
@@ -60,7 +60,7 @@ def update_user_by_name(old_username, new_username=None, new_password=None, new_
             if new_phone_number:
                 user.phone_number = new_phone_number
             session.commit()
-            return f"Usuario '{old_username}' actualizado con éxito."
+            return f"Usuario {id} actualizado con éxito."
         return "Usuario no encontrado."
     finally:
         session.close()
@@ -108,14 +108,14 @@ elif option == 'Buscar Usuario':
 
 elif option == 'Actualizar Usuario':
     with st.container():
-        old_username = st.text_input("Nombre de Usuario Actual")
+        update_id = st.number_input("ID del Usuario a actualizar", step=1)
         new_username = st.text_input("Nuevo Nombre de Usuario", placeholder="Dejar en blanco si no desea cambiar")
         new_password = st.text_input("Nueva Contraseña", type="password", placeholder="Dejar en blanco si no desea cambiar")
         new_role = st.selectbox("Nuevo Rol", ["", "Admin", "Empleado"], index=0, format_func=lambda x: x if x else "Dejar en blanco")
         new_full_name = st.text_input("Nuevo Nombre Completo", placeholder="Dejar en blanco si no desea cambiar")
         new_phone_number = st.text_input("Nuevo Número de Celular", placeholder="Dejar en blanco si no desea cambiar")
         if st.button("Actualizar"):
-            result = update_user_by_name(old_username, new_username or None, new_password or None, new_role if new_role else None, new_full_name or None, new_phone_number or None)
+            result = update_user(update_id, new_username or None, new_password or None, new_role if new_role else None, new_full_name or None, new_phone_number or None)
             st.success(result)
 
 elif option == 'Eliminar Usuario':
