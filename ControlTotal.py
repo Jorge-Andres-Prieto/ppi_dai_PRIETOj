@@ -9,16 +9,7 @@ def main():
         login_form()
     else:
         user = st.session_state['user']
-        selected = option_menu(
-            None,
-            ["Admin", "Ventas y Facturación", "Gestión de inventarios", "Análisis estadísticos", "Domicilios"],
-            icons=["person-circle", "currency-dollar", "archive", "graph-up", "truck"],
-            menu_icon="cast",
-            default_index=0,
-            orientation="horizontal"
-        )
-        if selected == 'Admin' and user.role == "Admin":
-            admin_menu()
+        main_menu(user)
 
 def login_form():
     username = st.text_input("Nombre de Usuario")
@@ -30,6 +21,26 @@ def login_form():
             st.experimental_rerun()
         else:
             st.error("Usuario o contraseña incorrectos.")
+
+def main_menu(user):
+    with st.sidebar:
+        selected = option_menu(
+            None,
+            ["Admin", "Ventas y Facturación", "Gestión de inventarios", "Análisis estadísticos", "Domicilios", "Cerrar Sesión"],
+            icons=["person-circle", "currency-dollar", "archive", "graph-up", "truck", "arrow-right-square"],
+            menu_icon="cast",
+            default_index=0
+        )
+        if selected == "Cerrar Sesión":
+            logout()
+
+    if selected == 'Admin' and user.role == "Admin":
+        admin_menu()
+
+def logout():
+    if 'user' in st.session_state:
+        del st.session_state['user']
+    st.experimental_rerun()
 
 def admin_menu():
     selected = option_menu(
