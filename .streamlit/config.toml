@@ -1,0 +1,14 @@
+# Tema personalizado para Streamlit
+
+[theme]
+base="light"
+primaryColor="#FF4B4B"
+backgroundColor="#F7F8FA"
+secondaryBackgroundColor="#FEF9E7"
+textColor="#31333F"
+font="sans serif"
+
+[theme.fonts]
+heading = "Verdana, Arial, sans-serif"
+base = "Verdana, Arial, sans-serif"
+code = "Monospace"
