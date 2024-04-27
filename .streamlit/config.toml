@@ -1,10 +1,10 @@
-# Tema personalizado para Streamlit basado en la paleta proporcionada
+# Tema personalizado para Streamlit basado en la nueva paleta verde y amarilla
 
 [theme]
 base="light"
-primaryColor="#ee6c4d"  # Coral para elementos activos y destacados
-backgroundColor="#e0fbfc"  # Azul muy claro para el fondo principal
-secondaryBackgroundColor="#98c1d9"  # Azul cielo para fondos de elementos secundarios
+primaryColor="#8EE630"  # Verde lima brillante para elementos activos y destacados
+backgroundColor="#DAE630"  # Amarillo limón para el fondo principal
+secondaryBackgroundColor="#30E69D"  # Verde turquesa para fondos de elementos secundarios
 textColor="#293241"  # Azul oscuro profundo para texto, asegurando excelente legibilidad
 font="sans serif"
 
