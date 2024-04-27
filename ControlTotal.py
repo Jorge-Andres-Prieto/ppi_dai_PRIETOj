@@ -1,4 +1,5 @@
 import streamlit as st
+from streamlit_option_menu import option_menu
 from auth import verify_user
 from user_management import create_user, search_users, update_user, delete_user, generate_password
 
@@ -8,7 +9,16 @@ def main():
         login_form()
     else:
         user = st.session_state['user']
-        side_menu()  # Display side menu for all user roles
+        selected = option_menu(
+            None,
+            ["Admin", "Ventas y Facturación", "Gestión de inventarios", "Análisis estadísticos", "Domicilios"],
+            icons=["person-circle", "currency-dollar", "archive", "graph-up", "truck"],
+            menu_icon="cast",
+            default_index=0,
+            orientation="horizontal"
+        )
+        if selected == 'Admin' and user.role == "Admin":
+            admin_menu()
 
 def login_form():
     username = st.text_input("Nombre de Usuario")
@@ -21,44 +31,22 @@ def login_form():
         else:
             st.error("Usuario o contraseña incorrectos.")
 
-def side_menu():
-    user = st.session_state['user']
-    options = {
-        "Admin": "👤",
-        "Ventas y Facturación": "💸",
-        "Gestión de inventarios": "📦",
-        "Análisis estadísticos": "📊",
-        "Domicilios": "🚚"
-    }
-    option = st.sidebar.radio(
-        'Menú', list(options.keys()), format_func=lambda x: f"{options[x]} {x}"
-    )
-    if option == 'Admin':
-        if user.role == "Admin":
-            admin_menu()
-    else:
-        st.header(option)
-        st.write("Sección en desarrollo.")
-
 def admin_menu():
-    admin_options = {
-        "Crear Usuario": "➕",
-        "Buscar Usuario": "🔍",
-        "Actualizar Usuario": "🔄",
-        "Eliminar Usuario": "❌"
-    }
-    admin_option = st.selectbox(
-        'Gestión de Usuarios',
-        list(admin_options.keys()),
-        format_func=lambda x: f"{admin_options[x]} {x}"
+    selected = option_menu(
+        None,
+        ["Crear Usuario", "Buscar Usuario", "Actualizar Usuario", "Eliminar Usuario"],
+        icons=["plus-circle", "search", "pencil-square", "trash"],
+        menu_icon="cast",
+        default_index=0,
+        orientation="horizontal"
     )
-    if admin_option == 'Crear Usuario':
+    if selected == 'Crear Usuario':
         create_user_form()
-    elif admin_option == 'Buscar Usuario':
+    elif selected == 'Buscar Usuario':
         search_user_form()
-    elif admin_option == 'Actualizar Usuario':
+    elif selected == 'Actualizar Usuario':
         update_user_form()
-    elif admin_option == 'Eliminar Usuario':
+    elif selected == 'Eliminar Usuario':
         delete_user_form()
 
 def create_user_form():
