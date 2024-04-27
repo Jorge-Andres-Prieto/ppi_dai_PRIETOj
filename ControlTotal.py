@@ -3,44 +3,54 @@ from auth import verify_user
 from user_management import create_user, search_users, update_user, delete_user, generate_password
 
 def main():
-    st.title("Control Total")
     if 'user' not in st.session_state:
+        st.title("Control Total")
         login_form()
     else:
         user = st.session_state['user']
         side_menu()  # Display side menu for all user roles
 
 def login_form():
-    with st.form("login_form"):
-        username = st.text_input("Nombre de Usuario")
-        password = st.text_input("Contraseña", type="password")
-        submitted = st.form_submit_button("Ingresar")
-        if submitted:
-            user = verify_user(username, password)
-            if user:
-                st.session_state['user'] = user
-                st.experimental_rerun()
-            else:
-                st.error("Usuario o contraseña incorrectos.")
+    username = st.text_input("Nombre de Usuario")
+    password = st.text_input("Contraseña", type="password")
+    if st.button("Ingresar"):
+        user = verify_user(username, password)
+        if user:
+            st.session_state['user'] = user
+            st.experimental_rerun()
+        else:
+            st.error("Usuario o contraseña incorrectos.")
 
 def side_menu():
     user = st.session_state['user']
-    option = st.sidebar.selectbox(
-        'Menú',
-        ('Admin', 'Ventas y Facturación', 'Gestión de inventarios', 'Análisis estadísticos', 'Domicilios')
+    options = {
+        "Admin": "👤",
+        "Ventas y Facturación": "💸",
+        "Gestión de inventarios": "📦",
+        "Análisis estadísticos": "📊",
+        "Domicilios": "🚚"
+    }
+    option = st.sidebar.radio(
+        'Menú', list(options.keys()), format_func=lambda x: f"{options[x]} {x}"
     )
     if option == 'Admin':
         if user.role == "Admin":
             admin_menu()
-    elif option in ['Ventas y Facturación', 'Gestión de inventarios', 'Análisis estadísticos', 'Domicilios']:
-        with st.form(option):
-            st.write(f"Sección en desarrollo: {option}")
+    else:
+        st.header(option)
+        st.write("Sección en desarrollo.")
 
 def admin_menu():
-    st.title("Sistema de Gestión de Usuarios")
+    admin_options = {
+        "Crear Usuario": "➕",
+        "Buscar Usuario": "🔍",
+        "Actualizar Usuario": "🔄",
+        "Eliminar Usuario": "❌"
+    }
     admin_option = st.selectbox(
         'Gestión de Usuarios',
-        ('Crear Usuario', 'Buscar Usuario', 'Actualizar Usuario', 'Eliminar Usuario')
+        list(admin_options.keys()),
+        format_func=lambda x: f"{admin_options[x]} {x}"
     )
     if admin_option == 'Crear Usuario':
         create_user_form()
@@ -61,30 +71,36 @@ def create_user_form():
         phone_number = st.text_input("Número de Celular", help="Formato válido: +1234567890")
         submitted = st.form_submit_button("Crear")
         if submitted:
-            if len(username) < 5:
-                st.error("El nombre de usuario debe tener al menos 5 caracteres.")
-            elif not auto_password and len(password) < 8:
-                st.error("La contraseña debe tener al menos 8 caracteres.")
-            else:
-                result = create_user(username, password, role, full_name, phone_number)
-                if "éxito" in result:
-                    st.success(result)
-                    if auto_password:
-                        st.info(f"Contraseña generada automáticamente: {password}")
-                else:
-                    st.error(result)
+            validate_and_submit_user(username, password, role, full_name, phone_number, auto_password)
+
+def validate_and_submit_user(username, password, role, full_name, phone_number, auto_password):
+    if len(username) < 5:
+        st.error("El nombre de usuario debe tener al menos 5 caracteres.")
+    elif not auto_password and len(password) < 8:
+        st.error("La contraseña debe tener al menos 8 caracteres.")
+    else:
+        result = create_user(username, password, role, full_name, phone_number)
+        if "éxito" in result:
+            st.success(result)
+            if auto_password:
+                st.info(f"Contraseña generada automáticamente: {password}")
+        else:
+            st.error(result)
 
 def search_user_form():
     with st.form("Buscar Usuario"):
         search_name = st.text_input("Nombre a buscar")
         submitted = st.form_submit_button("Buscar")
         if submitted:
-            users = search_users(search_name)
-            if users:
-                for user in users:
-                    st.write(f"ID: {user.id}, Nombre: {user.full_name}, Usuario: {user.username}, Rol: {user.role}, Teléfono: {user.phone_number}")
-            else:
-                st.write("No se encontraron usuarios")
+            display_search_results(search_name)
+
+def display_search_results(search_name):
+    users = search_users(search_name)
+    if users:
+        for user in users:
+            st.write(f"ID: {user.id}, Nombre: {user.full_name}, Usuario: {user.username}, Rol: {user.role}, Teléfono: {user.phone_number}")
+    else:
+        st.write("No se encontraron usuarios")
 
 def update_user_form():
     with st.form("Actualizar Usuario"):
