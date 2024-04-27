@@ -3,7 +3,7 @@
 [theme]
 base="dark"
 primaryColor="#63C7B2"  # Verde menta para interactividad
-backgroundColor="#23395D"  # Azul oscuro para el fondo principal
+backgroundColor="#23395D"  # Azul oscuro para el fondo principall
 secondaryBackgroundColor="#E8E9EB"  # Gris claro para fondos secundarios
 textColor="#FFFFFF"  # Blanco para el texto, asegurando legibilidad
 font="sans serif"
