@@ -1,6 +1,6 @@
 import streamlit as st
 from auth import verify_user
-from user_management import create_user, search_users, update_user, delete_user
+from user_management import create_user, search_users, update_user, delete_user, generate_password
 
 def main():
     st.title("Control Total")
@@ -38,18 +38,26 @@ def main():
 
 def create_user_form():
     with st.form("Crear Usuario"):
-        username = st.text_input("Nombre de Usuario")
-        password = st.text_input("Contraseña", type="password")
+        username = st.text_input("Nombre de Usuario", help="Debe ser único.")
+        auto_password = st.checkbox("Generar contraseña segura automáticamente")
+        password = generate_password() if auto_password else st.text_input("Contraseña", type="password")
         role = st.selectbox("Rol", ["Admin", "Empleado"])
         full_name = st.text_input("Nombre Completo")
-        phone_number = st.text_input("Número de Celular")
+        phone_number = st.text_input("Número de Celular", help="Formato válido: +1234567890")
         submitted = st.form_submit_button("Crear")
         if submitted:
-            result = create_user(username, password, role, full_name, phone_number)
-            if "éxito" in result:
-                st.success(result)
+            if len(username) < 5:
+                st.error("El nombre de usuario debe tener al menos 5 caracteres.")
+            elif not auto_password and len(password) < 8:
+                st.error("La contraseña debe tener al menos 8 caracteres.")
             else:
-                st.error(result)
+                result = create_user(username, password, role, full_name, phone_number)
+                if "éxito" in result:
+                    st.success(result)
+                    if auto_password:
+                        st.info(f"Contraseña generada automáticamente: {password}")
+                else:
+                    st.error(result)
 
 def search_user_form():
     search_name = st.text_input("Nombre a buscar")
