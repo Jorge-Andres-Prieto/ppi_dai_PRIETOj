@@ -1,14 +1,14 @@
-# Tema personalizado para Streamlit basado en la nueva paleta verde y amarilla
+# Tema personalizado para Streamlit para una aplicación de gestión de inventarios y ventas
 
 [theme]
-base="light"
-primaryColor="#8EE630"  # Verde lima brillante para elementos activos y destacados
-backgroundColor="#DAE630"  # Amarillo limón para el fondo principal
-secondaryBackgroundColor="#30E69D"  # Verde turquesa para fondos de elementos secundarios
-textColor="#293241"  # Azul oscuro profundo para texto, asegurando excelente legibilidad
+base="dark"
+primaryColor="#63C7B2"  # Verde menta para interactividad
+backgroundColor="#23395D"  # Azul oscuro para el fondo principal
+secondaryBackgroundColor="#E8E9EB"  # Gris claro para fondos secundarios
+textColor="#FFFFFF"  # Blanco para el texto, asegurando legibilidad
 font="sans serif"
 
 [theme.fonts]
-heading = "Helvetica, Arial, sans-serif"
-base = "Helvetica, Arial, sans-serif"
+heading = "Arial, sans-serif"
+base = "Arial, sans-serif"
 code = "Monospace"
