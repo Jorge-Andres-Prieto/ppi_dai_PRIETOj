@@ -2,13 +2,13 @@
 
 [theme]
 base="light"
-primaryColor="#FF4B4B"
-backgroundColor="#F7F8FA"
-secondaryBackgroundColor="#FEF9E7"
-textColor="#31333F"
+primaryColor="#007BFF"  # Un azul brillante para elementos activos y destacados
+backgroundColor="#FFFFFF"  # Blanco puro para el fondo principal, aportando luminosidad y claridad
+secondaryBackgroundColor="#F0F2F6"  # Un gris suave para fondos de elementos secundarios
+textColor="#333333"  # Un gris oscuro casi negro para texto, asegurando excelente legibilidad
 font="sans serif"
 
 [theme.fonts]
-heading = "Verdana, Arial, sans-serif"
-base = "Verdana, Arial, sans-serif"
+heading = "Helvetica, Arial, sans-serif"
+base = "Helvetica, Arial, sans-serif"
 code = "Monospace"
