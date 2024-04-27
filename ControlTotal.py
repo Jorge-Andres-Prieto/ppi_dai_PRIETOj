@@ -26,12 +26,12 @@ def main_menu(user):
     with st.sidebar:
         selected = option_menu(
             None,
-            ["Admin", "Ventas y Facturación", "Gestión de inventarios", "Análisis estadísticos", "Domicilios", "Cerrar Sesión"],
-            icons=["person-circle", "currency-dollar", "archive", "graph-up", "truck", "arrow-right-square"],
+            ["Admin", "Ventas y Facturación", "Gestión de inventarios", "Análisis estadísticos", "Domicilios"],
+            icons=["person-circle", "currency-dollar", "archive", "graph-up", "truck"],
             menu_icon="cast",
             default_index=0
         )
-        if selected == "Cerrar Sesión":
+        if st.button("Cerrar Sesión"):
             logout()
 
     if selected == 'Admin' and user.role == "Admin":
