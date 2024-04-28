@@ -36,9 +36,12 @@ class Product(Base):
         category (Column): Categoría del producto.
         subcategory (Column): Subcategoría del producto.
     """
-    __tablename__ = 'products'
-    id = Column(Integer, primary_key=True)
-    name = Column(String, nullable=False)
-    brand = Column(String)
-    category = Column(String, nullable=False)
-    subcategory = Column(String)
+    class Product(Base):
+        __tablename__ = 'products'
+        id = Column(Integer, primary_key=True)
+        name = Column(String, nullable=False)
+        brand = Column(String)
+        category = Column(String, nullable=False)
+        subcategory = Column(String)
+        price = Column(float, nullable=False)
+        quantity = Column(Integer, nullable=False)

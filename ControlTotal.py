@@ -8,10 +8,11 @@ from auth import verify_user
 from user_management import create_user, search_users, update_user, delete_user, generate_password
 # Importa funciones para la gestión de productos
 from product_management import search_products, view_product_details, update_product, add_product
-
+from database import init_db
 
 st.set_page_config(page_title="Control Total", layout="wide")
-
+# Inicializa la base de datos (crea tablas si no existen)
+init_db()
 
 def main():
     """Función principal que controla el flujo de la aplicación.

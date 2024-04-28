@@ -26,4 +26,3 @@ def init_db():
     """
     # Crea todas las tablas en la base de datos según lo definido en la clase Base
     Base.metadata.create_all(engine)
-    Base.metadata.create_all(engine)
