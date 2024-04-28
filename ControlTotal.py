@@ -322,7 +322,6 @@ def delete_user_form():
 
 def inventory_management_menu():
     """Muestra el menú de gestión de inventarios para buscar, ver, modificar y agregar productos."""
-    # Menu horizontal para la gestión de inventarios
     selected = option_menu(
         None,
         ["Buscar Producto", "Ver Producto", "Modificar Producto", "Agregar Producto"],
@@ -341,15 +340,15 @@ def inventory_management_menu():
     elif selected == "Agregar Producto":
         add_product_form()
 
-
 def search_product_form():
     """Formulario para buscar productos por nombre."""
     with st.form("Buscar Producto"):
         search_query = st.text_input("Nombre del Producto a buscar")
         submitted = st.form_submit_button("Buscar")
         if submitted:
-            search_products(search_query)
-
+            products = search_products(search_query)
+            for product in products:
+                st.write(f"ID: {product.id}, Nombre: {product.name}, Marca: {product.brand}, Categoría: {product.category}, Subcategoría: {product.subcategory}")
 
 def view_product_form():
     """Formulario para ver información detallada de un producto por su ID."""
@@ -357,8 +356,11 @@ def view_product_form():
         product_id = st.number_input("ID del Producto a ver", step=1)
         submitted = st.form_submit_button("Ver")
         if submitted:
-            view_product_details(product_id)
-
+            product = view_product_details(product_id)
+            if product:
+                st.write(f"ID: {product.id}, Nombre: {product.name}, Marca: {product.brand}, Categoría: {product.category}, Subcategoría: {product.subcategory}")
+            else:
+                st.error("Producto no encontrado")
 
 def update_product_form():
     """Formulario para modificar información de un producto existente."""
@@ -369,9 +371,38 @@ def update_product_form():
         new_category = st.text_input("Nueva Categoría del Producto")
         new_subcategory = st.text_input("Nueva Subcategoría del Producto")
         submitted = st.form_submit_button("Modificar")
-        if submitted:
-            update_product(product_id, new_name, new_brand, new_category, new_subcategory)
 
+        if submitted:
+            st.session_state.update_data = {
+                "product_id": product_id,
+                "new_name": new_name,
+                "new_brand": new_brand,
+                "new_category": new_category,
+                "new_subcategory": new_subcategory
+            }
+            st.session_state.confirmation = True
+
+    if st.session_state.get('confirmation'):
+        st.write("¿Estás seguro de que quieres actualizar este producto?")
+        if st.button("Sí, actualizar"):
+            data = st.session_state.update_data
+            result = update_product(
+                data["product_id"],
+                new_name=data["new_name"],
+                new_brand=data["new_brand"],
+                new_category=data["new_category"],
+                new_subcategory=data["new_subcategory"]
+            )
+            if "éxito" in result:
+                st.success(result)
+                st.session_state.confirmation = False
+                del st.session_state.update_data
+            else:
+                st.error(result)
+        elif st.button("No, cancelar"):
+            st.write("Actualización cancelada.")
+            st.session_state.confirmation = False
+            del st.session_state.update_data
 
 def add_product_form():
     """Formulario para añadir un nuevo producto."""
@@ -381,8 +412,14 @@ def add_product_form():
         category = st.text_input("Categoría del Producto")
         subcategory = st.text_input("Subcategoría del Producto")
         submitted = st.form_submit_button("Agregar")
+
         if submitted:
-            add_product(name, brand, category, subcategory)
+            result = add_product(name, brand, category, subcategory)
+            if "éxito" in result:
+                st.success(result)
+            else:
+                st.error(result)
+
 
 if __name__ == "__main__":
     main()
