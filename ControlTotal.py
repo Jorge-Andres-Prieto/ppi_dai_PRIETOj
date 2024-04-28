@@ -211,23 +211,18 @@ def update_user_form():
     """
     with st.form("Actualizar Usuario"):
         update_id = st.number_input("ID del Usuario a actualizar", step=1)
-
-        # Definir una función clara para el formato del selector de roles
-        def format_role_option(role):
-            """Devuelve el rol o un texto indicativo si el rol está vacío."""
-            return role if role else "Dejar en blanco"
-
-        # Uso de la función definida en lugar de una lambda
         new_username = st.text_input("Nuevo Nombre de Usuario", placeholder="Dejar en blanco si no desea cambiar")
-        new_password = st.text_input("Nueva Contraseña", type="password",
-                                     placeholder="Dejar en blanco si no desea cambiar")
-        new_role = st.selectbox("Nuevo Rol", ["", "Admin", "Empleado"], index=0, format_func=format_role_option)
+        new_password = st.text_input("Nueva Contraseña", type="password", placeholder="Dejar en blanco si no desea cambiar")
+        new_role = st.selectbox("Nuevo Rol", ["", "Admin", "Empleado"], index=0)
         new_full_name = st.text_input("Nuevo Nombre Completo", placeholder="Dejar en blanco si no desea cambiar")
         new_phone_number = st.text_input("Nuevo Número de Celular", placeholder="Dejar en blanco si no desea cambiar")
 
         submitted = st.form_submit_button("Actualizar")
-        if submitted:
-            # Llamada a la función de actualización con los valores introducidos
+
+    if submitted:
+        # Solicitar confirmación antes de realizar la actualización
+        confirm = st.button("¿Estás seguro de que quieres actualizar este usuario?")
+        if confirm:
             result = update_user(
                 update_id,
                 new_username=new_username,
@@ -240,6 +235,7 @@ def update_user_form():
                 st.success(result)
             else:
                 st.error(result)
+
 
 def delete_user_form():
     """Formulario para eliminar un usuario existente.
