@@ -3,26 +3,28 @@ from streamlit_option_menu import option_menu
 from auth import verify_user
 from user_management import create_user, search_users, update_user, delete_user, generate_password
 
+st.set_page_config(page_title="Control Total", layout="wide")
+
 def main():
     if 'user' not in st.session_state:
         st.title("Control Total")
-        st.set_page_config(page_title="Login de Control Total", layout="centered")
         login_form()
     else:
         user = st.session_state['user']
-        st.set_page_config(page_title="Dashboard de Control Total", layout="wide")
         main_menu(user)
 
 def login_form():
-    username = st.text_input("Nombre de Usuario")
-    password = st.text_input("Contraseña", type="password")
-    if st.button("Ingresar"):
-        user = verify_user(username, password)
-        if user:
-            st.session_state['user'] = user
-            st.experimental_rerun()
-        else:
-            st.error("Usuario o contraseña incorrectos.")
+    col1, col2, col3 = st.columns([1,2,1])
+    with col2:
+        username = st.text_input("Nombre de Usuario")
+        password = st.text_input("Contraseña", type="password")
+        if st.button("Ingresar"):
+            user = verify_user(username, password)
+            if user:
+                st.session_state['user'] = user
+                st.experimental_rerun()
+            else:
+                st.error("Usuario o contraseña incorrectos.")
 
 def main_menu(user):
     with st.sidebar:
