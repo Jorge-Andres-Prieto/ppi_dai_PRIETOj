@@ -20,6 +20,12 @@ def main():
     Returns:
         None
     """
+    # Asegúrate de que las claves existan en session_state al inicio de la app
+    if 'confirmation' not in st.session_state:
+        st.session_state.confirmation = False
+    if 'update_data' not in st.session_state:
+        st.session_state.update_data = {}
+
     if 'user' not in st.session_state:
         login_page()
     else:
@@ -254,12 +260,6 @@ def update_user_form():
             st.write("Actualización cancelada.")
             st.session_state.confirmation = False  # Restablecer la confirmación
             del st.session_state.update_data  # Limpiar los datos temporales
-
-# Asegúrate de que las claves existan en session_state al inicio de la app
-if 'confirmation' not in st.session_state:
-    st.session_state.confirmation = False
-if 'update_data' not in st.session_state:
-    st.session_state.update_data = {}
 
 
 def delete_user_form():
