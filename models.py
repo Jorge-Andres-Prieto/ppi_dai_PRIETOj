@@ -16,7 +16,7 @@ class User(Base):
         password (Column): Contraseña del usuario, no puede ser nula.
         role (Column): Rol del usuario en la aplicación, no puede ser nulo.
         full_name (Column): Nombre completo del usuario, no puede ser nulo.
-        phone_number (Column): Número de teléfono del usuario, no puede ser nulo.
+        phone_number (Column): Número de teléfono del usuario, no puede seer nulo.
     """
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
