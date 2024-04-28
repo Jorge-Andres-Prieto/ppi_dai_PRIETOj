@@ -7,15 +7,15 @@ st.set_page_config(page_title="Control Total", layout="wide")
 
 def main():
     if 'user' not in st.session_state:
-        st.title("Control Total")
-        login_form()
+        login_page()
     else:
         user = st.session_state['user']
         main_menu(user)
 
-def login_form():
+def login_page():
     col1, col2, col3 = st.columns([1,2,1])
     with col2:
+        st.title("Control Total")  # Mover el título aquí para asegurar que se centre con el formulario
         username = st.text_input("Nombre de Usuario")
         password = st.text_input("Contraseña", type="password")
         if st.button("Ingresar"):
