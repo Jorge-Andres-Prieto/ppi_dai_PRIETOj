@@ -209,64 +209,51 @@ def update_user_form():
     Returns:
         None
     """
-    with st.form("Actualizar Usuario"):
-        update_id = st.number_input("ID del Usuario a actualizar", step=1)
+    st.write("Actualizar Usuario")
+    update_id = st.number_input("ID del Usuario a actualizar", step=1)
 
-        # Opciones para seleccionar qué campos actualizar
-        update_username = st.checkbox("Actualizar nombre de usuario")
-        update_password = st.checkbox("Actualizar contraseña")
-        update_role = st.checkbox("Actualizar rol")
-        update_full_name = st.checkbox("Actualizar nombre completo")
-        update_phone_number = st.checkbox("Actualizar número de teléfono")
+    # Opciones para seleccionar qué campos actualizar
+    update_username = st.checkbox("Actualizar nombre de usuario")
+    update_password = st.checkbox("Actualizar contraseña")
+    update_role = st.checkbox("Actualizar rol")
+    update_full_name = st.checkbox("Actualizar nombre completo")
+    update_phone_number = st.checkbox("Actualizar número de teléfono")
 
-        # Contenedores para entradas condicionales
-        username_container = st.empty()
-        password_container = st.empty()
-        role_container = st.empty()
-        full_name_container = st.empty()
-        phone_number_container = st.empty()
+    # Botón para mostrar los campos de entrada según las selecciones
+    modify = st.button("Modificar")
 
+    # Diccionario para almacenar los nuevos valores
+    new_values = {}
+
+    if modify:
         if update_username:
-            new_username = username_container.text_input("Nuevo Nombre de Usuario")
-        else:
-            new_username = None
-
+            new_values['new_username'] = st.text_input("Nuevo Nombre de Usuario")
         if update_password:
-            new_password = password_container.text_input("Nueva Contraseña", type="password")
-        else:
-            new_password = None
-
+            new_values['new_password'] = st.text_input("Nueva Contraseña", type="password")
         if update_role:
-            new_role = role_container.selectbox("Nuevo Rol", ["", "Admin", "Empleado"], index=0)
-        else:
-            new_role = None
-
+            new_values['new_role'] = st.selectbox("Nuevo Rol", ["", "Admin", "Empleado"], index=0)
         if update_full_name:
-            new_full_name = full_name_container.text_input("Nuevo Nombre Completo")
-        else:
-            new_full_name = None
-
+            new_values['new_full_name'] = st.text_input("Nuevo Nombre Completo")
         if update_phone_number:
-            new_phone_number = phone_number_container.text_input("Nuevo Número de Celular")
-        else:
-            new_phone_number = None
+            new_values['new_phone_number'] = st.text_input("Nuevo Número de Celular")
 
-        submitted = st.form_submit_button("Actualizar")
-        if submitted:
-            # Solo se pasan los valores que se desean actualizar
+        # Botón para actualizar la información en la base de datos
+        update = st.button("Actualizar")
+
+        if update:
+            # Llamada a la función de actualización con los valores recogidos
             result = update_user(
                 update_id,
-                new_username=new_username,
-                new_password=new_password,
-                new_role=new_role,
-                new_full_name=new_full_name,
-                new_phone_number=new_phone_number
+                new_username=new_values.get('new_username'),
+                new_password=new_values.get('new_password'),
+                new_role=new_values.get('new_role'),
+                new_full_name=new_values.get('new_full_name'),
+                new_phone_number=new_values.get('new_phone_number')
             )
             if "éxito" in result:
                 st.success(result)
             else:
                 st.error(result)
-
 
 def delete_user_form():
     """Formulario para eliminar un usuario existente.
