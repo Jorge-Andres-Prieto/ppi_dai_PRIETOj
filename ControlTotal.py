@@ -201,7 +201,7 @@ def display_search_results(search_name):
 
 
 def update_user_form():
-    """Formulario para actualizar la información de un usuario existente con opciones seleccionables.
+    """Formulario para actualizar la información de un usuario existente.
 
     Args:
         None
@@ -209,46 +209,32 @@ def update_user_form():
     Returns:
         None
     """
-    st.write("Actualizar Usuario")
-    update_id = st.number_input("ID del Usuario a actualizar", step=1)
+    with st.form("Actualizar Usuario"):
+        update_id = st.number_input("ID del Usuario a actualizar", step=1)
 
-    # Opciones para seleccionar qué campos actualizar
-    update_username = st.checkbox("Actualizar nombre de usuario")
-    update_password = st.checkbox("Actualizar contraseña")
-    update_role = st.checkbox("Actualizar rol")
-    update_full_name = st.checkbox("Actualizar nombre completo")
-    update_phone_number = st.checkbox("Actualizar número de teléfono")
+        # Definir una función clara para el formato del selector de roles
+        def format_role_option(role):
+            """Devuelve el rol o un texto indicativo si el rol está vacío."""
+            return role if role else "Dejar en blanco"
 
-    # Botón para mostrar los campos de entrada según las selecciones
-    modify = st.button("Modificar")
+        # Uso de la función definida en lugar de una lambda
+        new_username = st.text_input("Nuevo Nombre de Usuario", placeholder="Dejar en blanco si no desea cambiar")
+        new_password = st.text_input("Nueva Contraseña", type="password",
+                                     placeholder="Dejar en blanco si no desea cambiar")
+        new_role = st.selectbox("Nuevo Rol", ["", "Admin", "Empleado"], index=0, format_func=format_role_option)
+        new_full_name = st.text_input("Nuevo Nombre Completo", placeholder="Dejar en blanco si no desea cambiar")
+        new_phone_number = st.text_input("Nuevo Número de Celular", placeholder="Dejar en blanco si no desea cambiar")
 
-    # Diccionario para almacenar los nuevos valores
-    new_values = {}
-
-    if modify:
-        if update_username:
-            new_values['new_username'] = st.text_input("Nuevo Nombre de Usuario")
-        if update_password:
-            new_values['new_password'] = st.text_input("Nueva Contraseña", type="password")
-        if update_role:
-            new_values['new_role'] = st.selectbox("Nuevo Rol", ["", "Admin", "Empleado"], index=0)
-        if update_full_name:
-            new_values['new_full_name'] = st.text_input("Nuevo Nombre Completo")
-        if update_phone_number:
-            new_values['new_phone_number'] = st.text_input("Nuevo Número de Celular")
-
-        # Botón para actualizar la información en la base de datos
-        update = st.button("Actualizar")
-
-        if update:
-            # Llamada a la función de actualización con los valores recogidos
+        submitted = st.form_submit_button("Actualizar")
+        if submitted:
+            # Llamada a la función de actualización con los valores introducidos
             result = update_user(
                 update_id,
-                new_username=new_values.get('new_username'),
-                new_password=new_values.get('new_password'),
-                new_role=new_values.get('new_role'),
-                new_full_name=new_values.get('new_full_name'),
-                new_phone_number=new_values.get('new_phone_number')
+                new_username=new_username,
+                new_password=new_password,
+                new_role=new_role,
+                new_full_name=new_full_name,
+                new_phone_number=new_phone_number
             )
             if "éxito" in result:
                 st.success(result)
