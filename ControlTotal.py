@@ -20,11 +20,15 @@ def main():
     Returns:
         None
     """
-    # Asegúrate de que las claves existan en session_state al inicio de la app
+    # Asegurarse de que las claves de estado de sesión necesarias existan
     if 'confirmation' not in st.session_state:
         st.session_state.confirmation = False
     if 'update_data' not in st.session_state:
         st.session_state.update_data = {}
+    if 'confirmation_delete' not in st.session_state:
+        st.session_state.confirmation_delete = False
+    if 'delete_id' not in st.session_state:
+        st.session_state.delete_id = None
 
     if 'user' not in st.session_state:
         login_page()
@@ -305,12 +309,6 @@ def delete_user_form():
             st.session_state.confirmation_delete = False
             # Limpiar el ID almacenado
             del st.session_state.delete_id
-
-# Inicialización de las claves en session_state al inicio de la app
-if 'confirmation_delete' not in st.session_state:
-    st.session_state.confirmation_delete = False
-if 'delete_id' not in st.session_state:
-    st.session_state.delete_id = None
 
 
 if __name__ == "__main__":
