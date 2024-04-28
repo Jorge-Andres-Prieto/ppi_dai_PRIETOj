@@ -41,40 +41,23 @@ def login_page():
     """Crea y gestiona la página de inicio de sesión.
 
     Args:
-        No recibe argumentos.
+        None
 
     Returns:
-        No retorna nada.
+        None
     """
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.title("Control Total")
-
-        # Validación básica del nombre de usuario
-        username = st.text_input(
-            "Nombre de Usuario", key="username", placeholder="Ingrese su nombre de usuario"
-        )
-        if not username:
-            st.error("El nombre de usuario no puede estar vacío.")
-            return
-
-        # Validación básica de la contraseña
-        password = st.text_input(
-            "Contraseña", key="password", type="password", placeholder="Ingrese su contraseña"
-        )
-        if not password:
-            st.error("La contraseña no puede estar vacía.")
-            return
-
+        username = st.text_input("Nombre de Usuario")
+        password = st.text_input("Contraseña", type="password")
         if st.button("Ingresar"):
             user = verify_user(username, password)
             if user:
                 st.session_state['user'] = user
                 st.experimental_rerun()
             else:
-                st.error(
-                    "Usuario o contraseña incorrectos. Por favor, verifique sus credenciales."
-                )
+                st.error("Usuario o contraseña incorrectos.")
 
 def main_menu(user):
     """Crea y muestra el menú principal para la navegación de la aplicación.
