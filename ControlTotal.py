@@ -363,7 +363,7 @@ def update_product_form():
         new_price = st.number_input("Nuevo Precio del Producto", format="%.2f",
                                     help="Dejar en blanco para mantener el precio actual", value=0.0)
         inventory_adjustment = st.number_input("Ajuste de Inventario (positivo para añadir, negativo para reducir)",
-                                               format="%d")
+                                               value=0, format="%d", step=1)
         submitted = st.form_submit_button("Actualizar")
 
         if submitted:
