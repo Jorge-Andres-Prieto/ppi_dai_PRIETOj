@@ -1,7 +1,7 @@
 # Importa la función declarative_base de SQLAlchemy para la creación de modelos ORM
 from sqlalchemy.ext.declarative import declarative_base
 # Importa tipos de columnas específicos de SQLAlchemy para definir propiedades de modelo
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Numeric
 
 # Crea una instancia base para los modelos ORM, que es necesario para definir clases de modelos
 Base = declarative_base()
@@ -43,5 +43,5 @@ class Product(Base):
         brand = Column(String)
         category = Column(String, nullable=False)
         subcategory = Column(String)
-        price = Column(Float, nullable=False)
+        price = Column(Numeric(10, 2), nullable=False)
         quantity = Column(Integer, nullable=False)
