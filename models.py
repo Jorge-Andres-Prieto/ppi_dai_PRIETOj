@@ -27,21 +27,11 @@ class User(Base):
     phone_number = Column(String, nullable=False)
 
 class Product(Base):
-    """Define la estructura de la tabla 'products' para almacenar información de productos.
-
-    Attributes:
-        id (Column): Identificador único del producto, clave primaria.
-        name (Column): Nombre del producto.
-        brand (Column): Marca del producto.
-        category (Column): Categoría del producto.
-        subcategory (Column): Subcategoría del producto.
-    """
-    class Product(Base):
-        __tablename__ = 'products'
-        id = Column(Integer, primary_key=True)
-        name = Column(String, nullable=False)
-        brand = Column(String)
-        category = Column(String, nullable=False)
-        subcategory = Column(String)
-        price = Column(Numeric(10, 2), nullable=False)
-        quantity = Column(Integer, nullable=False)
+    __tablename__ = 'products'
+    id = Column(Integer, primary_key=True)
+    name = Column(String, nullable=False)
+    brand = Column(String)
+    category = Column(String, nullable=False)
+    subcategory = Column(String)
+    price = Column(Numeric(10, 2), nullable=False)
+    quantity = Column(Integer, nullable=False)
