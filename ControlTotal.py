@@ -1,4 +1,4 @@
-# Importa el módulo de Streamlit para crear aplicaciones web
+# Importa el módulo de Streamlit para crear aplicaciones webb
 import streamlit as st
 # Importa opciones de menú para la navegación en la aplicación
 from streamlit_option_menu import option_menu
