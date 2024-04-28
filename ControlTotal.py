@@ -201,7 +201,7 @@ def display_search_results(search_name):
 
 
 def update_user_form():
-    """Formulario para actualizar la información de un usuario existente.
+    """Formulario para actualizar la información de un usuario existente con opciones seleccionables.
 
     Args:
         None
@@ -211,21 +211,35 @@ def update_user_form():
     """
     with st.form("Actualizar Usuario"):
         update_id = st.number_input("ID del Usuario a actualizar", step=1)
-        new_username = st.text_input("Nuevo Nombre de Usuario", placeholder="Dejar en blanco si no desea cambiar")
-        new_password = st.text_input("Nueva Contraseña", type="password",
-                                     placeholder="Dejar en blanco si no desea cambiar")
-        new_role = st.selectbox("Nuevo Rol", ["", "Admin", "Empleado"], index=0,
-                                format_func=lambda x: x if x else "Dejar en blanco")
-        new_full_name = st.text_input("Nuevo Nombre Completo", placeholder="Dejar en blanco si no desea cambiar")
-        new_phone_number = st.text_input("Nuevo Número de Celular", placeholder="Dejar en blanco si no desea cambiar")
+
+        # Opciones para seleccionar qué campos actualizar
+        update_username = st.checkbox("Actualizar nombre de usuario")
+        update_password = st.checkbox("Actualizar contraseña")
+        update_role = st.checkbox("Actualizar rol")
+        update_full_name = st.checkbox("Actualizar nombre completo")
+        update_phone_number = st.checkbox("Actualizar número de teléfono")
+
+        new_username = st.text_input("Nuevo Nombre de Usuario") if update_username else None
+        new_password = st.text_input("Nueva Contraseña", type="password") if update_password else None
+        new_role = st.selectbox("Nuevo Rol", ["Admin", "Empleado"], index=0) if update_role else None
+        new_full_name = st.text_input("Nuevo Nombre Completo") if update_full_name else None
+        new_phone_number = st.text_input("Nuevo Número de Celular") if update_phone_number else None
+
         submitted = st.form_submit_button("Actualizar")
         if submitted:
-            result = update_user(update_id, new_username, new_password, new_role, new_full_name, new_phone_number)
+            # Solo se pasan los valores que se desean actualizar
+            result = update_user(
+                update_id,
+                new_username=new_username,
+                new_password=new_password,
+                new_role=new_role,
+                new_full_name=new_full_name,
+                new_phone_number=new_phone_number
+            )
             if "éxito" in result:
                 st.success(result)
             else:
                 st.error(result)
-
 
 def delete_user_form():
     """Formulario para eliminar un usuario existente.
