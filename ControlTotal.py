@@ -3,6 +3,8 @@ from streamlit_option_menu import option_menu
 from auth import verify_user
 from user_management import create_user, search_users, update_user, delete_user, generate_password
 
+st.set_page_config(layout="wide")
+
 def main():
     if 'user' not in st.session_state:
         st.title("Control Total")
