@@ -7,7 +7,7 @@ from auth import verify_user
 # Importa funciones para manejar la creación, búsqueda, actualización y eliminación de usuarios
 from user_management import create_user, search_users, update_user, delete_user, generate_password
 # Importa funciones para la gestión de productos
-from product_management import search_products, view_product_details, update_product, add_product
+from product_management import search_products, delete_product, update_product, add_product
 from database import init_db
 
 st.set_page_config(page_title="Control Total", layout="wide")
@@ -321,11 +321,11 @@ def delete_user_form():
 
 
 def inventory_management_menu():
-    """Muestra el menú de gestión de inventarios para buscar, ver, modificar y agregar productos."""
+    """Muestra el menú de gestión de inventarios para buscar, modificar y agregar productos, y eliminar productos."""
     selected = option_menu(
         None,
-        ["Buscar Producto", "Ver Producto", "Modificar Producto", "Agregar Producto"],
-        icons=["search", "eye", "pencil-square", "plus-circle"],
+        ["Buscar Producto", "Modificar Producto", "Agregar Producto", "Eliminar Producto"],
+        icons=["search", "pencil-square", "plus-circle", "trash"],
         menu_icon="cast",
         default_index=0,
         orientation="horizontal"
@@ -333,12 +333,12 @@ def inventory_management_menu():
 
     if selected == "Buscar Producto":
         search_product_form()
-    elif selected == "Ver Producto":
-        view_product_form()
     elif selected == "Modificar Producto":
         update_product_form()
     elif selected == "Agregar Producto":
         add_product_form()
+    elif selected == "Eliminar Producto":
+        delete_product_form()
 
 def search_product_form():
     """Formulario para buscar productos por nombre."""
@@ -350,17 +350,6 @@ def search_product_form():
             for product in products:
                 st.write(f"ID: {product.id}, Nombre: {product.name}, Marca: {product.brand}, Categoría: {product.category}, Subcategoría: {product.subcategory}")
 
-def view_product_form():
-    """Formulario para ver información detallada de un producto por su ID."""
-    with st.form("Ver Producto"):
-        product_id = st.number_input("ID del Producto a ver", step=1)
-        submitted = st.form_submit_button("Ver")
-        if submitted:
-            product = view_product_details(product_id)
-            if product:
-                st.write(f"ID: {product.id}, Nombre: {product.name}, Marca: {product.brand}, Categoría: {product.category}, Subcategoría: {product.subcategory}")
-            else:
-                st.error("Producto no encontrado")
 
 def update_product_form():
     """Formulario para modificar información de un producto existente."""
@@ -422,6 +411,37 @@ def add_product_form():
             else:
                 st.error(result)
 
+def delete_product_form():
+    """Formulario para eliminar un producto existente."""
+    with st.form("Eliminar Producto"):
+        product_id = st.number_input("ID del Producto a eliminar", step=1, min_value=1)
+        submitted = st.form_submit_button("Eliminar Producto")
+
+    if submitted:
+        # Guardar el ID del producto a eliminar en el estado de la sesión
+        st.session_state.delete_id = product_id
+        # Marca para mostrar los botones de confirmación
+        st.session_state.confirmation_delete = True
+
+    if st.session_state.get('confirmation_delete'):
+        st.write("¿Estás seguro de que quieres eliminar este producto?")
+        if st.button("Sí, eliminar"):
+            # Llamar a la función de eliminación con el ID guardado y manejar la respuesta
+            result = delete_product(st.session_state.delete_id)
+            if "éxito" in result:
+                st.success(result)
+                # Restablecer la confirmación
+                st.session_state.confirmation_delete = False
+                # Limpiar el ID almacenado
+                del st.session_state.delete_id
+            else:
+                st.error(result)
+        elif st.button("No, cancelar"):
+            st.write("Eliminación cancelada.")
+            # Restablecer la confirmación
+            st.session_state.confirmation_delete = False
+            # Limpiar el ID almacenado
+            del st.session_state.delete_id
 
 
 if __name__ == "__main__":

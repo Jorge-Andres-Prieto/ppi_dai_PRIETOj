@@ -90,3 +90,17 @@ def add_product(name, brand, category, subcategory, price, quantity):
         return f"Error al añadir el producto: {str(e)}"
     finally:
         session.close()
+
+def delete_product(product_id):
+    """Elimina un producto existente de la base de datos."""
+    session = Session()
+    try:
+        product = session.query(Product).filter(Product.id == product_id).one_or_none()
+        if product:
+            session.delete(product)
+            session.commit()
+            return "Producto eliminado con éxito."
+        else:
+            return "Producto no encontrado."
+    finally:
+        session.close()
