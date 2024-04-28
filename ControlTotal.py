@@ -6,6 +6,8 @@ from streamlit_option_menu import option_menu
 from auth import verify_user
 # Importa funciones para manejar la creación, búsqueda, actualización y eliminación de usuarios
 from user_management import create_user, search_users, update_user, delete_user, generate_password
+# Importa funciones para la gestión de productos
+from product_management import search_products, view_product_details, update_product, add_product
 
 
 st.set_page_config(page_title="Control Total", layout="wide")
@@ -84,6 +86,9 @@ def main_menu(user):
 
     if selected == 'Admin' and user.role == "Admin":
         admin_menu()
+
+    elif selected == 'Gestión de inventarios':
+        inventory_management_menu()
 
 
 def logout():
@@ -312,6 +317,111 @@ def delete_user_form():
             st.session_state.confirmation_delete = False
             # Limpiar el ID almacenado
             del st.session_state.delete_id
+
+# En ControlTotal.py
+
+def inventory_management_menu():
+    """Muestra el menú de gestión de inventarios para buscar, ver, modificar y agregar productos.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    selected_option = st.sidebar.selectbox(
+        "Gestión de inventarios",
+        ["Buscar Producto", "Ver Producto", "Modificar Producto", "Agregar Producto"]
+    )
+
+    if selected_option == "Buscar Producto":
+        search_product_form()
+    elif selected_option == "Ver Producto":
+        view_product_form()
+    elif selected_option == "Modificar Producto":
+        update_product_form()
+    elif selected_option == "Agregar Producto":
+        add_product_form()
+
+def search_product_form():
+    """Formulario para buscar productos por nombre.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    with st.form("Buscar Producto"):
+        search_query = st.text_input("Nombre del Producto a buscar")
+        submitted = st.form_submit_button("Buscar")
+
+    if submitted:
+        # Llama a la función para buscar productos con el query ingresado
+        search_products(search_query)
+
+
+def view_product_form():
+    """Formulario para ver información detallada de un producto por su ID.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    with st.form("Ver Producto"):
+        product_id = st.number_input("ID del Producto a ver", step=1)
+        submitted = st.form_submit_button("Ver")
+
+    if submitted:
+        # Llama a la función para ver información detallada de un producto por su ID
+        view_product_details(product_id)
+
+
+def update_product_form():
+    """Formulario para modificar información de un producto existente.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    with st.form("Modificar Producto"):
+        product_id = st.number_input("ID del Producto a modificar", step=1)
+        # Implementa los campos que se pueden modificar (nombre, marca, categoría, etc.)
+        new_name = st.text_input("Nuevo Nombre del Producto")
+        new_brand = st.text_input("Nueva Marca del Producto")
+        new_category = st.text_input("Nueva Categoría del Producto")
+        new_subcategory = st.text_input("Nueva Subcategoría del Producto")
+        submitted = st.form_submit_button("Modificar")
+
+    if submitted:
+        # Llama a la función para modificar información de un producto existente
+        update_product(product_id, new_name, new_brand, new_category, new_subcategory)
+
+
+def add_product_form():
+    """Formulario para añadir un nuevo producto.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    with st.form("Agregar Producto"):
+        name = st.text_input("Nombre del Producto")
+        brand = st.text_input("Marca del Producto")
+        category = st.text_input("Categoría del Producto")
+        subcategory = st.text_input("Subcategoría del Producto")
+        submitted = st.form_submit_button("Agregar")
+
+    if submitted:
+        # Llama a la función para añadir un nuevo producto
+        add_product(name, brand, category, subcategory)
+
 
 
 if __name__ == "__main__":
