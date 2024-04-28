@@ -80,7 +80,8 @@ def add_product(name, brand, category, subcategory):
     """
     session = Session()
     try:
-        new_product = Product(name=name, brand=brand, category=category, subcategory=subcategory)
+        new_product = Product(name=name, brand=brand, category=category, subcategory=subcategory, price=price,
+                              quantity=quantity)
         session.add(new_product)
         session.commit()
         return "Producto añadido con éxito."

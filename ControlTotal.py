@@ -411,14 +411,17 @@ def add_product_form():
         brand = st.text_input("Marca del Producto")
         category = st.text_input("Categoría del Producto")
         subcategory = st.text_input("Subcategoría del Producto")
+        price = st.number_input("Precio del Producto", min_value=0.01, format="%.2f")
+        quantity = st.number_input("Cantidad del Producto", min_value=0, step=1)
         submitted = st.form_submit_button("Agregar")
 
         if submitted:
-            result = add_product(name, brand, category, subcategory)
+            result = add_product(name, brand, category, subcategory, price, quantity)
             if "éxito" in result:
                 st.success(result)
             else:
                 st.error(result)
+
 
 
 if __name__ == "__main__":
