@@ -20,7 +20,7 @@ def main():
     Returns:
         None
     """
-    # Asegurarse de que las claves de estado de sesión necesarias existan
+    # Claves de estado de sesión necesarias
     if 'confirmation' not in st.session_state:
         st.session_state.confirmation = False
     if 'update_data' not in st.session_state:
@@ -41,24 +41,40 @@ def login_page():
     """Crea y gestiona la página de inicio de sesión.
 
     Args:
-        None
+        No recibe argumentos.
 
     Returns:
-        None
+        No retorna nada.
     """
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.title("Control Total")
-        username = st.text_input("Nombre de Usuario")
-        password = st.text_input("Contraseña", type="password")
+
+        # Validación básica del nombre de usuario
+        username = st.text_input(
+            "Nombre de Usuario", key="username", placeholder="Ingrese su nombre de usuario"
+        )
+        if not username:
+            st.error("El nombre de usuario no puede estar vacío.")
+            return
+
+        # Validación básica de la contraseña
+        password = st.text_input(
+            "Contraseña", key="password", type="password", placeholder="Ingrese su contraseña"
+        )
+        if not password:
+            st.error("La contraseña no puede estar vacía.")
+            return
+
         if st.button("Ingresar"):
             user = verify_user(username, password)
             if user:
                 st.session_state['user'] = user
                 st.experimental_rerun()
             else:
-                st.error("Usuario o contraseña incorrectos.")
-
+                st.error(
+                    "Usuario o contraseña incorrectos. Por favor, verifique sus credenciales."
+                )
 
 def main_menu(user):
     """Crea y muestra el menú principal para la navegación de la aplicación.
@@ -69,6 +85,7 @@ def main_menu(user):
     Returns:
         None
     """
+    # Menu para las opciones basicas de la app "Admin", "Ventas y Facturación", "Gestión de inventarios"
     with st.sidebar:
         selected = option_menu(
             None,
@@ -109,6 +126,7 @@ def admin_menu():
     Returns:
         None
     """
+    # Menu para la gestión de usuarios
     selected = option_menu(
         None,
         ["Crear Usuario", "Buscar Usuario", "Actualizar Usuario", "Eliminar Usuario"],
@@ -136,6 +154,7 @@ def create_user_form():
     Returns:
         None
     """
+    # Formulario para crear un nuevo usuario.
     with st.form("Crear Usuario"):
         username = st.text_input("Nombre de Usuario", help="Debe ser único.")
         auto_password = st.checkbox("Generar contraseña segura automáticamente")
@@ -162,6 +181,7 @@ def validate_and_submit_user(username, password, role, full_name, phone_number, 
     Returns:
         None
     """
+    # Condicionales para crear un usuario
     if len(username) < 5:
         st.error("El nombre de usuario debe tener al menos 5 caracteres.")
     elif not auto_password and len(password) < 8:
