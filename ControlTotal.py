@@ -355,14 +355,12 @@ def update_product_form():
     """Formulario para modificar información de un producto existente."""
     with st.form("Modificar Producto"):
         product_id = st.number_input("ID del Producto a modificar", step=1, format="%d")
-        new_name = st.text_input("Nuevo Nombre del Producto")
-        new_brand = st.text_input("Nueva Marca del Producto")
-        new_category = st.text_input("Nueva Categoría del Producto")
-        new_subcategory = st.text_input("Nueva Subcategoría del Producto")
-        new_price = st.number_input("Nuevo Precio del Producto", format="%.2f",
-                                    help="Dejar en blanco si no desea cambiar.")
-        new_quantity = st.number_input("Nueva Cantidad del Producto", step=1, format="%d",
-                                       help="Dejar en blanco si no desea cambiar.")
+        new_name = st.text_input("Nuevo Nombre del Producto", placeholder="Dejar en blanco si no desea cambiar")
+        new_brand = st.text_input("Nueva Marca del Producto", placeholder="Dejar en blanco si no desea cambiar")
+        new_category = st.text_input("Nueva Categoría del Producto", placeholder="Dejar en blanco si no desea cambiar")
+        new_subcategory = st.text_input("Nueva Subcategoría del Producto", placeholder="Dejar en blanco si no desea cambiar")
+        new_price = st.number_input("Nuevo Precio del Producto", format="%.2f", placeholder="Dejar en blanco si no desea cambiar")
+        new_quantity = st.number_input("Nueva Cantidad del Producto", step=1, format="%d", placeholder="Dejar en blanco si no desea cambiar")
         submitted = st.form_submit_button("Actualizar")
 
         if submitted:
