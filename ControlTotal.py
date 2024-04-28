@@ -220,21 +220,46 @@ def update_user_form():
         submitted = st.form_submit_button("Actualizar")
 
     if submitted:
-        # Solicitar confirmación antes de realizar la actualización
-        confirm = st.button("¿Estás seguro de que quieres actualizar este usuario?")
-        if confirm:
+        # Guardar los datos temporales en el estado de la sesión
+        st.session_state.update_data = {
+            "update_id": update_id,
+            "new_username": new_username,
+            "new_password": new_password,
+            "new_role": new_role,
+            "new_full_name": new_full_name,
+            "new_phone_number": new_phone_number
+        }
+        st.session_state.confirmation = True  # Marca para mostrar los botones de confirmación
+
+    if st.session_state.get('confirmation'):
+        st.write("¿Estás seguro de que quieres actualizar este usuario?")
+        if st.button("Sí, actualizar"):
+            # Recuperar datos desde el estado de la sesión y llamar a la función de actualización
+            data = st.session_state.update_data
             result = update_user(
-                update_id,
-                new_username=new_username,
-                new_password=new_password,
-                new_role=new_role,
-                new_full_name=new_full_name,
-                new_phone_number=new_phone_number
+                data["update_id"],
+                new_username=data["new_username"],
+                new_password=data["new_password"],
+                new_role=data["new_role"],
+                new_full_name=data["new_full_name"],
+                new_phone_number=data["new_phone_number"]
             )
             if "éxito" in result:
                 st.success(result)
+                st.session_state.confirmation = False  # Restablecer la confirmación
+                del st.session_state.update_data  # Limpiar los datos temporales
             else:
                 st.error(result)
+        elif st.button("No, cancelar"):
+            st.write("Actualización cancelada.")
+            st.session_state.confirmation = False  # Restablecer la confirmación
+            del st.session_state.update_data  # Limpiar los datos temporales
+
+# Asegúrate de que las claves existan en session_state al inicio de la app
+if 'confirmation' not in st.session_state:
+    st.session_state.confirmation = False
+if 'update_data' not in st.session_state:
+    st.session_state.update_data = {}
 
 
 def delete_user_form():
