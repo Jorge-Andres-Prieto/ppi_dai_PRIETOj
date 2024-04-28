@@ -1,13 +1,13 @@
-# Importa el módulo de Streamlit para crear aplicaciones web.
+# Importa el módulo de Streamlit para crear aplicaciones web
 import streamlit as st
-# Importa opciones de menú para navegación en la aplicación.
+# Importa opciones de menú para la navegación en la aplicación
 from streamlit_option_menu import option_menu
-# Importa función para verificar la autenticidad del usuario.
+# Importa la función para verificar la autenticidad del usuario
 from auth import verify_user
-# Importa funciones de manejo de usuarios.
+# Importa funciones para manejar la creación, búsqueda, actualización y eliminación de usuarios
 from user_management import create_user, search_users, update_user, delete_user, generate_password
 
-# Configura la página con título y disposición.
+
 st.set_page_config(page_title="Control Total", layout="wide")
 
 
@@ -21,7 +21,14 @@ def main():
 
 
 def login_page():
-    """Muestra la página de inicio de sesión para la autenticación del usuario."""
+    """Crea y gestiona la página de inicio de sesión.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.title("Control Total")
@@ -37,10 +44,13 @@ def login_page():
 
 
 def main_menu(user):
-    """Despliega el menú principal para la navegación entre módulos de la aplicación.
+    """Crea y muestra el menú principal para la navegación de la aplicación.
 
     Args:
-        user (User): El usuario autenticado que está utilizando la aplicación.
+        user (dict): Diccionario que contiene la información del usuario autenticado.
+
+    Returns:
+        None
     """
     with st.sidebar:
         selected = option_menu(
@@ -60,14 +70,28 @@ def main_menu(user):
 
 
 def logout():
-    """Cierra la sesión del usuario actual y redirige a la página de inicio de sesión."""
+    """Cierra la sesión del usuario y reinicia la aplicación.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     if 'user' in st.session_state:
         del st.session_state['user']
     st.experimental_rerun()
 
 
 def admin_menu():
-    """Presenta el menú de administración con opciones para manejar usuarios."""
+    """Muestra el menú de administración para la gestión de usuarios.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     selected = option_menu(
         None,
         ["Crear Usuario", "Buscar Usuario", "Actualizar Usuario", "Eliminar Usuario"],
@@ -87,7 +111,14 @@ def admin_menu():
 
 
 def create_user_form():
-    """Formulario para la creación de nuevos usuarios."""
+    """Formulario para crear un nuevo usuario.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     with st.form("Crear Usuario"):
         username = st.text_input("Nombre de Usuario", help="Debe ser único.")
         auto_password = st.checkbox("Generar contraseña segura automáticamente")
@@ -101,15 +132,18 @@ def create_user_form():
 
 
 def validate_and_submit_user(username, password, role, full_name, phone_number, auto_password):
-    """Valida los datos del nuevo usuario y, si son correctos, los registra en el sistema.
+    """Valida la información del usuario y, si es válida, crea un nuevo usuario.
 
     Args:
-        username (str): El nombre de usuario deseado.
-        password (str): La contraseña elegida o generada.
-        role (str): El rol asignado al usuario dentro del sistema.
-        full_name (str): El nombre completo del usuario.
+        username (str): Nombre de usuario a crear.
+        password (str): Contraseña para el usuario.
+        role (str): Rol del usuario en la aplicación.
+        full_name (str): Nombre completo del usuario.
         phone_number (str): Número de teléfono del usuario.
         auto_password (bool): Indica si la contraseña fue generada automáticamente.
+
+    Returns:
+        None
     """
     if len(username) < 5:
         st.error("El nombre de usuario debe tener al menos 5 caracteres.")
@@ -126,7 +160,14 @@ def validate_and_submit_user(username, password, role, full_name, phone_number, 
 
 
 def search_user_form():
-    """Formulario para buscar usuarios existentes por nombre."""
+    """Formulario para buscar usuarios existentes en la base de datos.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     with st.form("Buscar Usuario"):
         search_name = st.text_input("Nombre a buscar")
         submitted = st.form_submit_button("Buscar")
@@ -135,10 +176,13 @@ def search_user_form():
 
 
 def display_search_results(search_name):
-    """Muestra los resultados de búsqueda de usuarios.
+    """Muestra los resultados de la búsqueda de usuarios.
 
     Args:
-        search_name (str): El nombre del usuario a buscar en la base de datos.
+        search_name (str): Nombre del usuario a buscar.
+
+    Returns:
+        None
     """
     users = search_users(search_name)
     if users:
@@ -148,27 +192,43 @@ def display_search_results(search_name):
     else:
         st.write("No se encontraron usuarios")
 
+
 def update_user_form():
-    """Formulario para actualizar los datos de un usuario existente."""
+    """Formulario para actualizar la información de un usuario existente.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     with st.form("Actualizar Usuario"):
         update_id = st.number_input("ID del Usuario a actualizar", step=1)
         new_username = st.text_input("Nuevo Nombre de Usuario", placeholder="Dejar en blanco si no desea cambiar")
-        new_password = st.text_input("Nueva Contraseña", type="password", placeholder="Dejar en blanco si no desea cambiar")
+        new_password = st.text_input("Nueva Contraseña", type="password",
+                                     placeholder="Dejar en blanco si no desea cambiar")
         new_role = st.selectbox("Nuevo Rol", ["", "Admin", "Empleado"], index=0,
                                 format_func=lambda x: x if x else "Dejar en blanco")
         new_full_name = st.text_input("Nuevo Nombre Completo", placeholder="Dejar en blanco si no desea cambiar")
         new_phone_number = st.text_input("Nuevo Número de Celular", placeholder="Dejar en blanco si no desea cambiar")
         submitted = st.form_submit_button("Actualizar")
         if submitted:
-            result = update_user(update_id, new_username, new_password, new_role,
-                                 new_full_name, new_phone_number)
+            result = update_user(update_id, new_username, new_password, new_role, new_full_name, new_phone_number)
             if "éxito" in result:
                 st.success(result)
             else:
                 st.error(result)
 
+
 def delete_user_form():
-    """Formulario para eliminar un usuario existente."""
+    """Formulario para eliminar un usuario existente.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     with st.form("Eliminar Usuario"):
         del_id = st.number_input("ID del Usuario a eliminar", step=1)
         submitted = st.form_submit_button("Eliminar")
@@ -181,4 +241,3 @@ def delete_user_form():
 
 if __name__ == "__main__":
     main()
-
