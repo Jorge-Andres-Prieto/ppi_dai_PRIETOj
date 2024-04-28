@@ -66,7 +66,7 @@ def update_product(product_id, new_name, new_brand, new_category, new_subcategor
     finally:
         session.close()
 
-def add_product(name, brand, category, subcategory):
+def add_product(name, brand, category, subcategory, price, quantity):
     """Añade un nuevo producto a la base de datos.
 
     Args:
