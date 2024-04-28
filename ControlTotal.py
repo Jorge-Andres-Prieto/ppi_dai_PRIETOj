@@ -348,50 +348,37 @@ def search_product_form():
         if submitted:
             products = search_products(search_query)
             for product in products:
-                st.write(f"ID: {product.id}, Nombre: {product.name}, Marca: {product.brand}, Categoría: {product.category}, Subcategoría: {product.subcategory}")
+                st.write(f"ID: {product.id}, Nombre: {product.name}, Marca: {product.brand}, Categoría: {product.category}, Subcategoría: {product.subcategory}, Precio: ${product.price}, Cantidad: {product.quantity}")
 
 
 def update_product_form():
     """Formulario para modificar información de un producto existente."""
     with st.form("Modificar Producto"):
-        product_id = st.number_input("ID del Producto a modificar", step=1)
+        product_id = st.number_input("ID del Producto a modificar", step=1, format="%d")
         new_name = st.text_input("Nuevo Nombre del Producto")
         new_brand = st.text_input("Nueva Marca del Producto")
         new_category = st.text_input("Nueva Categoría del Producto")
         new_subcategory = st.text_input("Nueva Subcategoría del Producto")
-        submitted = st.form_submit_button("Modificar")
+        new_price = st.number_input("Nuevo Precio del Producto", format="%.2f",
+                                    help="Dejar en blanco si no desea cambiar.")
+        new_quantity = st.number_input("Nueva Cantidad del Producto", step=1, format="%d",
+                                       help="Dejar en blanco si no desea cambiar.")
+        submitted = st.form_submit_button("Actualizar")
 
         if submitted:
-            st.session_state.update_data = {
-                "product_id": product_id,
-                "new_name": new_name,
-                "new_brand": new_brand,
-                "new_category": new_category,
-                "new_subcategory": new_subcategory
-            }
-            st.session_state.confirmation = True
-
-    if st.session_state.get('confirmation'):
-        st.write("¿Estás seguro de que quieres actualizar este producto?")
-        if st.button("Sí, actualizar"):
-            data = st.session_state.update_data
             result = update_product(
-                data["product_id"],
-                new_name=data["new_name"],
-                new_brand=data["new_brand"],
-                new_category=data["new_category"],
-                new_subcategory=data["new_subcategory"]
+                product_id,
+                new_name if new_name else None,
+                new_brand if new_brand else None,
+                new_category if new_category else None,
+                new_subcategory if new_subcategory else None,
+                new_price if new_price else None,
+                new_quantity if new_quantity else None
             )
             if "éxito" in result:
                 st.success(result)
-                st.session_state.confirmation = False
-                del st.session_state.update_data
             else:
                 st.error(result)
-        elif st.button("No, cancelar"):
-            st.write("Actualización cancelada.")
-            st.session_state.confirmation = False
-            del st.session_state.update_data
 
 def add_product_form():
     """Formulario para añadir un nuevo producto."""

@@ -13,7 +13,7 @@ def search_products(search_query):
     """
     session = Session()
     try:
-        products = session.query(Product).filter(func.lower(Product.name).like(func.lower(f"%{search_query}%"))).all()
+        products = session.query(Product).filter(Product.name.ilike(f"%{search_query}%")).all()
         return products
     finally:
         session.close()
@@ -38,7 +38,8 @@ def view_product_details(product_id):
     finally:
         session.close()
 
-def update_product(product_id, new_name, new_brand, new_category, new_subcategory):
+def update_product(product_id, new_name=None, new_brand=None, new_category=None, new_subcategory=None, new_price=None, new_quantity=None):
+    session = Session()
     """Actualiza la información de un producto existente.
 
     Args:
@@ -55,14 +56,25 @@ def update_product(product_id, new_name, new_brand, new_category, new_subcategor
     try:
         product = session.query(Product).filter(Product.id == product_id).first()
         if product:
-            product.name = new_name
-            product.brand = new_brand
-            product.category = new_category
-            product.subcategory = new_subcategory
+            if new_name:
+                product.name = new_name
+            if new_brand:
+                product.brand = new_brand
+            if new_category:
+                product.category = new_category
+            if new_subcategory:
+                product.subcategory = new_subcategory
+            if new_price is not None:
+                product.price = new_price
+            if new_quantity is not None:
+                product.quantity = new_quantity
             session.commit()
             return "Producto actualizado con éxito."
         else:
             return "Producto no encontrado."
+    except Exception as e:
+        session.rollback()
+        return f"Error al actualizar el producto: {str(e)}"
     finally:
         session.close()
 
