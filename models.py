@@ -26,6 +26,7 @@ class User(Base):
     full_name = Column(String, nullable=False)
     phone_number = Column(String, nullable=False)
 
+
 class Product(Base):
     __tablename__ = 'products'
     id = Column(Integer, primary_key=True)
