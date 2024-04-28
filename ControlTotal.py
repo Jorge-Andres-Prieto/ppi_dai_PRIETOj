@@ -12,7 +12,14 @@ st.set_page_config(page_title="Control Total", layout="wide")
 
 
 def main():
-    """Función principal que controla el flujo de la aplicación."""
+    """Función principal que controla el flujo de la aplicación.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     if 'user' not in st.session_state:
         login_page()
     else:
