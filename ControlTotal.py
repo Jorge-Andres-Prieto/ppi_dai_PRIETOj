@@ -235,7 +235,8 @@ def update_user_form():
             "new_full_name": new_full_name,
             "new_phone_number": new_phone_number
         }
-        st.session_state.confirmation = True  # Marca para mostrar los botones de confirmación
+        # Marca para mostrar los botones de confirmación
+        st.session_state.confirmation = True
 
     if st.session_state.get('confirmation'):
         st.write("¿Estás seguro de que quieres actualizar este usuario?")
@@ -252,14 +253,18 @@ def update_user_form():
             )
             if "éxito" in result:
                 st.success(result)
-                st.session_state.confirmation = False  # Restablecer la confirmación
-                del st.session_state.update_data  # Limpiar los datos temporales
+                # Restablecer la confirmación
+                st.session_state.confirmation = False
+                # Limpiar los datos temporales
+                del st.session_state.update_data
             else:
                 st.error(result)
         elif st.button("No, cancelar"):
             st.write("Actualización cancelada.")
-            st.session_state.confirmation = False  # Restablecer la confirmación
-            del st.session_state.update_data  # Limpiar los datos temporales
+            # Restablecer la confirmación
+            st.session_state.confirmation = False
+            # Limpiar los datos temporales
+            del st.session_state.update_data
 
 
 def delete_user_form():
@@ -271,15 +276,42 @@ def delete_user_form():
     Returns:
         None
     """
-    with st.form("Eliminar Usuario"):
-        del_id = st.number_input("ID del Usuario a eliminar", step=1)
-        submitted = st.form_submit_button("Eliminar")
-        if submitted:
-            result = delete_user(del_id)
+    st.write("Eliminar Usuario")
+    del_id = st.number_input("ID del Usuario a eliminar", step=1)
+    delete_submitted = st.button("Eliminar Usuario")
+
+    if delete_submitted:
+        # Guardar el ID del usuario a eliminar en el estado de la sesión
+        st.session_state.delete_id = del_id
+        # Marca para mostrar los botones de confirmación
+        st.session_state.confirmation_delete = True
+
+    if st.session_state.get('confirmation_delete'):
+        st.write("¿Estás seguro de que quieres eliminar este usuario?")
+        if st.button("Sí, eliminar"):
+            # Llamar a la función de eliminación con el ID guardado y manejar la respuesta
+            result = delete_user(st.session_state.delete_id)
             if "éxito" in result:
                 st.success(result)
+                # Restablecer la confirmación
+                st.session_state.confirmation_delete = False
+                # Limpiar el ID almacenado
+                del st.session_state.delete_id
             else:
                 st.error(result)
+        elif st.button("No, cancelar"):
+            st.write("Eliminación cancelada.")
+            # Restablecer la confirmación
+            st.session_state.confirmation_delete = False
+            # Limpiar el ID almacenado
+            del st.session_state.delete_id
+
+# Inicialización de las claves en session_state al inicio de la app
+if 'confirmation_delete' not in st.session_state:
+    st.session_state.confirmation_delete = False
+if 'delete_id' not in st.session_state:
+    st.session_state.delete_id = None
+
 
 if __name__ == "__main__":
     main()
