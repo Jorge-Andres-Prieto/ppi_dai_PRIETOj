@@ -219,11 +219,37 @@ def update_user_form():
         update_full_name = st.checkbox("Actualizar nombre completo")
         update_phone_number = st.checkbox("Actualizar número de teléfono")
 
-        new_username = st.text_input("Nuevo Nombre de Usuario") if update_username else None
-        new_password = st.text_input("Nueva Contraseña", type="password") if update_password else None
-        new_role = st.selectbox("Nuevo Rol", ["Admin", "Empleado"], index=0) if update_role else None
-        new_full_name = st.text_input("Nuevo Nombre Completo") if update_full_name else None
-        new_phone_number = st.text_input("Nuevo Número de Celular") if update_phone_number else None
+        # Contenedores para entradas condicionales
+        username_container = st.empty()
+        password_container = st.empty()
+        role_container = st.empty()
+        full_name_container = st.empty()
+        phone_number_container = st.empty()
+
+        if update_username:
+            new_username = username_container.text_input("Nuevo Nombre de Usuario")
+        else:
+            new_username = None
+
+        if update_password:
+            new_password = password_container.text_input("Nueva Contraseña", type="password")
+        else:
+            new_password = None
+
+        if update_role:
+            new_role = role_container.selectbox("Nuevo Rol", ["", "Admin", "Empleado"], index=0)
+        else:
+            new_role = None
+
+        if update_full_name:
+            new_full_name = full_name_container.text_input("Nuevo Nombre Completo")
+        else:
+            new_full_name = None
+
+        if update_phone_number:
+            new_phone_number = phone_number_container.text_input("Nuevo Número de Celular")
+        else:
+            new_phone_number = None
 
         submitted = st.form_submit_button("Actualizar")
         if submitted:
@@ -240,6 +266,7 @@ def update_user_form():
                 st.success(result)
             else:
                 st.error(result)
+
 
 def delete_user_form():
     """Formulario para eliminar un usuario existente.
