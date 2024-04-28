@@ -43,5 +43,5 @@ class Product(Base):
         brand = Column(String)
         category = Column(String, nullable=False)
         subcategory = Column(String)
-        price = Column(float, nullable=False)
+        price = Column(Float, nullable=False)
         quantity = Column(Integer, nullable=False)
