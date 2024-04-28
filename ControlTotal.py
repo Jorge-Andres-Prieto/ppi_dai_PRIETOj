@@ -319,111 +319,70 @@ def delete_user_form():
             # Limpiar el ID almacenado
             del st.session_state.delete_id
 
-# En ControlTotal.py
 
 def inventory_management_menu():
-    """Muestra el menú de gestión de inventarios para buscar, ver, modificar y agregar productos.
-
-    Args:
-        None
-
-    Returns:
-        None
-    """
-    selected_option = st.sidebar.selectbox(
-        "Gestión de inventarios",
-        ["Buscar Producto", "Ver Producto", "Modificar Producto", "Agregar Producto"]
+    """Muestra el menú de gestión de inventarios para buscar, ver, modificar y agregar productos."""
+    # Menu horizontal para la gestión de inventarios
+    selected = option_menu(
+        None,
+        ["Buscar Producto", "Ver Producto", "Modificar Producto", "Agregar Producto"],
+        icons=["search", "eye", "pencil-square", "plus-circle"],
+        menu_icon="cast",
+        default_index=0,
+        orientation="horizontal"
     )
 
-    if selected_option == "Buscar Producto":
+    if selected == "Buscar Producto":
         search_product_form()
-    elif selected_option == "Ver Producto":
+    elif selected == "Ver Producto":
         view_product_form()
-    elif selected_option == "Modificar Producto":
+    elif selected == "Modificar Producto":
         update_product_form()
-    elif selected_option == "Agregar Producto":
+    elif selected == "Agregar Producto":
         add_product_form()
 
+
 def search_product_form():
-    """Formulario para buscar productos por nombre.
-
-    Args:
-        None
-
-    Returns:
-        None
-    """
+    """Formulario para buscar productos por nombre."""
     with st.form("Buscar Producto"):
         search_query = st.text_input("Nombre del Producto a buscar")
         submitted = st.form_submit_button("Buscar")
-
-    if submitted:
-        # Llama a la función para buscar productos con el query ingresado
-        search_products(search_query)
+        if submitted:
+            search_products(search_query)
 
 
 def view_product_form():
-    """Formulario para ver información detallada de un producto por su ID.
-
-    Args:
-        None
-
-    Returns:
-        None
-    """
+    """Formulario para ver información detallada de un producto por su ID."""
     with st.form("Ver Producto"):
         product_id = st.number_input("ID del Producto a ver", step=1)
         submitted = st.form_submit_button("Ver")
-
-    if submitted:
-        # Llama a la función para ver información detallada de un producto por su ID
-        view_product_details(product_id)
+        if submitted:
+            view_product_details(product_id)
 
 
 def update_product_form():
-    """Formulario para modificar información de un producto existente.
-
-    Args:
-        None
-
-    Returns:
-        None
-    """
+    """Formulario para modificar información de un producto existente."""
     with st.form("Modificar Producto"):
         product_id = st.number_input("ID del Producto a modificar", step=1)
-        # Implementa los campos que se pueden modificar (nombre, marca, categoría, etc.)
         new_name = st.text_input("Nuevo Nombre del Producto")
         new_brand = st.text_input("Nueva Marca del Producto")
         new_category = st.text_input("Nueva Categoría del Producto")
         new_subcategory = st.text_input("Nueva Subcategoría del Producto")
         submitted = st.form_submit_button("Modificar")
-
-    if submitted:
-        # Llama a la función para modificar información de un producto existente
-        update_product(product_id, new_name, new_brand, new_category, new_subcategory)
+        if submitted:
+            update_product(product_id, new_name, new_brand, new_category, new_subcategory)
 
 
 def add_product_form():
-    """Formulario para añadir un nuevo producto.
-
-    Args:
-        None
-
-    Returns:
-        None
-    """
+    """Formulario para añadir un nuevo producto."""
     with st.form("Agregar Producto"):
         name = st.text_input("Nombre del Producto")
         brand = st.text_input("Marca del Producto")
         category = st.text_input("Categoría del Producto")
         subcategory = st.text_input("Subcategoría del Producto")
         submitted = st.form_submit_button("Agregar")
-
-    if submitted:
-        # Llama a la función para añadir un nuevo producto
-        add_product(name, brand, category, subcategory)
-
-
+        if submitted:
+            add_product(name, brand, category, subcategory)
 
 if __name__ == "__main__":
     main()
