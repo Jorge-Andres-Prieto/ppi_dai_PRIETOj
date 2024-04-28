@@ -11,8 +11,6 @@ from product_management import search_products, view_product_details, update_pro
 from database import init_db
 
 st.set_page_config(page_title="Control Total", layout="wide")
-# Inicializa la base de datos (crea tablas si no existen)
-init_db()
 
 def main():
     """Función principal que controla el flujo de la aplicación.
