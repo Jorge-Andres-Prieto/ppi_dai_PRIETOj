@@ -13,7 +13,11 @@ def search_products(search_query):
     """
     session = Session()
     try:
-        products = session.query(Product).filter(Product.name.ilike(f"%{search_query}%")).all()
+        if search_query.isdigit():  # Chequea si la entrada es numérica, asumiendo que es un ID
+            product_id = int(search_query)
+            products = session.query(Product).filter(Product.id == product_id).all()
+        else:  # De lo contrario, asume que es una búsqueda por nombre
+            products = session.query(Product).filter(Product.name.ilike(f"%{search_query}%")).all()
         return products
     finally:
         session.close()
@@ -38,7 +42,7 @@ def view_product_details(product_id):
     finally:
         session.close()
 
-def update_product(product_id, new_name=None, new_brand=None, new_category=None, new_subcategory=None, new_price=None, new_quantity=None):
+def update_product(product_id, new_name=None, new_brand=None, new_category=None, new_subcategory=None, new_price=None, inventory_adjustment=None):
     session = Session()
     """Actualiza la información de un producto existente.
 
@@ -66,8 +70,11 @@ def update_product(product_id, new_name=None, new_brand=None, new_category=None,
                 product.subcategory = new_subcategory
             if new_price is not None:
                 product.price = new_price
-            if new_quantity is not None:
-                product.quantity = new_quantity
+            if inventory_adjustment != 0:
+                product.quantity += inventory_adjustment
+                if product.quantity < 0:
+                    session.rollback()  # Hacer rollback si la cantidad es negativa
+                    return "La cantidad del producto no puede ser negativa."
             session.commit()
             return "Producto actualizado con éxito."
         else:

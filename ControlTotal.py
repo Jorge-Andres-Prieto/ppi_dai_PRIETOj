@@ -358,9 +358,12 @@ def update_product_form():
         new_name = st.text_input("Nuevo Nombre del Producto", placeholder="Dejar en blanco si no desea cambiar")
         new_brand = st.text_input("Nueva Marca del Producto", placeholder="Dejar en blanco si no desea cambiar")
         new_category = st.text_input("Nueva Categoría del Producto", placeholder="Dejar en blanco si no desea cambiar")
-        new_subcategory = st.text_input("Nueva Subcategoría del Producto", placeholder="Dejar en blanco si no desea cambiar")
-        new_price = st.number_input("Nuevo Precio del Producto", format="%.2f", placeholder="Dejar en blanco si no desea cambiar")
-        new_quantity = st.number_input("Nueva Cantidad del Producto", step=1, format="%d", placeholder="Dejar en blanco si no desea cambiar")
+        new_subcategory = st.text_input("Nueva Subcategoría del Producto",
+                                        placeholder="Dejar en blanco si no desea cambiar")
+        new_price = st.number_input("Nuevo Precio del Producto", format="%.2f",
+                                    help="Dejar en blanco para mantener el precio actual", value=0.0)
+        inventory_adjustment = st.number_input("Ajuste de Inventario (positivo para añadir, negativo para reducir)",
+                                               format="%d")
         submitted = st.form_submit_button("Actualizar")
 
         if submitted:
@@ -370,8 +373,8 @@ def update_product_form():
                 new_brand if new_brand else None,
                 new_category if new_category else None,
                 new_subcategory if new_subcategory else None,
-                new_price if new_price else None,
-                new_quantity if new_quantity else None
+                new_price if new_price != 0.0 else None,
+                inventory_adjustment if inventory_adjustment else None
             )
             if "éxito" in result:
                 st.success(result)
