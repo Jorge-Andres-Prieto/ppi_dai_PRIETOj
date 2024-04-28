@@ -21,6 +21,8 @@ def main():
     Returns:
         None
     """
+    init_db()  # Asegúrate de que todas las tablas estén creadas al iniciar la aplicación
+
     # Claves de estado de sesión necesarias
     if 'confirmation' not in st.session_state:
         st.session_state.confirmation = False

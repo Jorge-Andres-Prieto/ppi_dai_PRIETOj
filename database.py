@@ -15,6 +15,7 @@ engine = create_engine(DATABASE_URL, echo=True)
 Session = sessionmaker(bind=engine)
 
 
+
 def init_db():
     """Inicializa la base de datos creando todas las tablas definidas en los modelos.
 
