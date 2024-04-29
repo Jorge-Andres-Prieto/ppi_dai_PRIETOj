@@ -78,25 +78,42 @@ def main_menu(user):
     Returns:
         None
     """
-    # Menu para las opciones basicas de la app "Admin", "Ventas y Facturación", "Gestión de inventarios"
-    with st.sidebar:
-        selected = option_menu(
-            None,
-            ["Admin", "Ventas y Facturación", "Gestión de inventarios",
-             "Análisis estadísticos", "Domicilios"],
-            icons=["person-circle", "currency-dollar", "archive", "graph-up",
-                   "truck"],
-            menu_icon="cast",
-            default_index=0
-        )
-        if st.button("Cerrar Sesión"):
-            logout()
+    if user.role == "Admin":
+        with st.sidebar:
+            selected = option_menu(
+                None,
+                ["Admin", "Ventas y Facturación", "Gestión de inventarios",
+                 "Análisis estadísticos", "Domicilios"],
+                icons=["person-circle", "currency-dollar", "archive", "graph-up",
+                       "truck"],
+                menu_icon="cast",
+                default_index=0
+            )
+            if st.button("Cerrar Sesión"):
+                logout()
 
-    if selected == 'Admin' and user.role == "Admin":
-        admin_menu()
+        if selected == 'Admin':
+            admin_menu()
 
-    elif selected == 'Gestión de inventarios':
-        inventory_management_menu()
+        elif selected == 'Gestión de inventarios':
+            inventory_management_menu()
+
+    elif user.role == "Empleado":
+        with st.sidebar:
+            selected = option_menu(
+                None,
+                ["Ventas y Facturación", "Gestión de inventarios",
+                 "Análisis estadísticos", "Domicilios"],
+                icons=["currency-dollar", "archive", "graph-up",
+                       "truck"],
+                menu_icon="cast",
+                default_index=0
+            )
+            if st.button("Cerrar Sesión"):
+                logout()
+
+        if selected == 'Gestión de inventarios':
+            inventory_management_menu()
 
 
 def logout():
