@@ -78,7 +78,7 @@ def main_menu(user):
     Returns:
         None
     """
-    if user.role == "Amind":
+    if user.role == "Admin":
         with st.sidebar:
             selected = option_menu(
                 None,
