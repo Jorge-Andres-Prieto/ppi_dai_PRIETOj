@@ -64,7 +64,7 @@ def login_page():
 
         if user:
             if user.tdp == "No Aceptado":
-                with st.expander("Ver texto completo", expanded=False):
+                with st.expander("Ver Tratamiento de datos personales", expanded=False):
                     st.write(tdp)
                 accept_policies = st.checkbox(
                     "Acepto las políticas de tratamiento de datos personales al iniciar sesión.")
