@@ -8,8 +8,10 @@ from auth import verify_user
 from user_management import create_user, search_users, update_user, delete_user, generate_password
 # Importa funciones para la gestión de productos
 from product_management import search_products, delete_product, update_product, add_product
+# Importa funcion para crear la base de datos siesta no esta creada
 from database import init_db
 
+#Función de streamlit para utilizar la página completa
 st.set_page_config(page_title="Control Total", layout="wide")
 
 def main():
@@ -21,7 +23,9 @@ def main():
     Returns:
         None
     """
-    init_db()  # Asegúrate de que todas las tablas estén creadas al iniciar la aplicación
+
+    # Asegura de que todas las tablas estén creadas al iniciar la aplicación
+    init_db()
 
     # Claves de estado de sesión necesarias
     if 'confirmation' not in st.session_state:
@@ -49,12 +53,15 @@ def login_page():
     Returns:
         None
     """
+
+    # Función de streamlit para dividir la página en columnas
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.title("Control Total")
         username = st.text_input("Nombre de Usuario")
         password = st.text_input("Contraseña", type="password")
         if st.button("Ingresar"):
+            # Condicionales para verificar si el usuario y contraseña son correctos
             user = verify_user(username, password)
             if user:
                 st.session_state['user'] = user
@@ -71,25 +78,42 @@ def main_menu(user):
     Returns:
         None
     """
-    # Menu para las opciones basicas de la app "Admin", "Ventas y Facturación", "Gestión de inventarios"
-    with st.sidebar:
-        selected = option_menu(
-            None,
-            ["Admin", "Ventas y Facturación", "Gestión de inventarios",
-             "Análisis estadísticos", "Domicilios"],
-            icons=["person-circle", "currency-dollar", "archive", "graph-up",
-                   "truck"],
-            menu_icon="cast",
-            default_index=0
-        )
-        if st.button("Cerrar Sesión"):
-            logout()
+    if user.role == "Amind":
+        with st.sidebar:
+            selected = option_menu(
+                None,
+                ["Admin", "Ventas y Facturación", "Gestión de inventarios",
+                 "Análisis estadísticos", "Domicilios"],
+                icons=["person-circle", "currency-dollar", "archive", "graph-up",
+                       "truck"],
+                menu_icon="cast",
+                default_index=0
+            )
+            if st.button("Cerrar Sesión"):
+                logout()
 
-    if selected == 'Admin' and user.role == "Admin":
-        admin_menu()
+        if selected == 'Admin':
+            admin_menu()
 
-    elif selected == 'Gestión de inventarios':
-        inventory_management_menu()
+        elif selected == 'Gestión de inventarios':
+            inventory_management_menu()
+
+    elif user.role == "Empleado":
+        with st.sidebar:
+            selected = option_menu(
+                None,
+                ["Ventas y Facturación", "Gestión de inventarios",
+                 "Análisis estadísticos", "Domicilios"],
+                icons=["currency-dollar", "archive", "graph-up",
+                       "truck"],
+                menu_icon="cast",
+                default_index=0
+            )
+            if st.button("Cerrar Sesión"):
+                logout()
+
+        if selected == 'Gestión de inventarios':
+            inventory_management_menu()
 
 
 def logout():
