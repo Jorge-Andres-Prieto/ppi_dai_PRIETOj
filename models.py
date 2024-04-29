@@ -27,7 +27,7 @@ class User(Base):
     role = Column(String, nullable=False)
     full_name = Column(String, nullable=False)
     phone_number = Column(String, nullable=False)
-    user_data = relationship("UserData", uselist=False, back_populates="user")
+    user_data = relationship("UserData", uselist=False, back_populates="user", lazy='joined')
 
 
 class Product(Base):
