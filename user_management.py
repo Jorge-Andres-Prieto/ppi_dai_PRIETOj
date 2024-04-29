@@ -150,3 +150,8 @@ def update_user_data(user):
         raise e
     finally:
         session.close()
+
+def handle_terms_acceptance(user):
+    user.inicio = 1  # Marcar como que el usuario ha iniciado sesión al menos una vez
+    user.tdp = "Aceptado"  # Registrar que ha aceptado los términos y condiciones
+    update_user_data(user)  # Usar la función existente para guardar estos cambios

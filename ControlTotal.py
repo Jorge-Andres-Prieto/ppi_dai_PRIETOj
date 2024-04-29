@@ -8,7 +8,10 @@ from auth import verify_user
 from user_management import create_user, search_users, update_user, delete_user, generate_password, update_user_data
 # Importa funciones para la gestión de productos
 from product_management import search_products, delete_product, update_product, add_product
+
 from database import init_db
+
+from models import User
 
 st.set_page_config(page_title="Control Total", layout="wide")
 
@@ -55,28 +58,27 @@ def login_page():
         username = st.text_input("Nombre de Usuario")
         password = st.text_input("Contraseña", type="password")
         if st.button("Ingresar"):
-            user = verify_user(username, password)
+            user = verify_user(username,
+                               password)  # Asume que esta función verifica las credenciales y devuelve un objeto User
             if user:
-                st.session_state['user'] = user
+                st.session_state['user'] = user  # Guardar usuario en el estado de la sesión
                 if user.inicio == 0:
-                    show_terms_and_conditions(user)
+                    show_terms_and_conditions(user)  # Mostrar términos si es la primera vez que ingresa
                 else:
                     st.success("Bienvenido de nuevo a la aplicación.")
             else:
                 st.error("Usuario o contraseña incorrectos.")
 
-
 def show_terms_and_conditions(user):
     st.write("Texto informativo sobre el tratamiento de datos personales.")
     if st.button("Acepto"):
-        user.inicio = 1
-        user.tdp = "Aceptado"
-        update_user_data(user)
+        user.inicio = 1  # Marcar que el usuario ha iniciado sesión al menos una vez
+        user.tdp = "Aceptado"  # Marcar que el usuario ha aceptado los términos
+        update_user_data(user)  # Actualizar los datos del usuario en la base de datos
         st.success("Has aceptado los términos y condiciones. Bienvenido a la aplicación.")
     elif st.button("No acepto"):
         st.error("Debe aceptar los términos para utilizar la aplicación.")
-        del st.session_state['user']  # Opcionalmente limpiar el estado de sesión si no acepta
-
+        del st.session_state['user']
 
 def main_menu(user):
     """Crea y muestra el menú principal para la navegación de la aplicación.
