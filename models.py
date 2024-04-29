@@ -25,6 +25,7 @@ class User(Base):
     role = Column(String, nullable=False)
     full_name = Column(String, nullable=False)
     phone_number = Column(String, nullable=False)
+    tdp = Column(String, default="No Aceptado")
 
 
 class Product(Base):

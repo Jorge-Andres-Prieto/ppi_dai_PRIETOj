@@ -3,7 +3,7 @@ import streamlit as st
 # Importa opciones de menú para la navegación en la aplicación
 from streamlit_option_menu import option_menu
 # Importa la función para verificar la autenticidad del usuario
-from auth import verify_user
+from auth import verify_user, update_tdp_status
 # Importa funciones para manejar la creación, búsqueda, actualización y eliminación de usuarios
 from user_management import create_user, search_users, update_user, delete_user, generate_password
 # Importa funciones para la gestión de productos
@@ -60,13 +60,26 @@ def login_page():
         st.title("Control Total")
         username = st.text_input("Nombre de Usuario")
         password = st.text_input("Contraseña", type="password")
-        if st.button("Ingresar"):
-            # Condicionales para verificar si el usuario y contraseña son correctos
-            user = verify_user(username, password)
-            if user:
-                st.session_state['user'] = user
-                st.experimental_rerun()
+        user = verify_user(username, password, check_only=True)
+
+        if user:
+            if user.tdp == "No Aceptado":
+                accept_policies = st.checkbox(
+                    "Acepto las políticas de tratamiento de datos personales al iniciar sesión.")
+                if st.button("Ingresar"):
+                    if accept_policies:
+                        update_tdp_status(user.id, "Aceptado")
+                        st.session_state['user'] = user
+                        st.experimental_rerun()
+                    else:
+                        st.error("Debes aceptar las políticas de tratamiento de datos personales para iniciar sesión.")
+                        st.stop()
             else:
+                if st.button("Ingresar"):
+                    st.session_state['user'] = user
+                    st.experimental_rerun()
+        else:
+            if st.button("Ingresar"):
                 st.error("Usuario o contraseña incorrectos.")
 
 def main_menu(user):

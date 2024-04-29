@@ -4,7 +4,7 @@ from database import Session
 from models import User
 
 
-def verify_user(username, password):
+def verify_user(username, password, check_only=False):
     """Verifica las credenciales del usuario contra la base de datos.
 
     Args:
@@ -16,10 +16,23 @@ def verify_user(username, password):
     """
     session = Session()
     try:
-        # Realiza la consulta en la base de datos para encontrar al usuario
         user = session.query(User).filter(User.username == username,
                                           User.password == password).first()
-        return user
+        if check_only:
+            return user
+        else:
+            session.close()
+            return user
     finally:
-        # Asegura que la sesión se cierre después de la consulta
+        if not check_only:
+            session.close()
+
+def update_tdp_status(user_id, status):
+    """Actualiza el estado de aceptación de las políticas de tratamiento de datos personales."""
+    session = Session()
+    try:
+        user = session.query(User).filter(User.id == user_id).one()
+        user.tdp = status
+        session.commit()
+    finally:
         session.close()
