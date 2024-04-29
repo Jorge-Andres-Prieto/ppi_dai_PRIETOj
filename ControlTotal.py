@@ -5,7 +5,7 @@ from streamlit_option_menu import option_menu
 # Importa la función para verificar la autenticidad del usuario
 from auth import verify_user
 # Importa funciones para manejar la creación, búsqueda, actualización y eliminación de usuarios
-from user_management import create_user, search_users, update_user, delete_user, generate_password
+from user_management import create_user, search_users, update_user, delete_user, generate_password, update_user_terms
 # Importa funciones para la gestión de productos
 from product_management import search_products, delete_product, update_product, add_product
 
@@ -57,25 +57,37 @@ def login_page():
         st.title("Control Total")
         username = st.text_input("Nombre de Usuario")
         password = st.text_input("Contraseña", type="password")
+
         if st.button("Ingresar"):
             session = Session()
-            user = session.query(User).filter_by(username=username, password=password).first()
+            user = session.query(User).filter(User.username == username, User.password == password).first()
+            session.close()  # Cerramos la sesión después de la consulta
+
             if user:
-                st.session_state['user'] = user
+                st.session_state['user'] = user  # Guardar el usuario en el estado de la sesión de Streamlit
                 if user.inicio == 0:
-                    st.write("Texto informativo sobre el tratamiento de datos personales.")
-                    if st.button("Acepto"):
-                        user.inicio = 1
-                        user.tdp = "Aceptado"
-                        session.commit()  # Realiza el commit inmediatamente después de cambiar los datos
-                        st.success("Has aceptado los términos y condiciones. Bienvenido a la aplicación.")
-                    elif st.button("No acepto"):
-                        st.error("Debe aceptar los términos para utilizar la aplicación.")
+                    show_terms_and_conditions(user)
                 else:
                     st.success("Bienvenido de nuevo a la aplicación.")
             else:
                 st.error("Usuario o contraseña incorrectos.")
-            session.close()  # Asegúrate de cerrar la sesión
+
+
+def show_terms_and_conditions(user):
+    st.write("Texto informativo sobre el tratamiento de datos personales.")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Acepto"):
+            resultado = update_user_terms(user.id, 1, "Aceptado")
+            if "éxito" in resultado:
+                st.success("Has aceptado los términos y condiciones. Bienvenido a la aplicación.")
+            else:
+                st.error(resultado)
+    with col2:
+        if st.button("No acepto"):
+            st.error("Debe aceptar los términos para utilizar la aplicación.")
+            del st.session_state['user']  # Limpiar el estado de la sesión si no acepta
 
 
 def main_menu(user):

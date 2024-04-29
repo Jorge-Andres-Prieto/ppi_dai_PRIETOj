@@ -138,3 +138,29 @@ def delete_user(user_id):
     finally:
         session.close()
 
+def update_user_terms(user_id, inicio, tdp):
+    """Actualiza el estado de aceptación de términos y condiciones de un usuario.
+
+    Args:
+        user_id (int): ID del usuario a actualizar.
+        inicio (int): Estado de inicio del usuario.
+        tdp (str): Estado de aceptación de términos y condiciones.
+
+    Returns:
+        str: Mensaje indicando si el usuario fue actualizado o no.
+    """
+    session = Session()
+    try:
+        user = session.query(User).filter(User.id == user_id).one_or_none()
+        if user:
+            user.inicio = inicio
+            user.tdp = tdp
+            session.commit()
+            return "Estado del usuario actualizado con éxito."
+        else:
+            return "Usuario no encontrado."
+    except Exception as e:
+        session.rollback()
+        return f"Error al actualizar el estado del usuario: {e}"
+    finally:
+        session.close()
