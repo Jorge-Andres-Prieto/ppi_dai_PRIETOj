@@ -10,7 +10,7 @@ from user_management import create_user, search_users, update_user, delete_user,
 from product_management import search_products, delete_product, update_product, add_product
 # Importa funcion para crear la base de datos siesta no esta creada
 from database import init_db
-
+from tdp import tdp
 #Función de streamlit para utilizar la página completa
 st.set_page_config(page_title="Control Total", layout="wide", page_icon="🐳")
 
@@ -64,6 +64,8 @@ def login_page():
 
         if user:
             if user.tdp == "No Aceptado":
+                with st.expander("Ver texto completo", expanded=False):
+                    st.write(tdp)
                 accept_policies = st.checkbox(
                     "Acepto las políticas de tratamiento de datos personales al iniciar sesión.")
                 if st.button("Ingresar"):
