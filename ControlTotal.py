@@ -5,13 +5,10 @@ from streamlit_option_menu import option_menu
 # Importa la función para verificar la autenticidad del usuario
 from auth import verify_user
 # Importa funciones para manejar la creación, búsqueda, actualización y eliminación de usuarios
-from user_management import create_user, search_users, update_user, delete_user, generate_password, update_user_terms
+from user_management import create_user, search_users, update_user, delete_user, generate_password
 # Importa funciones para la gestión de productos
 from product_management import search_products, delete_product, update_product, add_product
-
-from database import init_db, Session
-
-from models import User
+from database import init_db
 
 st.set_page_config(page_title="Control Total", layout="wide")
 
@@ -44,46 +41,26 @@ def main():
 
 
 def login_page():
-    """Crea y gestiona la página de inicio de sesión."""
+    """Crea y gestiona la página de inicio de sesión.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.title("Control Total")
         username = st.text_input("Nombre de Usuario")
         password = st.text_input("Contraseña", type="password")
-
         if st.button("Ingresar"):
-            session = Session()
-            user = session.query(User).filter(User.username == username, User.password == password).first()
-            session.close()
+            user = verify_user(username, password)
             if user:
                 st.session_state['user'] = user
-                if user.inicio == 0:
-                    show_terms_and_conditions(user)
-                else:
-                    st.success("Bienvenido de nuevo a la aplicación.")
-                    main_menu(user)
+                st.experimental_rerun()
             else:
                 st.error("Usuario o contraseña incorrectos.")
-
-def show_terms_and_conditions(user):
-    """Muestra los términos y condiciones para el tratamiento de datos personales."""
-    with st.form("Términos y Condiciones"):
-        st.write("Texto informativo sobre el tratamiento de datos personales.")
-
-        acepto = st.form_submit_button("Acepto")
-        no_acepto = st.form_submit_button("No acepto")
-
-        if acepto:
-            resultado = update_user_terms(user.id, 1, "Aceptado")
-            if "éxito" in resultado:
-                st.success("Has aceptado los términos y condiciones. Bienvenido a la aplicación.")
-                main_menu(user)  # Continuar a la aplicación principal
-            else:
-                st.error(resultado)
-
-        if no_acepto:
-            st.error("Debe aceptar los términos para utilizar la aplicación.")
-            del st.session_state['user']
 
 def main_menu(user):
     """Crea y muestra el menú principal para la navegación de la aplicación.
