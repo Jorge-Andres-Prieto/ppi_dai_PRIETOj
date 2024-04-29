@@ -1,5 +1,11 @@
+''' Importa la clase Session del módulo database. Esta clase se utiliza para crear
+    sesiones de interacción con la base de datos.'''
 from database import Session
+''' Importa la clase Product del módulo models. Esta clase representa
+    el modelo de datos para los productos en la base de datos.'''
 from models import Product
+'''Importa funciones de la biblioteca sqlalchemy. La función func se 
+   utiliza para crear expresiones SQL personalizadas.'''
 from sqlalchemy import func
 
 def search_products(search_query):
@@ -13,10 +19,12 @@ def search_products(search_query):
     """
     session = Session()
     try:
-        if search_query.isdigit():  # Chequea si la entrada es numérica, asumiendo que es un ID
+        # Chequea si la entrada es numérica, asumiendo que es un ID
+        if search_query.isdigit():
             product_id = int(search_query)
             products = session.query(Product).filter(Product.id == product_id).all()
-        else:  # De lo contrario, asume que es una búsqueda por nombre
+        # De lo contrario, asume que es una búsqueda por nombre
+        else:
             products = session.query(Product).filter(Product.name.ilike(f"%{search_query}%")).all()
         return products
     finally:

@@ -28,6 +28,17 @@ class User(Base):
 
 
 class Product(Base):
+    """Define la estructura de la tabla 'products' para almacenar datos de productos.
+
+        Attributes:
+            id (Column): Identificador único del usuario, clave primaria.
+            name (Column): Nombre del producto, debe ser no nulo.
+            brand (Column): Marca del producto
+            category (Column): Categoría del producto, no puede ser nulo.
+            subcategory (Column): Sub categoria del producto
+            price (Column): Precio del producto, no puede ser nulo.
+            quantity = Cantidad del producto, no puede ser nulo.
+        """
     __tablename__ = 'products'
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)
