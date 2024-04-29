@@ -5,7 +5,7 @@ from streamlit_option_menu import option_menu
 # Importa la función para verificar la autenticidad del usuario
 from auth import verify_user
 # Importa funciones para manejar la creación, búsqueda, actualización y eliminación de usuarios
-from user_management import create_user, search_users, update_user, delete_user, generate_password
+from user_management import create_user, search_users, update_user, delete_user, generate_password, create_or_update_user_data
 # Importa funciones para la gestión de productos
 from product_management import search_products, delete_product, update_product, add_product
 from database import init_db
@@ -57,8 +57,18 @@ def login_page():
         if st.button("Ingresar"):
             user = verify_user(username, password)
             if user:
-                st.session_state['user'] = user
-                st.experimental_rerun()
+                if user.user_data is None or user.user_data.inicio == 0:
+                    st.write("Texto informativo sobre el tratamiento de datos personales.")
+                    if st.checkbox("Acepto los términos y condiciones del tratamiento de mis datos personales."):
+                        create_or_update_user_data(user.id, 1, "Aceptado")
+                        st.success("Términos aceptados. Bienvenido a la aplicación.")
+                        st.session_state['user'] = user
+                        st.experimental_rerun()
+                    else:
+                        st.error("Debe aceptar los términos para utilizar la aplicación.")
+                else:
+                    st.session_state['user'] = user
+                    st.experimental_rerun()
             else:
                 st.error("Usuario o contraseña incorrectos.")
 

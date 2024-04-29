@@ -1,7 +1,7 @@
 # Importa Session para manejar sesiones de base de datos
 from database import Session
 # Importa el modelo User para interactuar con la tabla de usuarios
-from models import User
+from models import User, UserData
 # Importa exc para manejar excepciones específicas de SQLAlchemy
 from sqlalchemy import exc
 # Importa string para generar contraseñas seguras
@@ -135,5 +135,22 @@ def delete_user(user_id):
             return "Usuario eliminado con éxito."
         else:
             return "Usuario no encontrado."
+    finally:
+        session.close()
+
+def create_or_update_user_data(user_id, inicio, tdp):
+    session = Session()
+    user_data = session.query(UserData).filter(UserData.user_id == user_id).first()
+    if user_data is None:
+        user_data = UserData(user_id=user_id, inicio=inicio, tdp=tdp)
+        session.add(user_data)
+    else:
+        user_data.inicio = inicio
+        user_data.tdp = tdp
+    try:
+        session.commit()
+    except Exception as e:
+        session.rollback()
+        raise e
     finally:
         session.close()
