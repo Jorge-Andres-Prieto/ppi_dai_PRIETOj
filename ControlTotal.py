@@ -44,14 +44,7 @@ def main():
 
 
 def login_page():
-    """Crea y gestiona la página de inicio de sesión.
-
-    Args:
-        None
-
-    Returns:
-        None
-    """
+    """Crea y gestiona la página de inicio de sesión."""
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.title("Control Total")
@@ -61,34 +54,36 @@ def login_page():
         if st.button("Ingresar"):
             session = Session()
             user = session.query(User).filter(User.username == username, User.password == password).first()
-            session.close()  # Cerramos la sesión después de la consulta
-
+            session.close()
             if user:
-                st.session_state['user'] = user  # Guardar el usuario en el estado de la sesión de Streamlit
+                st.session_state['user'] = user
                 if user.inicio == 0:
                     show_terms_and_conditions(user)
                 else:
                     st.success("Bienvenido de nuevo a la aplicación.")
+                    main_menu(user)
             else:
                 st.error("Usuario o contraseña incorrectos.")
 
-
 def show_terms_and_conditions(user):
-    st.write("Texto informativo sobre el tratamiento de datos personales.")
+    """Muestra los términos y condiciones para el tratamiento de datos personales."""
+    with st.form("Términos y Condiciones"):
+        st.write("Texto informativo sobre el tratamiento de datos personales.")
 
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("Acepto"):
+        acepto = st.form_submit_button("Acepto")
+        no_acepto = st.form_submit_button("No acepto")
+
+        if acepto:
             resultado = update_user_terms(user.id, 1, "Aceptado")
             if "éxito" in resultado:
                 st.success("Has aceptado los términos y condiciones. Bienvenido a la aplicación.")
+                main_menu(user)  # Continuar a la aplicación principal
             else:
                 st.error(resultado)
-    with col2:
-        if st.button("No acepto"):
-            st.error("Debe aceptar los términos para utilizar la aplicación.")
-            del st.session_state['user']  # Limpiar el estado de la sesión si no acepta
 
+        if no_acepto:
+            st.error("Debe aceptar los términos para utilizar la aplicación.")
+            del st.session_state['user']
 
 def main_menu(user):
     """Crea y muestra el menú principal para la navegación de la aplicación.
