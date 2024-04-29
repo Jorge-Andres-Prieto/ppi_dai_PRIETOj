@@ -1,7 +1,7 @@
 # Importa Session para manejar sesiones de base de datos
 from database import Session
 # Importa el modelo User para interactuar con la tabla de usuarios
-from models import User, UserData
+from models import User
 # Importa exc para manejar excepciones específicas de SQLAlchemy
 from sqlalchemy import exc
 # Importa string para generar contraseñas seguras
@@ -142,7 +142,7 @@ def update_user_data(user):
     """Actualiza los datos de un usuario en la base de datos."""
     session = Session()
     try:
-        session.add(user)  # SQLAlchemy maneja tanto nuevas instancias como instancias ya existentes
+        session.add(user)
         session.commit()
     except Exception as e:
         session.rollback()

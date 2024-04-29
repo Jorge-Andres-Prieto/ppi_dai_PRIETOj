@@ -40,11 +40,3 @@ class Product(Base):
     price = Column(Numeric(10, 2), nullable=False)
     quantity = Column(Integer, nullable=False)
 
-
-class UserData(Base):
-    __tablename__ = 'user_data'
-    user_id = Column(Integer, ForeignKey('users.id'), primary_key=True)
-    inicio = Column(Integer, default=0)
-    tdp = Column(String, default='No Aceptado')
-
-    user = relationship("User", back_populates="user_data")
