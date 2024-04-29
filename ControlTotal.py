@@ -12,7 +12,7 @@ from product_management import search_products, delete_product, update_product, 
 from database import init_db
 
 #Función de streamlit para utilizar la página completa
-st.set_page_config(page_title="Control Total", layout="wide")
+st.set_page_config(page_title="Control Total", layout="wide", page_icon="🐳")
 
 def main():
     """Función principal que controla el flujo de la aplicación.
