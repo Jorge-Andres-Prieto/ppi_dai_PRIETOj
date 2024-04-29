@@ -27,8 +27,8 @@ class User(Base):
     role = Column(String, nullable=False)
     full_name = Column(String, nullable=False)
     phone_number = Column(String, nullable=False)
-    user_data = relationship("UserData", uselist=False, back_populates="user", lazy='joined')
-
+    inicio = Column(Integer, default=0)
+    tdp = Column(String, default='No Aceptado')
 
 class Product(Base):
     __tablename__ = 'products'

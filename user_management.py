@@ -138,20 +138,15 @@ def delete_user(user_id):
     finally:
         session.close()
 
-def create_or_update_user_data(user_id, inicio, tdp):
+def update_user_data(user):
+    """Actualiza los datos de un usuario en la base de datos."""
     session = Session()
-    user_data = session.query(UserData).filter(UserData.user_id == user_id).first()
-    if user_data is None:
-        user_data = UserData(user_id=user_id, inicio=inicio, tdp=tdp)
-        session.add(user_data)
-    else:
-        user_data.inicio = inicio
-        user_data.tdp = tdp
     try:
+        session.add(user)  # SQLAlchemy maneja tanto nuevas instancias como instancias ya existentes
         session.commit()
     except Exception as e:
         session.rollback()
+        print(f"Error al actualizar los datos del usuario: {e}")
         raise e
     finally:
         session.close()
-
