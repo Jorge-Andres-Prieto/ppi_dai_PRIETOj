@@ -3,7 +3,7 @@
 <h3 id="Dale clic para ir a la App" align="center">Dale clic para ir a la App</h3>
 <h3 id="⬇️" align="center">⬇️</h3>
 <p align="center">
-  <a href="https://ppidaiprietoj-crfunfpdb8sph5bpvj9bg9.streamlit.app/"><img src="https://cdn.icon-icons.com/icons2/3915/PNG/512/streamlit_logo_icon_249495.png" alt="GitHub" width="85" style="margin-right: 20px;"></a>
+  <a href="https://controltotal.streamlit.app/"><img src="https://cdn.icon-icons.com/icons2/3915/PNG/512/streamlit_logo_icon_249495.png" alt="GitHub" width="85" style="margin-right: 20px;"></a>
 
 <h3>Tabla de Contenido</h3>
 <ul>
