@@ -78,6 +78,7 @@ def main_menu(user):
     Returns:
         None
     """
+    # Condicionales para mostrar el menú admin o el menú empleado
     if user.role == "Admin":
         with st.sidebar:
             selected = option_menu(
@@ -194,9 +195,10 @@ def validate_and_submit_user(username, password, role, full_name, phone_number, 
     Returns:
         None
     """
-    # Condicionales para crear un usuario
+    # Restricción para crear un usuario
     if len(username) < 5:
         st.error("El nombre de usuario debe tener al menos 5 caracteres.")
+    # Restricción para crear una contraseña
     elif not auto_password and len(password) < 8:
         st.error("La contraseña debe tener al menos 8 caracteres.")
     else:
@@ -238,7 +240,7 @@ def display_search_results(search_name):
     if users:
         for user in users:
             st.write(
-                f"ID: {user.id}, Nombre: {user.full_name}, Usuario: {user.username}, Rol: {user.role}, Teléfono: {user.phone_number}")
+                f"|ID: {user.id}|    |Nombre: {user.full_name}|     |Usuario: {user.username}|     |Rol: {user.role}|     |Teléfono: {user.phone_number}|")
     else:
         st.write("No se encontraron usuarios")
 
