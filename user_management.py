@@ -154,3 +154,4 @@ def create_or_update_user_data(user_id, inicio, tdp):
         raise e
     finally:
         session.close()
+

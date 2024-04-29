@@ -57,20 +57,28 @@ def login_page():
         if st.button("Ingresar"):
             user = verify_user(username, password)
             if user:
+                st.session_state['user'] = user
                 if user.user_data is None or user.user_data.inicio == 0:
-                    st.write("Texto informativo sobre el tratamiento de datos personales.")
-                    if st.checkbox("Acepto los términos y condiciones del tratamiento de mis datos personales."):
-                        create_or_update_user_data(user.id, 1, "Aceptado")
-                        st.success("Términos aceptados. Bienvenido a la aplicación.")
-                        st.session_state['user'] = user
-                        st.experimental_rerun()
-                    else:
-                        st.error("Debe aceptar los términos para utilizar la aplicación.")
+                    terms_and_conditions()
                 else:
-                    st.session_state['user'] = user
-                    st.experimental_rerun()
+                    st.success("Bienvenido de nuevo a la aplicación.")
             else:
                 st.error("Usuario o contraseña incorrectos.")
+
+
+def terms_and_conditions():
+    with st.form("Terms and Conditions"):
+        st.write("Texto informativo sobre el tratamiento de datos personales.")
+        acepto = st.form_submit_button("Acepto")
+        no_acepto = st.form_submit_button("No acepto")
+
+        if acepto:
+            create_or_update_user_data(st.session_state['user'].id, 1, "Aceptado")
+            st.success("Has aceptado los términos y condiciones. Bienvenido a la aplicación.")
+            st.experimental_rerun()
+        elif no_acepto:
+            del st.session_state['user']  # Opcionalmente limpiar el estado de sesión si no acepta
+            st.error("No has aceptado los términos y condiciones. No puedes utilizar la aplicación.")
 
 def main_menu(user):
     """Crea y muestra el menú principal para la navegación de la aplicación.
