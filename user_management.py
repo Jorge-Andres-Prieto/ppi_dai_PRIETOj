@@ -142,12 +142,27 @@ def update_user_data(user):
     """Actualiza los datos de un usuario en la base de datos."""
     session = Session()
     try:
-        session.add(user)
+        session.add(user)  # SQLAlchemy maneja tanto nuevas instancias como instancias ya existentes
+        session.commit()  # Realiza el commit de los cambios
+    except Exception as e:
+        session.rollback()  # Hace rollback en caso de error
+        print(f"Error al actualizar los datos del usuario: {e}")
+        raise e
+    finally:
+        session.close()
+
+def update_user_terms(user_id, inicio, tdp):
+    """Actualiza el estado de aceptación de términos y condiciones de un usuario."""
+    session = Session()
+    try:
+        user = session.query(User).filter(User.id == user_id).one()
+        user.inicio = inicio
+        user.tdp = tdp
         session.commit()
     except Exception as e:
         session.rollback()
-        print(f"Error al actualizar los datos del usuario: {e}")
-        raise e
+        print(f"Error al actualizar los términos del usuario: {e}")  # Usar print o logging según tu configuración
+        raise
     finally:
         session.close()
 

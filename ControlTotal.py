@@ -5,7 +5,7 @@ from streamlit_option_menu import option_menu
 # Importa la función para verificar la autenticidad del usuario
 from auth import verify_user
 # Importa funciones para manejar la creación, búsqueda, actualización y eliminación de usuarios
-from user_management import create_user, search_users, update_user, delete_user, generate_password, update_user_data
+from user_management import create_user, search_users, update_user, delete_user, generate_password, update_user_terms
 # Importa funciones para la gestión de productos
 from product_management import search_products, delete_product, update_product, add_product
 
@@ -72,13 +72,13 @@ def login_page():
 def show_terms_and_conditions(user):
     st.write("Texto informativo sobre el tratamiento de datos personales.")
     if st.button("Acepto"):
-        user.inicio = 1  # Marcar que el usuario ha iniciado sesión al menos una vez
-        user.tdp = "Aceptado"  # Marcar que el usuario ha aceptado los términos
-        update_user_data(user)  # Actualizar los datos del usuario en la base de datos
+        update_user_terms(user.id, 1, "Aceptado")
         st.success("Has aceptado los términos y condiciones. Bienvenido a la aplicación.")
+        st.experimental_rerun()
     elif st.button("No acepto"):
         st.error("Debe aceptar los términos para utilizar la aplicación.")
-        del st.session_state['user']
+        del st.session_state['user']  # Limpiar el estado de sesión si no acepta
+
 
 def main_menu(user):
     """Crea y muestra el menú principal para la navegación de la aplicación.
