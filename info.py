@@ -88,8 +88,8 @@ He creado esta aplicación con el propósito de ayudar a las pequeñas y mediana
 
 ### Contáctame
 
-- **Correo Electrónico:** prietojorge905@gmail.com
-- **Teléfono:** 3104219762
+📧 **Correo Electrónico:** prietojorge905@gmail.com
+📞 **Teléfono:** 3104219762
 
 También puedes contactarme en:
 
