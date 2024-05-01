@@ -49,7 +49,7 @@ Si tienes preguntas sobre esta política o sobre cómo gestionamos tus datos per
 """
 
 info_control_total = """
-# Control Total - Información de la Aplicación
+# Bienvenido a Control Total 
 
 ### ¿Qué es?
 Control Total es una plataforma integral diseñada para optimizar la gestión de inventario y contabilidad en pequeñas y medianas empresas.
@@ -69,7 +69,7 @@ La plataforma está construida sobre una interfaz amigable en Streamlit, permiti
 3. **Operaciones Diarias:** Registra ventas, compras y otros movimientos.
 4. **Reportes:** Accede a reportes detallados y análisis de tus datos.
 
-Únete a los cientos de negocios que ya están mejorando su gestión con Control Total.
+Únete a todos los negocios que ya están mejorando su gestión con Control Total.
 """
 
 
@@ -81,7 +81,7 @@ Mi nombre es Jorge Prieto, desarrollador y creador de Control Total. Actualmente
 ### Tecnologías que Uso
 
 - **Python:** He utilizado librerías como NumPy, Pandas y Matplotlib para el análisis de datos y visualización.
-- **Bases de Datos:** Experiencia con MySQL y SQL Server, gestionando datos de forma segura y eficiente.
+- **Bases de Datos:** Experiencia con PostgreSQL, MySQL y SQL Server, gestionando datos de forma segura y eficiente.
 - **Web:** Desarrollo de aplicaciones web usando Streamlit, lo que permite una interfaz interactiva y moderna.
 
 He creado esta aplicación con el propósito de ayudar a las pequeñas y medianas empresas a mejorar la forma en que llevan el inventario y la contabilidad de sus negocios.
