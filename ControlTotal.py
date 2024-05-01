@@ -64,8 +64,10 @@ def login_page():
 
         if user:
             if user.tdp == "No Aceptado":
-                with st.expander("Ver Tratamiento de datos personales", expanded=False):
-                    st.write(tdp)
+                # Aquí usamos Markdown para mostrar las políticas
+                policies_text = (tdp)
+                st.markdown(policies_text)
+
                 accept_policies = st.checkbox(
                     "Acepto las políticas de tratamiento de datos personales al iniciar sesión.")
                 if st.button("Ingresar"):
