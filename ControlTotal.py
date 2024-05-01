@@ -1,16 +1,26 @@
 # Importa el módulo de Streamlit para crear aplicaciones web
 import streamlit as st
+
 # Importa opciones de menú para la navegación en la aplicación
 from streamlit_option_menu import option_menu
+
 # Importa la función para verificar la autenticidad del usuario
 from auth import verify_user, update_tdp_status
+
 # Importa funciones para manejar la creación, búsqueda, actualización y eliminación de usuarios
 from user_management import create_user, search_users, update_user, delete_user, generate_password
+
 # Importa funciones para la gestión de productos
 from product_management import search_products, delete_product, update_product, add_product
+
 # Importa funcion para crear la base de datos siesta no esta creada
 from database import init_db
-from tdp import tdp
+
+# importa las variables donde se encuentra toda la información de tdp(tratamiento de
+# datos personales), información del autor e información de la app.
+from info import tdp, info_control_total, info_sobre_autor
+
+
 #Función de streamlit para utilizar la página completa
 st.set_page_config(page_title="Control Total", layout="wide", page_icon="🐳")
 
@@ -100,38 +110,49 @@ def main_menu(user):
         with st.sidebar:
             selected = option_menu(
                 None,
-                ["Admin", "Ventas y Facturación", "Gestión de inventarios",
-                 "Análisis estadísticos", "Domicilios"],
-                icons=["person-circle", "currency-dollar", "archive", "graph-up",
-                       "truck"],
-                menu_icon="cast",
+                ["Control Total", "Admin", "Ventas y Facturación", "Gestión de inventarios",
+                 "Análisis estadísticos", "Domicilios", "Sobre el Autor"],
+                icons=["cast", "person-circle", "currency-dollar", "archive", "graph-up", "truck", "info-circle"],
+                menu_icon="list",
                 default_index=0
             )
             if st.button("Cerrar Sesión"):
                 logout()
 
+        if selected == 'Control Total':
+            st.markdown(info_control_total)
+
         if selected == 'Admin':
             admin_menu()
 
-        elif selected == 'Gestión de inventarios':
+        if selected == 'Gestión de inventarios':
             inventory_management_menu()
+
+        if selected == 'Sobre el Autor':
+            st.markdown(info_sobre_autor)
 
     elif user.role == "Empleado":
         with st.sidebar:
             selected = option_menu(
                 None,
-                ["Ventas y Facturación", "Gestión de inventarios",
-                 "Análisis estadísticos", "Domicilios"],
-                icons=["currency-dollar", "archive", "graph-up",
-                       "truck"],
+                ["Control Total", "Ventas y Facturación", "Gestión de inventarios",
+                 "Análisis estadísticos", "Domicilios", "Sobre el Autor"],
+                icons=["cast","currency-dollar", "archive", "graph-up",
+                       "truck", "info-circle"],
                 menu_icon="cast",
                 default_index=0
             )
             if st.button("Cerrar Sesión"):
                 logout()
 
+        if selected == 'Control Total':
+            st.markdown(info_control_total)
+
         if selected == 'Gestión de inventarios':
             inventory_management_menu()
+
+        if selected == 'Sobre el Autor':
+            st.markdown(info_sobre_autor)
 
 
 def logout():

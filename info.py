@@ -47,3 +47,36 @@ Si tienes preguntas sobre esta política o sobre cómo gestionamos tus datos per
 - **Teléfono:** 3104219762
 
 """
+
+info_control_total = """
+## Control Total - Información de la Aplicación
+
+Control Total es una plataforma diseñada para facilitar la gestión y operación de tu negocio. A continuación, se detallan las principales funcionalidades que ofrece la aplicación:
+
+- **Administración de Usuarios:** Gestiona los accesos y roles de los usuarios dentro de la aplicación.
+- **Ventas y Facturación:** Registra y realiza seguimiento a las transacciones de ventas y genera facturas automáticamente.
+- **Gestión de Inventarios:** Mantén un control detallado sobre el stock disponible, registra entradas y salidas de productos.
+- **Análisis Estadísticos:** Proporciona herramientas de análisis y reportes estadísticos para una mejor toma de decisiones.
+- **Domicilios:** Coordina y gestiona la logística de entregas a domicilio para tus clientes.
+
+Estas herramientas están diseñadas para integrarse y ofrecer una experiencia fluida y completa, asegurando que puedas concentrarte en lo más importante: tu negocio.
+"""
+
+
+info_sobre_autor = """
+## Sobre el Autor
+
+Mi nombre es Jorge Prieto, desarrollador y creador de Control Total. Me especializo en el desarrollo de soluciones tecnológicas que ayudan a optimizar los procesos empresariales.
+
+### Contáctame
+
+- **Correo Electrónico:** prietojorge905@gmail.com
+- **Teléfono:** 3104219762
+
+También puedes contactarme en:
+
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/yourGitHub)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/yourLinkedIn)
+[![Upwork](https://img.shields.io/badge/Upwork-6FDA44?style=for-the-badge&logo=upwork&logoColor=white)](https://www.upwork.com/freelancers/~yourUpworkProfile)
+[![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/yourReddit)
+"""
