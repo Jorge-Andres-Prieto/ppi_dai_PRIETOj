@@ -49,24 +49,42 @@ Si tienes preguntas sobre esta política o sobre cómo gestionamos tus datos per
 """
 
 info_control_total = """
-## Control Total - Información de la Aplicación
+# Control Total - Información de la Aplicación
 
-Control Total es una plataforma diseñada para facilitar la gestión y operación de tu negocio. A continuación, se detallan las principales funcionalidades que ofrece la aplicación:
+### ¿Qué es?
+Control Total es una plataforma integral diseñada para optimizar la gestión de inventario y contabilidad en pequeñas y medianas empresas.
 
-- **Administración de Usuarios:** Gestiona los accesos y roles de los usuarios dentro de la aplicación.
-- **Ventas y Facturación:** Registra y realiza seguimiento a las transacciones de ventas y genera facturas automáticamente.
-- **Gestión de Inventarios:** Mantén un control detallado sobre el stock disponible, registra entradas y salidas de productos.
-- **Análisis Estadísticos:** Proporciona herramientas de análisis y reportes estadísticos para una mejor toma de decisiones.
-- **Domicilios:** Coordina y gestiona la logística de entregas a domicilio para tus clientes.
+### ¿Por qué usar Control Total?
+Control Total ofrece una solución todo-en-uno que simplifica procesos, reduce errores y ahorra tiempo. Con nuestra plataforma, puedes:
 
-Estas herramientas están diseñadas para integrarse y ofrecer una experiencia fluida y completa, asegurando que puedas concentrarte en lo más importante: tu negocio.
+- 📈 **Gestionar inventarios** de forma eficiente.
+- 💵 **Automatizar la facturación** y seguimiento de ventas.
+- 📊 **Analizar datos** para tomar decisiones informadas.
+
+### ¿Cómo Funciona?
+La plataforma está construida sobre una interfaz amigable en Streamlit, permitiendo una fácil navegación y manejo:
+
+1. **Registro de Usuario:** Comienza creando tu cuenta de usuario.
+2. **Configuración de Inventario:** Añade y organiza tus productos.
+3. **Operaciones Diarias:** Registra ventas, compras y otros movimientos.
+4. **Reportes:** Accede a reportes detallados y análisis de tus datos.
+
+Únete a los cientos de negocios que ya están mejorando su gestión con Control Total.
 """
 
 
 info_sobre_autor = """
 ## Sobre el Autor
 
-Mi nombre es Jorge Prieto, desarrollador y creador de Control Total. Me especializo en el desarrollo de soluciones tecnológicas que ayudan a optimizar los procesos empresariales.
+Mi nombre es Jorge Prieto, desarrollador y creador de Control Total. Actualmente soy estudiante de ingeniería de sistemas e informática en la Universidad Nacional de Colombia en Medellín.
+
+### Tecnologías que Uso
+
+- **Python:** He utilizado librerías como NumPy, Pandas y Matplotlib para el análisis de datos y visualización.
+- **Bases de Datos:** Experiencia con MySQL y SQL Server, gestionando datos de forma segura y eficiente.
+- **Web:** Desarrollo de aplicaciones web usando Streamlit, lo que permite una interfaz interactiva y moderna.
+
+He creado esta aplicación con el propósito de ayudar a las pequeñas y medianas empresas a mejorar la forma en que llevan el inventario y la contabilidad de sus negocios.
 
 ### Contáctame
 
