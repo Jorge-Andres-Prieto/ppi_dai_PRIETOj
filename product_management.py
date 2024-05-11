@@ -1,12 +1,15 @@
 ''' Importa la clase Session del módulo database. Esta clase se utiliza para crear
     sesiones de interacción con la base de datos.'''
 from database import Session
+
 ''' Importa la clase Product del módulo models. Esta clase representa
     el modelo de datos para los productos en la base de datos.'''
 from models import Product
+
 '''Importa funciones de la biblioteca sqlalchemy. La función func se 
    utiliza para crear expresiones SQL personalizadas.'''
 from sqlalchemy import func
+
 
 def search_products(search_query):
     """Busca productos que coincidan con un criterio de búsqueda en el nombre.
@@ -119,7 +122,14 @@ def add_product(name, brand, category, subcategory, price, quantity):
         session.close()
 
 def delete_product(product_id):
-    """Elimina un producto existente de la base de datos."""
+    """Elimina un producto existente de la base de datos.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     session = Session()
     try:
         product = session.query(Product).filter(Product.id == product_id).one_or_none()

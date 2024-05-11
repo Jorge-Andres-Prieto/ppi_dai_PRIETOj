@@ -1,11 +1,12 @@
 # Importa la función declarative_base de SQLAlchemy para la creación de modelos ORM
 from sqlalchemy.ext.declarative import declarative_base
+
 # Importa tipos de columnas específicos de SQLAlchemy para definir propiedades de modelo
 from sqlalchemy import Column, Integer, String, Numeric
 
+
 # Crea una instancia base para los modelos ORM, que es necesario para definir clases de modelos
 Base = declarative_base()
-
 
 class User(Base):
     """Define la estructura de la tabla 'users' para almacenar datos de usuario.
@@ -17,6 +18,12 @@ class User(Base):
         role (Column): Rol del usuario en la aplicación, no puede ser nulo.
         full_name (Column): Nombre completo del usuario, no puede ser nulo.
         phone_number (Column): Número de teléfono del usuario, no puede seer nulo.
+
+    Args:
+        None
+
+    Returns:
+        None
     """
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True)
@@ -39,7 +46,13 @@ class Product(Base):
             subcategory (Column): Sub categoria del producto
             price (Column): Precio del producto, no puede ser nulo.
             quantity = Cantidad del producto, no puede ser nulo.
-        """
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     __tablename__ = 'products'
     id = Column(Integer, primary_key=True)
     name = Column(String, nullable=False)

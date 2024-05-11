@@ -1,5 +1,6 @@
 # Importa Session para manejar sesiones de base de datos
 from database import Session
+
 # Importa la clase User para verificar las credenciales de los usuarios
 from models import User
 
@@ -28,7 +29,14 @@ def verify_user(username, password, check_only=False):
             session.close()
 
 def update_tdp_status(user_id, status):
-    """Actualiza el estado de aceptación de las políticas de tratamiento de datos personales."""
+    """Actualiza el estado de aceptación de las políticas de tratamiento de datos personales.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     session = Session()
     try:
         user = session.query(User).filter(User.id == user_id).one()
