@@ -372,43 +372,42 @@ def update_user_form():
             # Limpiar el estado de confirmación
             st.session_state.confirmation = False
 
-
 def delete_user_form():
-    """Formulario para eliminar un usuario existente permitiendo buscar por ID o nombre."""
+    """Formulario para eliminar un usuario existente permitiendo buscar por ID o nombre, con eliminación directa."""
     if 'user_to_delete' not in st.session_state:
         st.session_state.user_to_delete = None
         st.session_state.confirmation_delete = False
 
-    with st.form("Buscar Usuario para Eliminar"):
-        search_query = st.text_input("Nombre o ID del Usuario a eliminar", help="Escriba el ID o nombre del usuario para buscar")
-        search_button = st.form_submit_button("Buscar Usuario")
+    # Input para buscar usuario
+    search_query = st.text_input("Nombre o ID del Usuario a eliminar", help="Escriba el ID o nombre del usuario para buscar", on_change=None)
 
-        if search_button and search_query:
-            user_info = search_users(search_query)
-            if user_info:
-                st.session_state.user_to_delete = user_info
-                st.success(f"Usuario encontrado: {user_info.full_name} (ID: {user_info.id})")
-            else:
-                st.error("Usuario no encontrado. Por favor, verifica el ID o nombre e intenta de nuevo.")
-                st.session_state.user_to_delete = None
+    # Reacción automática al cambio en el input
+    if search_query:
+        user_info = search_users(search_query)
+        if user_info:
+            st.session_state.user_to_delete = user_info
+            st.write(f"Usuario encontrado: {user_info.full_name} (ID: {user_info.id})")
+        else:
+            st.error("Usuario no encontrado. Por favor, verifica el ID o nombre e intenta de nuevo.")
+            st.session_state.user_to_delete = None
 
+    # Si se encontró un usuario, mostrar botón de eliminación
     if st.session_state.user_to_delete:
         user_info = st.session_state.user_to_delete
-        st.write(f"¿Estás seguro de que quieres eliminar a este usuario? ID: {user_info.id}, Nombre: {user_info.full_name}")
-        if st.button("Sí, eliminar"):
-            result = delete_user(user_info.id)
-            if "éxito" in result:
-                st.success(result)
-                # Limpiar el estado después de la eliminación
-                del st.session_state.user_to_delete
+        if st.button("Eliminar Usuario"):
+            # Confirmación para proceder con la eliminación
+            if st.button("Sí, eliminar"):
+                result = delete_user(user_info.id)
+                if "éxito" in result:
+                    st.success(result)
+                    # Limpiar el estado después de la eliminación
+                    del st.session_state.user_to_delete
+                else:
+                    st.error(result)
+            elif st.button("No, cancelar"):
+                st.write("Eliminación cancelada.")
+                # Limpiar el estado de confirmación
                 del st.session_state.confirmation_delete
-            else:
-                st.error(result)
-        elif st.button("No, cancelar"):
-            st.write("Eliminación cancelada.")
-            # Limpiar el estado de confirmación
-            del st.session_state.confirmation_delete
-
 
 
 def inventory_management_menu():
