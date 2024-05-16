@@ -570,8 +570,8 @@ def sales_menu():
         default_index=0,  # Ventas como pestaña predeterminada
         styles={
             "container": {"padding": "0!important", "background-color": "#fafafa"},
-            "icon": {"color": "orange", "font-size": "25px"},
-            "nav-link": {"font-size": "18px", "text-align": "left", "margin": "0px", "padding": "8px",
+            "icon": {"color": "orange", "font-size": "18px"},
+            "nav-link": {"font-size": "13px", "text-align": "left", "margin": "0px", "padding": "8px",
                          "border-radius": "0", "background-color": "#25d366", "color": "white"},
             "nav-link-selected": {"background-color": "green"
                                   },
