@@ -23,15 +23,20 @@ def search_clients(query):
     finally:
         session.close()
 
-def update_client(cedula, nombre, direccion, telefono, credito):
+def update_client(cedula, new_nombre=None, new_direccion=None, new_telefono=None, new_credito=None):
     session = Session()
     try:
         client = session.query(Cliente).filter(Cliente.cedula == cedula).first()
         if client:
-            client.nombre = nombre if nombre else client.nombre
-            client.direccion = direccion if direccion else client.direccion
-            client.telefono = telefono if telefono else client.telefono
-            client.credito = credito if credito else client.credito
+            if new_nombre is not None:
+                client.nombre = new_nombre
+            if new_direccion is not None:
+                client.direccion = new_direccion
+            if new_telefono is not None:
+                client.telefono = new_telefono
+            if new_credito is not None and new_credito != 0.0:  # Verifica que el crédito sea diferente de 0.0 para actualizar
+                client.credito = new_credito
+
             session.commit()
             return "Cliente actualizado con éxito."
         else:
@@ -41,6 +46,7 @@ def update_client(cedula, nombre, direccion, telefono, credito):
         return f"Error al actualizar el cliente: {str(e)}"
     finally:
         session.close()
+
 
 def delete_client(cedula):
     session = Session()

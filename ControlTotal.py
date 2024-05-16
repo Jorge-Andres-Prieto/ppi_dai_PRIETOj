@@ -633,19 +633,26 @@ def search_client_form():
 
 def update_client_form():
     with st.form("Actualizar Cliente"):
-        cedula = st.text_input("Cédula del Cliente a actualizar")
-        new_nombre = st.text_input("Nuevo Nombre")
-        new_direccion = st.text_input("Nueva Dirección")
-        new_telefono = st.text_input("Nuevo Teléfono")
-        new_credito = st.number_input("Nuevo Crédito", format="%f", step=0.01)
+        cedula = st.text_input("Cédula del Cliente a actualizar", help="Usa la cédula para buscar el cliente")
+        new_nombre = st.text_input("Nuevo Nombre", placeholder="Dejar en blanco si no desea cambiar")
+        new_direccion = st.text_input("Nueva Dirección", placeholder="Dejar en blanco si no desea cambiar")
+        new_telefono = st.text_input("Nuevo Teléfono", placeholder="Dejar en blanco si no desea cambiar")
+        new_credito = st.number_input("Nuevo Crédito", format="%.2f", value=0.0, help="Dejar en blanco para mantener el crédito actual")
 
         submitted = st.form_submit_button("Actualizar Cliente")
         if submitted:
-            result = update_client(cedula, new_nombre, new_direccion, new_telefono, new_credito)
+            result = update_client(
+                cedula,
+                new_nombre if new_nombre else None,
+                new_direccion if new_direccion else None,
+                new_telefono if new_telefono else None,
+                new_credito if new_credito != 0.0 else None
+            )
             if "éxito" in result:
                 st.success(result)
             else:
                 st.error(result)
+
 
 def delete_client_form():
     with st.form("Eliminar Cliente"):
