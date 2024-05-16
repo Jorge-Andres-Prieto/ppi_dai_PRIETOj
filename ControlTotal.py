@@ -386,11 +386,17 @@ def delete_user_form():
             if user_info:
                 st.session_state.delete_user_info = user_info
                 st.write(f"Usuario encontrado: {user_info.full_name} (ID: {user_info.id})")
+                # Botón para solicitar la eliminación
+                delete_button = st.button("Eliminar Usuario")
+                if delete_button:
+                    # Activar confirmación
+                    st.session_state.confirmation_delete_user = True
             else:
                 st.error("Usuario no encontrado. Por favor, verifica el ID o nombre e intenta de nuevo.")
                 st.session_state.delete_user_info = None  # Reset user_info if not found
 
-    if st.session_state.delete_user_info:
+    # Sección de confirmación de eliminación
+    if st.session_state.confirmation_delete_user and st.session_state.delete_user_info:
         st.write(f"¿Estás seguro de que quieres eliminar a este usuario: {st.session_state.delete_user_info.full_name}?")
         if st.button("Sí, eliminar"):
             result = delete_user(st.session_state.delete_user_info.id)
@@ -402,7 +408,6 @@ def delete_user_form():
                 st.error(result)
         elif st.button("No, cancelar"):
             st.write("Eliminación cancelada.")
-            st.session_state.delete_user_info = None
             st.session_state.confirmation_delete_user = False
 
 
