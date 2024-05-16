@@ -99,6 +99,7 @@ def login_page():
             if st.button("Ingresar"):
                 st.error("Usuario o contraseña incorrectos.")
 
+
 def main_menu(user):
     """Crea y muestra el menú principal para la navegación de la aplicación.
 
@@ -132,7 +133,7 @@ def main_menu(user):
             inventory_management_menu()
 
         if selected == 'Ventas y Facturación':
-            sales_client_menu()
+            sales_menu()
 
         if selected == 'Sobre el Autor':
             st.markdown(info_sobre_autor)
@@ -560,15 +561,29 @@ def delete_product_form():
             del st.session_state.delete_id
 
 
-def sales_client_menu():
+def sales_menu():
     st.write("### Ventas y Facturación")
-    tab1, tab2 = st.tabs(["Ventas", "Clientes"])
+    selected = option_menu(
+        menu_title=None,  # Sin título para el menú
+        options=["Ventas", "Clientes"],  # Opciones del menú
+        icons=["cash", "people"],  # Íconos para cada opción
+        orientation="horizontal",
+        default_index=0,  # Ventas como pestaña predeterminada
+        styles={
+            "container": {"padding": "0!important", "background-color": "#fafafa"},
+            "icon": {"color": "orange", "font-size": "25px"},
+            "nav-link": {"font-size": "18px", "text-align": "left", "margin": "0px", "padding": "8px",
+                         "border-radius": "0"},
+            "nav-link-selected": {"background-color": "green"},
+        }
+    )
 
-    with tab1:
-        st.write("Aquí se gestionarán las ventas.")  # Aquí puedes añadir las funciones o formularios para las ventas
-
-    with tab2:
+    if selected == "Ventas":
+        st.subheader("Gestión de Ventas")
+        # Aquí agregar funciones o formularios para manejar las ventas
+    elif selected == "Clientes":
         client_management_menu()
+
 def client_management_menu():
     selected = option_menu(
         None,
