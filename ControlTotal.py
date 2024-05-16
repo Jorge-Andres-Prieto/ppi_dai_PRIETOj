@@ -380,6 +380,9 @@ def delete_user_form():
     search_query = st.text_input("Nombre o ID del Usuario a eliminar", help="Escriba el ID o nombre del usuario para buscar")
     search_button = st.button("Buscar Usuario")
 
+    # Inicialización de 'delete_button' para evitar UnboundLocalError
+    delete_button = False
+
     # Paso 2: Búsqueda y visualización del resultado
     if search_button and search_query:
         user_info = search_users(search_query)
@@ -390,15 +393,15 @@ def delete_user_form():
             delete_button = st.button("Eliminar Usuario")
         else:
             st.error("Usuario no encontrado. Por favor, verifica el ID o nombre e intenta de nuevo.")
-            st.session_state.user_to_delete = None
-            delete_button = False
+            if 'user_to_delete' in st.session_state:
+                del st.session_state.user_to_delete
 
     # Paso 4: Confirmación de eliminación
     if 'user_to_delete' in st.session_state and delete_button:
         user_info = st.session_state.user_to_delete
         st.write(f"¿Estás seguro de que quieres eliminar al usuario {user_info.full_name}?")
-        confirm_delete = st.button("Sí, eliminar")
-        cancel_delete = st.button("No, cancelar")
+        confirm_delete = st.button("Sí, eliminar", key="confirm_delete")
+        cancel_delete = st.button("No, cancelar", key="cancel_delete")
 
         # Paso 5: Ejecutar la eliminación o cancelar
         if confirm_delete:
@@ -411,6 +414,7 @@ def delete_user_form():
         elif cancel_delete:
             st.write("Eliminación cancelada.")
             del st.session_state.user_to_delete  # Limpia el estado si se cancela
+
 
 
 def inventory_management_menu():
