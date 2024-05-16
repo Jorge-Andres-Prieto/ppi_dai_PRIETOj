@@ -314,29 +314,28 @@ def update_user_form():
     Returns:
         None
     """
-    # Búsqueda por ID o Nombre
-    search_query = st.text_input("Buscar usuario por ID o nombre para actualizar")
-    search_button = st.button("Buscar Usuario")
+    with st.form("Actualizar Usuario"):
+        search_query = st.text_input("Nombre o ID del Usuario a actualizar", help="Escriba el ID o nombre del usuario para buscar")
+        search_button = st.form_submit_button("Buscar Usuario")
 
-    # Inicializamos user_info como None
-    user_info = None
-    if search_button and search_query:
-        user_info = search_users(search_query)
+        # Inicializamos user_info como None
+        user_info = None
+        if search_button and search_query:
+            user_info = search_users(search_query)
+            if user_info:
+                # Mostramos la información del usuario
+                st.write(f"ID: {user_info.id}, Nombre: {user_info.full_name}, Usuario: {user_info.username}, Rol: {user_info.role}, Teléfono: {user_info.phone_number}")
+            else:
+                st.error("Usuario no encontrado. Por favor, verifica el ID o nombre e intenta de nuevo.")
+
+        # Si se encontró un usuario, muestra el resto del formulario de actualización
         if user_info:
-            # Mostramos la información del usuario
-            st.write(f"ID: {user_info.id}, Nombre: {user_info.full_name}, Usuario: {user_info.username}, Rol: {user_info.role}, Teléfono: {user_info.phone_number}")
-        else:
-            st.error("Usuario no encontrado. Por favor, verifica el ID o nombre e intenta de nuevo.")
-
-    if user_info:
-        with st.form("Actualizar Usuario"):
-            # Campos para actualizar la información del usuario
-            update_id = st.number_input("ID del Usuario a actualizar", step=1, value=user_info.id, format="%d")
-            new_username = st.text_input("Nuevo Nombre de Usuario", placeholder="Dejar en blanco si no desea cambiar")
+            update_id = st.number_input("ID del Usuario", value=user_info.id, format="%d", disabled=True)
+            new_username = st.text_input("Nuevo Nombre de Usuario", value=user_info.username, placeholder="Dejar en blanco si no desea cambiar")
             new_password = st.text_input("Nueva Contraseña", type="password", placeholder="Dejar en blanco si no desea cambiar")
-            new_role = st.selectbox("Nuevo Rol", ["", "Admin", "Empleado"], index=0)
-            new_full_name = st.text_input("Nuevo Nombre Completo", placeholder="Dejar en blanco si no desea cambiar")
-            new_phone_number = st.text_input("Nuevo Número de Celular", placeholder="Dejar en blanco si no desea cambiar")
+            new_role = st.selectbox("Nuevo Rol", ["", "Admin", "Empleado"], index=0 if user_info.role not in ["Admin", "Empleado"] else ["Admin", "Empleado"].index(user_info.role))
+            new_full_name = st.text_input("Nuevo Nombre Completo", value=user_info.full_name, placeholder="Dejar en blanco si no desea cambiar")
+            new_phone_number = st.text_input("Nuevo Número de Celular", value=user_info.phone_number, placeholder="Dejar en blanco si no desea cambiar")
 
             submitted = st.form_submit_button("Actualizar")
 
@@ -344,42 +343,43 @@ def update_user_form():
                 # Guardar los datos temporales en el estado de la sesión
                 st.session_state.update_data = {
                     "update_id": update_id,
-                    "new_username": new_username,
+                    "new_username": new_username if new_username != user_info.username else None,
                     "new_password": new_password,
-                    "new_role": new_role,
-                    "new_full_name": new_full_name,
-                    "new_phone_number": new_phone_number
+                    "new_role": new_role if new_role != user_info.role else None,
+                    "new_full_name": new_full_name if new_full_name != user_info.full_name else None,
+                    "new_phone_number": new_phone_number if new_phone_number != user_info.phone_number else None
                 }
                 # Marca para mostrar los botones de confirmación
                 st.session_state.confirmation = True
 
-        if st.session_state.get('confirmation'):
-            st.write("¿Estás seguro de que quieres actualizar este usuario?")
-            if st.button("Sí, actualizar"):
-                # Recuperar datos desde el estado de la sesión y llamar a la función de actualización
-                data = st.session_state.update_data
-                result = update_user(
-                    data["update_id"],
-                    new_username=data["new_username"],
-                    new_password=data["new_password"],
-                    new_role=data["new_role"],
-                    new_full_name=data["new_full_name"],
-                    new_phone_number=data["new_phone_number"]
-                )
-                if "éxito" in result:
-                    st.success(result)
-                    # Restablecer la confirmación
-                    st.session_state.confirmation = False
-                    # Limpiar los datos temporales
-                    del st.session_state.update_data
-                else:
-                    st.error(result)
-            elif st.button("No, cancelar"):
-                st.write("Actualización cancelada.")
+    if st.session_state.get('confirmation'):
+        st.write("¿Estás seguro de que quieres actualizar este usuario?")
+        if st.button("Sí, actualizar"):
+            # Recuperar datos desde el estado de la sesión y llamar a la función de actualización
+            data = st.session_state.update_data
+            result = update_user(
+                data["update_id"],
+                new_username=data["new_username"],
+                new_password=data["new_password"],
+                new_role=data["new_role"],
+                new_full_name=data["new_full_name"],
+                new_phone_number=data["new_phone_number"]
+            )
+            if "éxito" in result:
+                st.success(result)
                 # Restablecer la confirmación
                 st.session_state.confirmation = False
                 # Limpiar los datos temporales
                 del st.session_state.update_data
+            else:
+                st.error(result)
+        elif st.button("No, cancelar"):
+            st.write("Actualización cancelada.")
+            # Restablecer la confirmación
+            st.session_state.confirmation = False
+            # Limpiar los datos temporales
+            del st.session_state.update_data
+
 
 
 
