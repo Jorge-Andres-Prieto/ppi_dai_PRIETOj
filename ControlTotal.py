@@ -372,61 +372,56 @@ def update_user_form():
             # Limpiar el estado de confirmación
             st.session_state.confirmation = False
 
-
 def delete_user_form():
-    """Formulario para buscar y eliminar un usuario, permitiendo la búsqueda por ID o nombre y requiriendo confirmación."""
+    """Formulario para eliminar un usuario, permitiendo la búsqueda por ID o nombre y requiriendo confirmación."""
     st.write("Eliminar Usuario")
 
-    # Input para buscar usuario por ID o nombre
-    search_query = st.text_input("Ingrese el ID o nombre del Usuario a eliminar",
-                                 help="Escribe el ID o nombre del usuario para buscar")
-    search_button = st.button("Buscar Usuario")
+    # Paso 1: Entrada para búsqueda por ID o nombre
+    search_query = st.text_input("Ingrese el ID o nombre del Usuario a eliminar", help="Escribe el ID o nombre del usuario para buscar")
+    find_user_button = st.button("Buscar Usuario")
 
-    # Estados temporales para manejar el flujo
-    if 'action' not in st.session_state:
-        st.session_state.action = None
+    # Variable para controlar la visibilidad de los botones de confirmación de eliminación
+    if 'show_confirmation_buttons' not in st.session_state:
+        st.session_state.show_confirmation_buttons = False
 
-    # Búsqueda del usuario y visualización de la información
-    if search_button and search_query:
+    if find_user_button and search_query:
         user_info = search_users(search_query)
         if user_info:
+            # Almacenamos la información del usuario en el estado de la sesión
             st.session_state.user_to_delete = user_info
             st.success(f"Usuario encontrado: {user_info.full_name} (ID: {user_info.id})")
-            # Opciones para eliminar o cancelar después de encontrar al usuario
-            delete_button = st.button("Eliminar Usuario")
-            cancel_button = st.button("Cancelar")
-
-            if delete_button:
-                st.session_state.action = 'delete'
-            elif cancel_button:
-                st.session_state.action = 'cancel'
-
+            # Mostrar el botón de eliminar usuario sólo si el usuario ha sido encontrado
+            delete_user_button = st.button("Eliminar Usuario")
+            if delete_user_button:
+                # Activar la visibilidad de los botones de confirmación
+                st.session_state.show_confirmation_buttons = True
         else:
             st.error("Usuario no encontrado. Por favor, verifica el ID o nombre e intenta de nuevo.")
 
-    # Manejar las acciones según los botones presionados
-    if 'user_to_delete' in st.session_state and st.session_state.action == 'delete':
+    # Paso 2: Confirmación para eliminar usuario
+    if st.session_state.show_confirmation_buttons:
         st.write(f"¿Estás seguro de que quieres eliminar al usuario {st.session_state.user_to_delete.full_name}?")
-        confirm_delete = st.button("Sí, eliminar", key="confirm_delete")
-        deny_delete = st.button("No, cancelar", key="deny_delete")
+        yes_button = st.button("Sí, eliminar")
+        no_button = st.button("No, cancelar")
 
-        if confirm_delete:
+        if yes_button:
             result = delete_user(st.session_state.user_to_delete.id)
             if "éxito" in result:
                 st.success("Usuario eliminado con éxito.")
-                # Limpiar estado después de la eliminación
-                st.session_state.action = None
+                # Resetear el estado después de la eliminación
+                st.session_state.show_confirmation_buttons = False
                 del st.session_state.user_to_delete
             else:
                 st.error("No se pudo eliminar el usuario.")
-        elif deny_delete:
-            st.write("Eliminación cancelada.")
-            st.session_state.action = None
+            # Después de procesar la acción, ocultar los botones de confirmación
+            st.session_state.show_confirmation_buttons = False
 
-    elif 'user_to_delete' in st.session_state and st.session_state.action == 'cancel':
-        st.write("Proceso cancelado.")
-        st.session_state.action = None
-        del st.session_state.user_to_delete
+        if no_button:
+            st.write("Eliminación cancelada.")
+            # Ocultar los botones de confirmación y resetear el estado relevante
+            st.session_state.show_confirmation_buttons = False
+
+
 
 
 def inventory_management_menu():
