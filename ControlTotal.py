@@ -572,7 +572,7 @@ def sales_menu():
             "container": {"padding": "0!important", "background-color": "#fafafa"},
             "icon": {"color": "orange", "font-size": "25px"},
             "nav-link": {"font-size": "18px", "text-align": "left", "margin": "0px", "padding": "8px",
-                         "border-radius": "0", "background-color": "#b2fab4", "color": "white"},
+                         "border-radius": "0", "background-color": "#25d366", "color": "white"},
             "nav-link-selected": {"background-color": "green"
                                   },
         }
