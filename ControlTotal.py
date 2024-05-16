@@ -128,6 +128,15 @@ def main_menu(user):
         if selected == 'Gestión de inventarios':
             inventory_management_menu()
 
+        if selected == 'Ventas y Facturación':
+            with st.expander("Opciones de Ventas y Facturación"):
+                sales_client_menu = st.radio(
+                    "Selecciona una opción",
+                    ('Ventas', 'Clientes')
+                )
+                if sales_client_menu == 'Clientes':
+                    client_management_menu()
+
         if selected == 'Sobre el Autor':
             st.markdown(info_sobre_autor)
 
@@ -150,6 +159,15 @@ def main_menu(user):
 
         if selected == 'Gestión de inventarios':
             inventory_management_menu()
+
+        if selected == 'Ventas y Facturación':
+            with st.expander("Opciones de Ventas y Facturación"):
+                sales_client_menu = st.radio(
+                    "Selecciona una opción",
+                    ('Ventas', 'Clientes')
+                )
+                if sales_client_menu == 'Clientes':
+                    client_management_menu()
 
         if selected == 'Sobre el Autor':
             st.markdown(info_sobre_autor)
@@ -543,6 +561,25 @@ def delete_product_form():
             st.session_state.confirmation_delete = False
             # Limpiar el ID almacenado
             del st.session_state.delete_id
+
+def client_management_menu():
+    selected = option_menu(
+        None,
+        ["Crear Cliente", "Buscar Cliente", "Actualizar Cliente", "Eliminar Cliente"],
+        icons=["plus-circle", "search", "pencil-square", "trash"],
+        menu_icon="cast",
+        default_index=0,
+        orientation="horizontal"
+    )
+
+  #  if selected == 'Crear Cliente':
+   #     create_client_form()
+    #elif selected == 'Buscar Cliente':
+     #   search_client_form()
+    #elif selected == 'Actualizar Cliente':
+     #   update_client_form()
+    #elif selected == 'Eliminar Cliente':
+     #   delete_client_form()
 
 
 if __name__ == "__main__":

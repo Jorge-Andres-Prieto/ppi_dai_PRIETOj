@@ -61,3 +61,12 @@ class Product(Base):
     subcategory = Column(String)
     price = Column(Numeric(10, 2), nullable=False)
     quantity = Column(Integer, nullable=False)
+
+    class Cliente(Base):
+        __tablename__ = 'clientes'
+        id = Column(Integer, primary_key=True)
+        nombre = Column(String, nullable=False)
+        direccion = Column(String, nullable=False)
+        telefono = Column(String, nullable=False)
+        cedula = Column(String, nullable=False, unique=True)
+        credito = Column(Numeric(10, 2))
