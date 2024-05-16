@@ -132,13 +132,7 @@ def main_menu(user):
             inventory_management_menu()
 
         if selected == 'Ventas y Facturación':
-            with st.expander("Opciones de Ventas y Facturación"):
-                sales_client_menu = st.radio(
-                    "Selecciona una opción",
-                    ('Ventas', 'Clientes')
-                )
-                if sales_client_menu == 'Clientes':
-                    client_management_menu()
+            sales_client_menu()
 
         if selected == 'Sobre el Autor':
             st.markdown(info_sobre_autor)
@@ -565,6 +559,16 @@ def delete_product_form():
             # Limpiar el ID almacenado
             del st.session_state.delete_id
 
+
+def sales_client_menu():
+    st.write("### Ventas y Facturación")
+    tab1, tab2 = st.tabs(["Ventas", "Clientes"])
+
+    with tab1:
+        st.write("Aquí se gestionarán las ventas.")  # Aquí puedes añadir las funciones o formularios para las ventas
+
+    with tab2:
+        client_management_menu()
 def client_management_menu():
     selected = option_menu(
         None,
