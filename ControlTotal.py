@@ -13,6 +13,9 @@ from user_management import create_user, search_users, update_user, delete_user,
 # Importa funciones para la gestión de productos
 from product_management import search_products, delete_product, update_product, add_product
 
+from client_management import create_client, search_clients, update_client, delete_client
+
+
 # Importa funcion para crear la base de datos siesta no esta creada
 from database import init_db
 
@@ -572,14 +575,69 @@ def client_management_menu():
         orientation="horizontal"
     )
 
-  #  if selected == 'Crear Cliente':
-   #     create_client_form()
-    #elif selected == 'Buscar Cliente':
-     #   search_client_form()
-    #elif selected == 'Actualizar Cliente':
-     #   update_client_form()
-    #elif selected == 'Eliminar Cliente':
-     #   delete_client_form()
+    if selected == 'Crear Cliente':
+        create_client_form()
+    elif selected == 'Buscar Cliente':
+        search_client_form()
+    elif selected == 'Actualizar Cliente':
+        update_client_form()
+    elif selected == 'Eliminar Cliente':
+        delete_client_form()
+
+def create_client_form():
+    with st.form("Crear Cliente"):
+        nombre = st.text_input("Nombre Completo")
+        direccion = st.text_input("Dirección")
+        telefono = st.text_input("Teléfono")
+        cedula = st.text_input("Cédula")
+        credito = st.number_input("Crédito", format="%f", step=0.01, value=0.00)
+
+        submitted = st.form_submit_button("Crear Cliente")
+        if submitted:
+            result = create_client(nombre, direccion, telefono, cedula, credito)
+            if "éxito" in result:
+                st.success(result)
+            else:
+                st.error(result)
+
+def search_client_form():
+    with st.form("Buscar Cliente"):
+        search_query = st.text_input("Introduzca el nombre o cédula del cliente a buscar")
+        submitted = st.form_submit_button("Buscar Cliente")
+        if submitted:
+            clients = search_clients(search_query)
+            if clients:
+                for client in clients:
+                    st.write(f"Nombre: {client.nombre}, Dirección: {client.direccion}, Teléfono: {client.telefono}, Cédula: {client.cedula}, Crédito: {client.credito}")
+            else:
+                st.write("No se encontraron clientes")
+
+def update_client_form():
+    with st.form("Actualizar Cliente"):
+        cedula = st.text_input("Cédula del Cliente a actualizar")
+        new_nombre = st.text_input("Nuevo Nombre")
+        new_direccion = st.text_input("Nueva Dirección")
+        new_telefono = st.text_input("Nuevo Teléfono")
+        new_credito = st.number_input("Nuevo Crédito", format="%f", step=0.01)
+
+        submitted = st.form_submit_button("Actualizar Cliente")
+        if submitted:
+            result = update_client(cedula, new_nombre, new_direccion, new_telefono, new_credito)
+            if "éxito" in result:
+                st.success(result)
+            else:
+                st.error(result)
+
+def delete_client_form():
+    with st.form("Eliminar Cliente"):
+        cedula = st.text_input("Cédula del Cliente a eliminar")
+        submitted = st.form_submit_button("Eliminar Cliente")
+        if submitted:
+            result = delete_client(cedula)
+            if "éxito" in result:
+                st.success(result)
+            else:
+                st.error(result)
 
 
 if __name__ == "__main__":
