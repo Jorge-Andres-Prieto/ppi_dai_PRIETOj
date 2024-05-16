@@ -69,20 +69,27 @@ def create_user(username, password, role, full_name, phone_number):
 
 
 def search_users(search_query):
-    """Busca usuarios que coincidan con un criterio de búsqueda en el nombre completo.
+    """Busca un usuario que coincida con un criterio de búsqueda por ID o nombre completo.
 
     Args:
-        search_query (str): Criterio de búsqueda.
+        search_query (str): Criterio de búsqueda, puede ser ID o nombre completo.
 
     Returns:
-        list: Lista de objetos User que coinciden con la búsqueda.
+        User: Objeto User si se encuentra un usuario que coincida con la búsqueda, None de lo contrario.
     """
     session = Session()
+    user = None
     try:
-        users = session.query(User).filter(User.full_name.ilike(f"%{search_query}%")).all()
-        return users
+        # Intenta convertir la consulta en un entero para buscar por ID
+        if search_query.isdigit():
+            user_id = int(search_query)
+            user = session.query(User).filter(User.id == user_id).one_or_none()
+        else:
+            user = session.query(User).filter(User.full_name.ilike(f"%{search_query}%")).first()
     finally:
         session.close()
+    return user
+
 
 
 def update_user(user_id, new_username=None, new_password=None, new_role=None,
