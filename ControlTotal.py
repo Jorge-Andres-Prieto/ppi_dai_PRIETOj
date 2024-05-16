@@ -266,7 +266,7 @@ def validate_and_submit_user(username, password, role, full_name, phone_number, 
 
 
 def search_user_form():
-    """Formulario para buscar usuarios existentes en la base de datos.
+    """Formulario para buscar usuarios existentes en la base de datos usando ID o nombre.
 
     Args:
         None
@@ -275,10 +275,15 @@ def search_user_form():
         None
     """
     with st.form("Buscar Usuario"):
-        search_name = st.text_input("Nombre a buscar")
+        search_query = st.text_input("Introduzca ID o nombre del usuario a buscar")
         submitted = st.form_submit_button("Buscar")
         if submitted:
-            display_search_results(search_name)
+            user = search_users(search_query)
+            if user:
+                # Muestra la información detallada del usuario encontrado
+                st.write(f"ID: {user.id}, Nombre: {user.full_name}, Usuario: {user.username}, Rol: {user.role}, Teléfono: {user.phone_number}")
+            else:
+                st.error("No se encontró ningún usuario con ese criterio.")
 
 
 def display_search_results(search_name):
