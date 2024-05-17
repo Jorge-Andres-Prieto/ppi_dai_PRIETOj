@@ -614,14 +614,17 @@ def handle_sales():
 
     sitio = st.session_state.get('sitio', 'Tienda')
 
-    st.title("Sistema de Ventas")
-
-    # Información del cliente
-    col1, col2 = st.columns([2, 1])
+    # Tipo de Cliente
+    col1, col2 = st.columns(2)
     with col1:
-        client_type = st.radio("Tipo de Cliente", ("Cliente Registrado", "Cliente No Registrado"))
+        cliente_registrado = st.radio("Cliente Registrado", ("Sí", "No"), index=0)
+    with col2:
+        cliente_no_registrado = st.radio("Cliente No Registrado", ("No", "Sí"),
+                                         index=1 if cliente_registrado == "No" else 0)
 
-    if client_type == "Cliente Registrado":
+    if cliente_registrado == "Sí":
+        # Buscar Cliente
+        col1, col2 = st.columns(2)
         with col1:
             search_query = st.text_input("Buscar Cliente por Cédula o Nombre")
             if st.button("Buscar Cliente"):
@@ -632,17 +635,18 @@ def handle_sales():
                 else:
                     st.error("Cliente no encontrado")
 
-        if 'cliente' in st.session_state:
-            with col2:
+        with col2:
+            if 'cliente' in st.session_state:
                 client_info = st.session_state['cliente']
                 st.write(f"**Cliente:** {client_info.nombre}")
                 st.write(f"**Cédula:** {client_info.cedula}")
                 st.write(f"**Crédito:** ${client_info.credito:.2f}")
 
-    # Agregar productos al carrito
-    col1, col2, col3 = st.columns(3)
+    # Agregar Producto al Carrito
+    col1, col2 = st.columns(2)
     with col1:
         product_id = st.text_input("ID del Producto")
+    with col2:
         cantidad = st.number_input("Cantidad", min_value=1, step=1)
         if st.button("Agregar al Carrito"):
             products = search_products(product_id)
@@ -657,8 +661,9 @@ def handle_sales():
             else:
                 st.error("Producto no encontrado")
 
-    # Carrito de compras
-    with col2:
+    # Carrito de Compras y Pago
+    col1, col2 = st.columns(2)
+    with col1:
         if st.session_state['carrito']:
             st.write("### Carrito de Compras")
             cart_data = []
@@ -673,12 +678,11 @@ def handle_sales():
             st.table(cart_df)
             st.write(f"Total: ${st.session_state['total']:.2f}")
 
-    # Pago
-    with col3:
+    with col2:
         if st.session_state['carrito']:
             efectivo = st.number_input("Pago en Efectivo", min_value=0.0, format="%.2f")
             transferencia = st.number_input("Pago por Transferencia", min_value=0.0, format="%.2f")
-            if client_type == "Cliente Registrado":
+            if cliente_registrado == "Sí":
                 credito = st.number_input("Deuda", min_value=0.0, format="%.2f")
             else:
                 credito = 0.0
