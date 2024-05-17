@@ -27,7 +27,7 @@ def search_clients(query):
 def update_client_credit(cedula, nuevo_credito):
     session = Session()
     try:
-        client = session.query(Cliente).filter(Cliente.cedula == cedula).first()
+        client = session.query(Cliente).filter(Cliente.cedula == str(cedula)).first()  # Asegurarse de que cédula es una cadena
         if client:
             client.credito = nuevo_credito
             session.commit()
@@ -39,7 +39,6 @@ def update_client_credit(cedula, nuevo_credito):
         return f"Error al actualizar el crédito del cliente: {str(e)}"
     finally:
         session.close()
-
 
 
 def delete_client(cedula):

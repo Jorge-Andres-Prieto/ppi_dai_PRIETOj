@@ -787,36 +787,25 @@ def search_client_form():
     if st.button("Buscar Cliente"):
         clients = search_clients(search_query)
         if clients:
-            st.session_state['clients'] = clients
+            client_data = []
+            for client in clients:
+                client_data.append([
+                    client.nombre, client.direccion, client.telefono, client.cedula, f"${client.credito:.2f}"
+                ])
+            df = pd.DataFrame(client_data, columns=["Nombre", "Dirección", "Teléfono", "Cédula", "Crédito"])
+            st.table(df)
+
+            abono = st.number_input("Cantidad a abonar al crédito", min_value=0.0, format="%.2f")
+            if st.button("Abonar al Crédito"):
+                if len(clients) == 1:  # Asegurarse de que solo hay un cliente para abonar
+                    cliente = clients[0]
+                    nuevo_credito = Decimal(cliente.credito) - Decimal(abono)
+                    result = update_client_credit(cliente.cedula, nuevo_credito)
+                    st.write(result)
+                else:
+                    st.error("Por favor, refine su búsqueda para obtener un único cliente.")
         else:
-            st.write("No se encontraron clientes")
-
-    if 'clients' in st.session_state:
-        for client in st.session_state['clients']:
-            st.write(
-                f"Nombre: {client.nombre}, Dirección: {client.direccion}, Teléfono: {client.telefono}, Cédula: {client.cedula}, Crédito: {client.credito}")
-            abono_key = f"abono_{client.id}"
-            confirm_abono_key = f"confirm_abono_{client.id}"
-
-            if abono_key not in st.session_state:
-                st.session_state[abono_key] = 0.0
-
-            abono = st.number_input(f"Abonar al crédito de {client.nombre}", min_value=0.0,
-                                    max_value=float(client.credito), format="%.2f", key=abono_key)
-
-            if st.button(f"Abonar a {client.nombre}", key=f"abonar_{client.id}"):
-                st.session_state[confirm_abono_key] = True
-
-            if st.session_state.get(confirm_abono_key, False):
-                st.write(
-                    f"¿Estás seguro de que deseas abonar {st.session_state[abono_key]} al crédito de {client.nombre}?")
-                if st.button(f"Sí, confirmar abono a {client.nombre}", key=f"confirmar_abono_{client.id}"):
-                    nuevo_credito = client.credito - Decimal(st.session_state[abono_key])
-                    resultado = update_client_credit(client.id, nuevo_credito)
-                    st.write(resultado)
-                    st.session_state[confirm_abono_key] = False
-                if st.button(f"No, cancelar abono a {client.nombre}", key=f"cancelar_abono_{client.id}"):
-                    st.session_state[confirm_abono_key] = False
+            st.error("No se encontraron clientes")
 
 def update_client_form():
     with st.form("Actualizar Cliente"):
