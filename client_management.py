@@ -23,6 +23,7 @@ def search_clients(query):
     finally:
         session.close()
 
+
 def update_client(cedula, new_nombre=None, new_direccion=None, new_telefono=None, new_credito=None):
     session = Session()
     try:

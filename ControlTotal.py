@@ -591,17 +591,23 @@ def handle_sales():
 
     client_id = st.text_input("Cédula o Nombre del Cliente")
     if st.button("Buscar Cliente"):
-        client = search_clients(client_id)
-        if client:
-            st.write(f"Cliente encontrado: {client.nombre} (Cédula: {client.cedula}, Crédito: {client.credito})")
+        clients = search_clients(client_id)
+        if clients:
+            # Si se encontraron múltiples clientes, muestra una selección para elegir el correcto
+            client_options = {client.cedula: client for client in clients}
+            selected_client_cedula = st.selectbox("Selecciona un Cliente", list(client_options.keys()))
+            selected_client = client_options[selected_client_cedula]
+            st.write(
+                f"Cliente encontrado: {selected_client.nombre} (Cédula: {selected_client.cedula}, Crédito: {selected_client.credito})")
         else:
             st.error("Cliente no encontrado")
 
     product_id = st.text_input("ID del Producto")
     quantity = st.number_input("Cantidad", min_value=1, step=1)
     if st.button("Agregar Producto"):
-        product = search_products(product_id)
-        if product:
+        products = search_products(product_id)
+        if products:
+            product = products[0]  # Asumimos que solo hay un producto con ese ID
             st.write(f"Producto agregado: {product.name} (Precio: {product.price}, Cantidad: {quantity})")
             # Aquí añade la lógica para almacenar la venta temporalmente
         else:
