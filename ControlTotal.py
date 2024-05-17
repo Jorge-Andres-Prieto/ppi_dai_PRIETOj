@@ -611,6 +611,8 @@ def handle_sales():
         st.session_state['carrito'] = []
     if 'total' not in st.session_state:
         st.session_state['total'] = 0.0
+    if 'cliente' in st.session_state:
+        del st.session_state['cliente']
 
     sitio = st.session_state.get('sitio', 'Tienda')
 
@@ -662,48 +664,80 @@ def handle_sales():
         if st.session_state['carrito']:
             st.write("### Carrito de Compras")
             cart_data = []
-            for item in st.session_state['carrito']:
+            for idx, item in enumerate(st.session_state['carrito']):
                 product = item['product']
                 cart_data.append([
                     product.product_id, product.name, f"${product.price:.2f}", item['quantity'],
-                    f"${product.price * item['quantity']:.2f}"
+                    f"${product.price * item['quantity']:.2f}", idx
                 ])
             cart_df = pd.DataFrame(cart_data,
-                                   columns=["Product ID", "Nombre", "Precio Unitario", "Cantidad", "Importe"])
+                                   columns=["Product ID", "Nombre", "Precio Unitario", "Cantidad", "Importe", "Índice"])
             st.table(cart_df)
             st.write(f"Total: ${st.session_state['total']:.2f}")
 
+            # Opción para quitar productos
+            col1, col2 = st.columns(2)
+            with col1:
+                idx_to_remove = st.number_input("Índice del Producto a Quitar", min_value=0, step=1)
+            with col2:
+                cantidad_to_remove = st.number_input("Cantidad a Quitar", min_value=1, step=1)
+                if st.button("Quitar del Carrito"):
+                    if idx_to_remove < len(st.session_state['carrito']):
+                        item = st.session_state['carrito'][idx_to_remove]
+                        if cantidad_to_remove >= item['quantity']:
+                            st.session_state['total'] -= float(item['product'].price) * item['quantity']
+                            del st.session_state['carrito'][idx_to_remove]
+                        else:
+                            item['quantity'] -= cantidad_to_remove
+                            st.session_state['total'] -= float(item['product'].price) * cantidad_to_remove
+                        st.success(f"Producto {item['product'].name} actualizado en el carrito")
+
     with col2:
         if st.session_state['carrito']:
-            efectivo = st.number_input("Pago en Efectivo", min_value=0.0, format="%.2f")
-            transferencia = st.number_input("Pago por Transferencia", min_value=0.0, format="%.2f")
-            if cliente_registrado == "Cliente Registrado":
-                credito = st.number_input("Deuda", min_value=0.0, format="%.2f")
-            else:
-                credito = 0.0
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                efectivo = st.number_input("Pago en Efectivo", min_value=0.0, format="%.2f")
+            with col2:
+                transferencia = st.number_input("Pago por Transferencia", min_value=0.0, format="%.2f")
+            with col3:
+                if cliente_registrado == "Cliente Registrado":
+                    credito = st.number_input("Deuda", min_value=0.0, format="%.2f")
+                else:
+                    credito = 0.0
 
-            if st.button("Pagar"):
-                if efectivo + transferencia + credito >= st.session_state['total']:
-                    productos_vendidos = st.session_state['carrito']
-                    user_id = st.session_state['user'].id
-                    total_efectivo = efectivo
-                    total_transferencia = transferencia
-                    total_credito = credito
-                    result = create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos,
-                                         total_credito, sitio)
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("Pagar"):
+                    if efectivo + transferencia + credito >= st.session_state['total']:
+                        productos_vendidos = st.session_state['carrito']
+                        user_id = st.session_state['user'].id
+                        total_efectivo = efectivo
+                        total_transferencia = transferencia
+                        total_credito = credito
+                        result = create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos,
+                                             total_credito, sitio)
 
-                    if cliente_registrado == "Cliente Registrado" and credito > 0:
-                        cliente = st.session_state['cliente']
-                        nuevo_credito = cliente.credito + Decimal(credito)
-                        update_client_credit(cliente.cedula, nuevo_credito)
-                        st.session_state['cliente'].credito = nuevo_credito
-                        st.write(f"**Nuevo Crédito:** ${nuevo_credito:.2f}")
+                        if cliente_registrado == "Cliente Registrado" and credito > 0:
+                            cliente = st.session_state['cliente']
+                            nuevo_credito = cliente.credito + Decimal(credito)
+                            update_client_credit(cliente.cedula, nuevo_credito)
+                            st.session_state['cliente'].credito = nuevo_credito
+                            st.write(f"**Nuevo Crédito:** ${nuevo_credito:.2f}")
 
-                    st.success(result)
+                        st.success(result)
+                        st.session_state['carrito'] = []
+                        st.session_state['total'] = 0.0
+                        if cliente_registrado == "Cliente Registrado":
+                            del st.session_state['cliente']
+                    else:
+                        st.error("Pago insuficiente")
+
+            with col2:
+                if st.button("Cancelar Venta"):
                     st.session_state['carrito'] = []
                     st.session_state['total'] = 0.0
-                else:
-                    st.error("Pago insuficiente")
+                    st.session_state['cliente'] = None
+                    st.experimental_rerun()
 
 
 def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos, total_credito, sitio):
