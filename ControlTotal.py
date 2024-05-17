@@ -500,6 +500,7 @@ def update_product_form():
                 st.error(result)
 
 
+
 def add_product_form():
     """Formulario para añadir un nuevo producto."""
     with st.form("Agregar Producto"):
@@ -519,7 +520,6 @@ def add_product_form():
                 st.success(result)
             else:
                 st.error(result)
-
 
 def delete_product_form():
     """Formulario para eliminar un producto existente.

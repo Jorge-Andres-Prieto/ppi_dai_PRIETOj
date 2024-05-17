@@ -102,6 +102,7 @@ def update_product(product_id, new_name=None, new_brand=None, new_category=None,
 
 
 
+
 def add_product(product_id, name, brand, category, subcategory, price, sitio, cantidad):
     """Añade un nuevo producto a la base de datos.
 
@@ -129,6 +130,7 @@ def add_product(product_id, name, brand, category, subcategory, price, sitio, ca
         return f"Error al añadir el producto: {str(e)}"
     finally:
         session.close()
+
 
 
 def delete_product(product_id):
