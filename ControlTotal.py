@@ -64,7 +64,12 @@ def main():
         user = st.session_state['user']
         main_menu(user)
 
-
+def reset_sale():
+    """Limpia el estado de la sesión para iniciar una nueva venta."""
+    st.session_state['current_sale'] = []
+    st.session_state['selected_client'] = None
+    st.session_state['cancel_sale'] = False
+    st.session_state['confirm_payment'] = False
 def login_page():
     """Crea y gestiona la página de inicio de sesión.
 
@@ -600,20 +605,25 @@ def handle_sales():
     # Inicializar arrays para manejar productos en la venta
     if 'current_sale' not in st.session_state:
         st.session_state['current_sale'] = []
+    if 'selected_client' not in st.session_state:
+        st.session_state['selected_client'] = None
 
-    # Buscar cliente
-    client_id = st.text_input("Cédula o Nombre del Cliente")
-    if st.button("Buscar Cliente"):
-        clients = search_clients(client_id)
-        if clients:
-            selected_client = clients[0]
-            st.write(
-                f"Cliente encontrado: {selected_client.nombre} (Cédula: {selected_client.cedula}, Crédito: {selected_client.credito})")
-            st.session_state['selected_client'] = selected_client
-        else:
-            st.error("Cliente no encontrado")
+    # Selección de tipo de cliente
+    client_type = st.radio("Selecciona el tipo de cliente", ["Cliente Registrado", "Cliente No Registrado"])
 
-    if 'selected_client' in st.session_state:
+    if client_type == "Cliente Registrado":
+        client_id = st.text_input("Cédula o Nombre del Cliente")
+        if st.button("Buscar Cliente"):
+            clients = search_clients(client_id)
+            if clients:
+                selected_client = clients[0]
+                st.write(
+                    f"Cliente encontrado: {selected_client.nombre} (Cédula: {selected_client.cedula}, Crédito: {selected_client.credito})")
+                st.session_state['selected_client'] = selected_client
+            else:
+                st.error("Cliente no encontrado")
+
+    if 'selected_client' in st.session_state or client_type == "Cliente No Registrado":
         col1, col2, col3 = st.columns(3)
         with col1:
             # Agregar producto
@@ -665,10 +675,12 @@ def handle_sales():
         # Opciones de pago
         efectivo = st.number_input("Pago en Efectivo", min_value=0.0, format="%.2f")
         transferencia = st.number_input("Pago por Transferencia", min_value=0.0, format="%.2f")
-        if st.button("Pagar"):
-            total_pagado = efectivo + transferencia
-            if 'selected_client' in st.session_state:
-                credito = total - total_pagado if total_pagado < total else 0
+        if client_type == "Cliente Registrado":
+            credito = 0
+            if st.button("Pagar"):
+                total_pagado = efectivo + transferencia
+                if total_pagado < total:
+                    credito = total - total_pagado
                 st.write(f"Crédito: {credito}")
                 if credito > 0:
                     st.write("¿Quieres registrar la deuda en crédito?")
@@ -676,13 +688,36 @@ def handle_sales():
                         selected_client = st.session_state['selected_client']
                         update_client_credit(selected_client.id, selected_client.credito + decimal.Decimal(credito))
                         st.write(f"Deuda registrada: {credito}")
-            if total_pagado >= total:
-                create_sale(st.session_state['user'].id, decimal.Decimal(efectivo), decimal.Decimal(transferencia),
-                            st.session_state['current_sale'])
-                st.write("Pago realizado con éxito")
-                st.session_state['current_sale'] = []
+                        create_sale(st.session_state['user'].id, decimal.Decimal(efectivo),
+                                    decimal.Decimal(transferencia), st.session_state['current_sale'])
+                        st.write("Pago realizado con éxito")
+                        reset_sale()
+                    elif st.button("No, volver a intentar"):
+                        pass
+                else:
+                    create_sale(st.session_state['user'].id, decimal.Decimal(efectivo), decimal.Decimal(transferencia),
+                                st.session_state['current_sale'])
+                    st.write("Pago realizado con éxito")
+                    reset_sale()
             else:
-                st.error("Pago insuficiente")
+                if efectivo + transferencia >= total:
+                    create_sale(st.session_state['user'].id, decimal.Decimal(efectivo), decimal.Decimal(transferencia),
+                                st.session_state['current_sale'])
+                    st.write("Pago realizado con éxito")
+                    reset_sale()
+                else:
+                    st.error("Pago insuficiente")
+
+        elif client_type == "Cliente No Registrado":
+            if st.button("Pagar"):
+                total_pagado = efectivo + transferencia
+                if total_pagado >= total:
+                    create_sale(st.session_state['user'].id, decimal.Decimal(efectivo), decimal.Decimal(transferencia),
+                                st.session_state['current_sale'])
+                    st.write("Pago realizado con éxito")
+                    reset_sale()
+                else:
+                    st.error("Pago insuficiente")
 
         # Cancelar compra
         if st.button("Cancelar Compra"):
@@ -691,8 +726,7 @@ def handle_sales():
         if st.session_state.get('cancel_sale', False):
             st.write("¿Estás seguro de que deseas cancelar la compra?")
             if st.button("Sí, cancelar"):
-                st.session_state['current_sale'] = []
-                st.session_state['cancel_sale'] = False
+                reset_sale()
                 st.write("Compra cancelada")
             elif st.button("No, continuar con la compra"):
                 st.session_state['cancel_sale'] = False
