@@ -12,26 +12,16 @@ from sqlalchemy import func
 
 
 def search_products(search_query):
-    """Busca productos que coincidan con un criterio de búsqueda en el nombre.
-
-    Args:
-        search_query (str): Criterio de búsqueda.
-
-    Returns:
-        list: Lista de objetos Product que coinciden con la búsqueda.
-    """
     session = Session()
     try:
-        # Chequea si la entrada es numérica, asumiendo que es un ID
-        if search_query.isdigit():
-            product_id = int(search_query)
-            products = session.query(Product).filter(Product.id == product_id).all()
-        # De lo contrario, asume que es una búsqueda por nombre
-        else:
-            products = session.query(Product).filter(Product.name.ilike(f"%{search_query}%")).all()
+        # Búsqueda por product_id o nombre del producto
+        products = session.query(Product).filter(
+            (Product.product_id.ilike(f"%{search_query}%")) | (Product.name.ilike(f"%{search_query}%"))
+        ).all()
         return products
     finally:
         session.close()
+
 
 def view_product_details(product_id):
     """Obtiene y muestra la información detallada de un producto por su ID.
@@ -102,18 +92,11 @@ def add_product(product_id, name, brand, category, subcategory, price, cantidad)
         session.close()
 
 
+
 def delete_product(product_id):
-    """Elimina un producto existente de la base de datos.
-
-    Args:
-        None
-
-    Returns:
-        None
-    """
     session = Session()
     try:
-        product = session.query(Product).filter(Product.id == product_id).one_or_none()
+        product = session.query(Product).filter(Product.product_id == product_id).one_or_none()
         if product:
             session.delete(product)
             session.commit()

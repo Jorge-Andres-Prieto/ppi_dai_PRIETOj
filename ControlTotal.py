@@ -449,27 +449,37 @@ def inventory_management_menu():
         delete_product_form()
 
 def search_product_form():
-    with st.form("Buscar Producto"):
-        search_query = st.text_input("Nombre o ID del Producto a buscar")
-        submitted = st.form_submit_button("Buscar")
-        if submitted:
-            products = search_products(search_query)
-            if products:
-                for product in products:
-                    st.write(f"ID: {product.id}, Product ID: {product.product_id}, Nombre: {product.name}, Marca: {product.brand}, Categoría: {product.category}, Subcategoría: {product.subcategory}, Precio: ${product.price}, Total en Tienda: {product.total_tienda}, Total en Bodega: {product.total_bodega}")
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        transfer_to_tienda = st.number_input(f"Transferir de Bodega a Tienda ({product.name})", min_value=0, max_value=product.total_bodega, step=1)
-                        if st.form_submit_button(f"Transferir a Tienda ({product.product_id})"):
-                            result = update_product(product.product_id, inventory_adjustment_tienda=transfer_to_tienda, inventory_adjustment_bodega=-transfer_to_tienda)
-                            st.write(result)
-                    with col2:
-                        transfer_to_bodega = st.number_input(f"Transferir de Tienda a Bodega ({product.name})", min_value=0, max_value=product.total_tienda, step=1)
-                        if st.form_submit_button(f"Transferir a Bodega ({product.product_id})"):
-                            result = update_product(product.product_id, inventory_adjustment_tienda=-transfer_to_bodega, inventory_adjustment_bodega=transfer_to_bodega)
-                            st.write(result)
-            else:
-                st.error("No se encontraron productos con ese criterio.")
+    """Formulario para buscar productos por nombre o ID del producto."""
+
+    search_query = st.text_input("Nombre o ID del Producto a buscar")
+    if st.button("Buscar Producto"):
+        products = search_products(search_query)
+        if products:
+            # Crear una tabla para mostrar la información de los productos
+            product_data = []
+            for product in products:
+                product_data.append([
+                    product.product_id, product.name, product.brand, product.category,
+                    product.subcategory, product.price, product.total_tienda, product.total_bodega
+                ])
+            df = pd.DataFrame(product_data, columns=["Product ID", "Nombre", "Marca", "Categoría", "Subcategoría", "Precio", "Total en Tienda", "Total en Bodega"])
+            st.table(df)
+
+            for product in products:
+                st.write(f"Product ID: {product.product_id}, Nombre: {product.name}, Marca: {product.brand}, Categoría: {product.category}, Subcategoría: {product.subcategory}, Precio: ${product.price}, Total en Tienda: {product.total_tienda}, Total en Bodega: {product.total_bodega}")
+                col1, col2 = st.columns(2)
+                with col1:
+                    transfer_to_tienda = st.number_input(f"Transferir de Bodega a Tienda ({product.name})", min_value=0, max_value=product.total_bodega, step=1, key=f"to_tienda_{product.product_id}")
+                    if st.button(f"Transferir a Tienda ({product.product_id})", key=f"btn_to_tienda_{product.product_id}"):
+                        result = update_product(product.product_id, inventory_adjustment_tienda=transfer_to_tienda, inventory_adjustment_bodega=-transfer_to_tienda)
+                        st.write(result)
+                with col2:
+                    transfer_to_bodega = st.number_input(f"Transferir de Tienda a Bodega ({product.name})", min_value=0, max_value=product.total_tienda, step=1, key=f"to_bodega_{product.product_id}")
+                    if st.button(f"Transferir a Bodega ({product.product_id})", key=f"btn_to_bodega_{product.product_id}"):
+                        result = update_product(product.product_id, inventory_adjustment_tienda=-transfer_to_bodega, inventory_adjustment_bodega=transfer_to_bodega)
+                        st.write(result)
+        else:
+            st.error("No se encontraron productos con ese criterio.")
 
 
 def update_product_form():
