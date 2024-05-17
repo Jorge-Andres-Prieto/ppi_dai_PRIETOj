@@ -781,6 +781,7 @@ def create_client_form():
             else:
                 st.error(result)
 
+
 def search_client_form():
     if 'cliente_seleccionado' not in st.session_state:
         st.session_state['cliente_seleccionado'] = None
@@ -793,6 +794,12 @@ def search_client_form():
     if st.button("Buscar Cliente"):
         clients = search_clients(search_query)
         if clients:
+            if len(clients) == 1:
+                st.session_state['cliente_seleccionado'] = clients[0]
+            else:
+                st.session_state['cliente_seleccionado'] = None
+                st.error("Por favor, refine su búsqueda para obtener un único cliente.")
+
             client_data = []
             for client in clients:
                 client_data.append([
@@ -800,19 +807,11 @@ def search_client_form():
                 ])
             df = pd.DataFrame(client_data, columns=["Nombre", "Dirección", "Teléfono", "Cédula", "Crédito"])
             st.table(df)
-            if len(clients) == 1:
-                st.session_state['cliente_seleccionado'] = clients[0]
-            else:
-                st.error("Por favor, refine su búsqueda para obtener un único cliente.")
         else:
             st.error("No se encontraron clientes")
 
     if st.session_state['cliente_seleccionado']:
         cliente = st.session_state['cliente_seleccionado']
-        st.write(f"Cliente seleccionado: {cliente.nombre}")
-        st.write(f"Cédula: {cliente.cedula}")
-        st.write(f"Crédito actual: ${cliente.credito:.2f}")
-
         st.session_state['abono'] = st.number_input("Cantidad a abonar al crédito", min_value=0.0, format="%.2f")
 
         if st.button("Abonar al Crédito"):
