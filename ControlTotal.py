@@ -614,13 +614,13 @@ def handle_sales():
 
     sitio = st.session_state.get('sitio', 'Tienda')
 
-    # Tipo de Cliente
-    cliente_registrado = st.radio("Tipo de Cliente", ("Cliente Registrado", "Cliente No Registrado"))
+    # Información del Cliente
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        cliente_registrado = st.radio("Tipo de Cliente", ("Cliente Registrado", "Cliente No Registrado"))
 
     if cliente_registrado == "Cliente Registrado":
-        # Buscar Cliente
-        col1, col2 = st.columns(2)
-        with col1:
+        with col2:
             search_query = st.text_input("Buscar Cliente por Cédula o Nombre")
             if st.button("Buscar Cliente"):
                 client = search_clients(search_query)
@@ -630,7 +630,7 @@ def handle_sales():
                 else:
                     st.error("Cliente no encontrado")
 
-        with col2:
+        with col3:
             if 'cliente' in st.session_state:
                 client_info = st.session_state['cliente']
                 st.write(f"**Cliente:** {client_info.nombre}")
