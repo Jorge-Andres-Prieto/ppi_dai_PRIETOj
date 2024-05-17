@@ -41,14 +41,16 @@ class User(Base):
 class Product(Base):
     """Define la estructura de la tabla 'products' para almacenar datos de productos.
 
-        Attributes:
-            id (Column): Identificador único del usuario, clave primaria.
-            name (Column): Nombre del producto, debe ser no nulo.
-            brand (Column): Marca del producto
-            category (Column): Categoría del producto, no puede ser nulo.
-            subcategory (Column): Sub categoria del producto
-            price (Column): Precio del producto, no puede ser nulo.
-            quantity = Cantidad del producto, no puede ser nulo.
+    Attributes:
+        id (Column): Identificador único del usuario, clave primaria.
+        product_id (Column): Identificador específico del producto.
+        name (Column): Nombre del producto, debe ser no nulo.
+        brand (Column): Marca del producto
+        category (Column): Categoría del producto, no puede ser nulo.
+        subcategory (Column): Subcategoria del producto.
+        price (Column): Precio del producto, no puede ser nulo.
+        sitio (Column): Ubicación del producto (tienda o bodega).
+        cantidad (Column): Cantidad del producto.
 
     Args:
         None
@@ -58,12 +60,14 @@ class Product(Base):
     """
     __tablename__ = 'products'
     id = Column(Integer, primary_key=True)
+    product_id = Column(String, nullable=False, unique=True)
     name = Column(String, nullable=False)
     brand = Column(String)
     category = Column(String, nullable=False)
     subcategory = Column(String)
     price = Column(Numeric(10, 2), nullable=False)
-    quantity = Column(Integer, nullable=False)
+    sitio = Column(String, nullable=False)  # Nueva columna para la ubicación
+    cantidad = Column(Integer, nullable=False)  # Nueva columna para la cantidad
 
 class Cliente(Base):
     __tablename__ = 'clientes'

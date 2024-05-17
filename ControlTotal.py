@@ -449,7 +449,7 @@ def inventory_management_menu():
         delete_product_form()
 
 def search_product_form():
-    """Formulario para buscar productos por nombre.
+    """Formulario para buscar productos por nombre o ID.
 
     Args:
         None
@@ -458,44 +458,31 @@ def search_product_form():
         None
     """
     with st.form("Buscar Producto"):
-        search_query = st.text_input("Nombre del Producto a buscar")
+        search_query = st.text_input("Nombre o ID del Producto a buscar")
         submitted = st.form_submit_button("Buscar")
         if submitted:
             products = search_products(search_query)
-            #Toma cada una de la información de los productos y la muestra
-            for product in products:
-                st.write(f"|ID: {product.id}| |Nombre: {product.name}| |Marca: {product.brand}| "
-                         f"|Categoría: {product.category}| |Subcategoría: {product.subcategory}|"
-                         f"|Precio: ${product.price}| |Cantidad: {product.quantity}|")
+            if products:
+                for product in products:
+                    st.write(f"ID: {product.id}, Product ID: {product.product_id}, Nombre: {product.name}, Marca: {product.brand}, Categoría: {product.category}, Subcategoría: {product.subcategory}, Precio: ${product.price}, Sitio: {product.sitio}, Cantidad: {product.cantidad}")
+            else:
+                st.error("No se encontraron productos con ese criterio.")
+
 
 
 def update_product_form():
-    """Formulario para modificar información de un producto existente.
-
-    Args:
-        None
-
-    Returns:
-        None
-    """
+    """Formulario para modificar información de un producto existente."""
     with st.form("Modificar Producto"):
         product_id = st.number_input("ID del Producto a modificar", step=1, format="%d")
-        new_name = st.text_input("Nuevo Nombre del Producto", placeholder="Dejar en "
-                                 "blanco si no desea cambiar")
-        new_brand = st.text_input("Nueva Marca del Producto", placeholder="Dejar en "
-                                  "blanco si no desea cambiar")
-        new_category = st.text_input("Nueva Categoría del Producto", placeholder="Dejar en "
-                                     "blanco si no desea cambiar")
-        new_subcategory = st.text_input("Nueva Subcategoría del Producto",
-                                        placeholder="Dejar en blanco si no desea cambiar")
-        new_price = st.number_input("Nuevo Precio del Producto", format="%.2f",
-                                    help="Dejar en blanco para mantener el precio actual", value=0.0)
-        inventory_adjustment = st.number_input("Ajuste de Inventario (positivo para añadir,"
-                                               " negativo para reducir)",
-                                               value=0, format="%d", step=1)
+        new_name = st.text_input("Nuevo Nombre del Producto", placeholder="Dejar en blanco si no desea cambiar")
+        new_brand = st.text_input("Nueva Marca del Producto", placeholder="Dejar en blanco si no desea cambiar")
+        new_category = st.text_input("Nueva Categoría del Producto", placeholder="Dejar en blanco si no desea cambiar")
+        new_subcategory = st.text_input("Nueva Subcategoría del Producto", placeholder="Dejar en blanco si no desea cambiar")
+        new_price = st.number_input("Nuevo Precio del Producto", format="%.2f", help="Dejar en blanco para mantener el precio actual", value=0.0)
+        sitio = st.selectbox("Nueva Ubicación del Producto", ["", "Tienda", "Bodega"])
+        inventory_adjustment = st.number_input("Ajuste de Inventario (positivo para añadir, negativo para reducir)", value=0, format="%d", step=1)
         submitted = st.form_submit_button("Actualizar")
 
-        # Se verifica el cambio únicamente de los campos modificados
         if submitted:
             result = update_product(
                 product_id,
@@ -504,6 +491,7 @@ def update_product_form():
                 new_category if new_category else None,
                 new_subcategory if new_subcategory else None,
                 new_price if new_price != 0.0 else None,
+                sitio if sitio else None,
                 inventory_adjustment if inventory_adjustment else None
             )
             if "éxito" in result:
@@ -511,30 +499,27 @@ def update_product_form():
             else:
                 st.error(result)
 
+
 def add_product_form():
-    """Formulario para añadir un nuevo producto.
-
-    Args:
-        None
-
-    Returns:
-        None
-    """
+    """Formulario para añadir un nuevo producto."""
     with st.form("Agregar Producto"):
+        product_id = st.text_input("ID del Producto")
         name = st.text_input("Nombre del Producto")
         brand = st.text_input("Marca del Producto")
         category = st.text_input("Categoría del Producto")
         subcategory = st.text_input("Subcategoría del Producto")
         price = st.number_input("Precio del Producto", min_value=0.01, format="%.2f")
-        quantity = st.number_input("Cantidad del Producto", min_value=0, step=1)
+        sitio = st.selectbox("Ubicación del Producto", ["Tienda", "Bodega"])
+        cantidad = st.number_input("Cantidad del Producto", min_value=0, step=1)
         submitted = st.form_submit_button("Agregar")
 
         if submitted:
-            result = add_product(name, brand, category, subcategory, price, quantity)
+            result = add_product(product_id, name, brand, category, subcategory, price, sitio, cantidad)
             if "éxito" in result:
                 st.success(result)
             else:
                 st.error(result)
+
 
 def delete_product_form():
     """Formulario para eliminar un producto existente.
