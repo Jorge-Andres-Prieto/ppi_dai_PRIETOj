@@ -450,7 +450,6 @@ def inventory_management_menu():
 
 def search_product_form():
     """Formulario para buscar productos por nombre o ID del producto."""
-
     search_query = st.text_input("Nombre o ID del Producto a buscar")
     if st.button("Buscar Producto"):
         products = search_products(search_query)
@@ -465,17 +464,19 @@ def search_product_form():
             df = pd.DataFrame(product_data, columns=["Product ID", "Nombre", "Marca", "Categoría", "Subcategoría", "Precio", "Total en Tienda", "Total en Bodega"])
             st.table(df)
 
+            # Formularios para transferir productos
             for product in products:
-                st.write(f"Product ID: {product.product_id}, Nombre: {product.name}, Marca: {product.brand}, Categoría: {product.category}, Subcategoría: {product.subcategory}, Precio: ${product.price}, Total en Tienda: {product.total_tienda}, Total en Bodega: {product.total_bodega}")
-                col1, col2 = st.columns(2)
-                with col1:
-                    transfer_to_tienda = st.number_input(f"Transferir de Bodega a Tienda ({product.name})", min_value=0, max_value=product.total_bodega, step=1, key=f"to_tienda_{product.product_id}")
-                    if st.button(f"Transferir a Tienda ({product.product_id})", key=f"btn_to_tienda_{product.product_id}"):
+                with st.form(f"transfer_to_tienda_form_{product.product_id}"):
+                    transfer_to_tienda = st.number_input(f"Cantidad a transferir de Bodega a Tienda para {product.name}", min_value=0, max_value=product.total_bodega, step=1, key=f"to_tienda_{product.product_id}")
+                    transfer_to_tienda_submitted = st.form_submit_button("Transferir a Tienda")
+                    if transfer_to_tienda_submitted:
                         result = update_product(product.product_id, inventory_adjustment_tienda=transfer_to_tienda, inventory_adjustment_bodega=-transfer_to_tienda)
                         st.write(result)
-                with col2:
-                    transfer_to_bodega = st.number_input(f"Transferir de Tienda a Bodega ({product.name})", min_value=0, max_value=product.total_tienda, step=1, key=f"to_bodega_{product.product_id}")
-                    if st.button(f"Transferir a Bodega ({product.product_id})", key=f"btn_to_bodega_{product.product_id}"):
+
+                with st.form(f"transfer_to_bodega_form_{product.product_id}"):
+                    transfer_to_bodega = st.number_input(f"Cantidad a transferir de Tienda a Bodega para {product.name}", min_value=0, max_value=product.total_tienda, step=1, key=f"to_bodega_{product.product_id}")
+                    transfer_to_bodega_submitted = st.form_submit_button("Transferir a Bodega")
+                    if transfer_to_bodega_submitted:
                         result = update_product(product.product_id, inventory_adjustment_tienda=-transfer_to_bodega, inventory_adjustment_bodega=transfer_to_bodega)
                         st.write(result)
         else:

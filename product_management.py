@@ -23,6 +23,7 @@ def search_products(search_query):
         session.close()
 
 
+
 def view_product_details(product_id):
     """Obtiene y muestra la información detallada de un producto por su ID.
 
