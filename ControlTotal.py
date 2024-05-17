@@ -832,7 +832,7 @@ def search_client_form():
                 st.write(
                     f"¿Estás seguro de que deseas abonar {st.session_state[abono_key]} al crédito de {client.nombre}?")
                 if st.button(f"Sí, confirmar abono a {client.nombre}", key=f"confirmar_abono_{client.id}"):
-                    nuevo_credito = client.credito - decimal.Decimal(st.session_state[abono_key])
+                    nuevo_credito = client.credito - Decimal(st.session_state[abono_key])
                     resultado = update_client_credit(client.id, nuevo_credito)
                     st.write(resultado)
                     st.session_state[confirm_abono_key] = False
