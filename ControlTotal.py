@@ -600,8 +600,6 @@ def sales_menu():
 
 
 def handle_sales():
-    st.header("Nueva Venta")
-
     # Inicializar arrays para manejar productos en la venta
     if 'current_sale' not in st.session_state:
         st.session_state['current_sale'] = []
@@ -609,11 +607,19 @@ def handle_sales():
         st.session_state['selected_client'] = None
 
     # Selección de tipo de cliente
-    client_type = st.radio("Selecciona el tipo de cliente", ["Cliente Registrado", "Cliente No Registrado"])
+    col_client_type1, col_client_type2 = st.columns(2)
+    with col_client_type1:
+        if st.button("Cliente Registrado"):
+            st.session_state['client_type'] = "Cliente Registrado"
+    with col_client_type2:
+        if st.button("Cliente No Registrado"):
+            st.session_state['client_type'] = "Cliente No Registrado"
 
-    col_client, col_info = st.columns([1, 2])
-    with col_client:
-        if client_type == "Cliente Registrado":
+    client_type = st.session_state.get('client_type', None)
+
+    if client_type == "Cliente Registrado":
+        col_client, col_info = st.columns([1, 2])
+        with col_client:
             client_id = st.text_input("Cédula o Nombre del Cliente")
             if st.button("Buscar Cliente"):
                 clients = search_clients(client_id)
@@ -623,13 +629,13 @@ def handle_sales():
                 else:
                     st.error("Cliente no encontrado")
 
-    with col_info:
-        if st.session_state['selected_client']:
-            selected_client = st.session_state['selected_client']
-            st.write(
-                f"Cliente encontrado: {selected_client.nombre} (Cédula: {selected_client.cedula}, Crédito: {selected_client.credito})")
+        with col_info:
+            if st.session_state['selected_client']:
+                selected_client = st.session_state['selected_client']
+                st.write(
+                    f"Cliente encontrado: {selected_client.nombre} (Cédula: {selected_client.cedula}, Crédito: {selected_client.credito})")
 
-    if 'selected_client' in st.session_state or client_type == "Cliente No Registrado":
+    if client_type:
         col1, col2, col3 = st.columns(3)
         with col1:
             # Agregar producto
@@ -730,14 +736,11 @@ def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos
     finally:
         session.close()
 
-
-def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos):
+def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos, total_credito):
     session = Session()
     try:
-        productos_vendidos_str = ', '.join(
-            [f"{item['product'].name} x {item['quantity']}" for item in productos_vendidos])
-        new_sale = Venta(user_id=user_id, total_efectivo=total_efectivo, total_transferencia=total_transferencia,
-                         productos_vendidos=productos_vendidos_str)
+        productos_vendidos_str = ', '.join([f"{item['product'].name} x {item['quantity']}" for item in productos_vendidos])
+        new_sale = Venta(user_id=user_id, total_efectivo=total_efectivo, total_transferencia=total_transferencia, productos_vendidos=productos_vendidos_str, total_credito=total_credito)
         session.add(new_sale)
         session.commit()
         return "Venta registrada con éxito."
@@ -746,7 +749,6 @@ def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos
         return f"Error al registrar la venta: {str(e)}"
     finally:
         session.close()
-
 
 def client_management_menu():
     selected = option_menu(
