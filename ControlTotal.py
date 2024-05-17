@@ -17,7 +17,7 @@ from user_management import create_user, search_users, update_user, delete_user,
 # Importa funciones para la gestión de productos
 from product_management import search_products, delete_product, update_product, add_product
 from sales_management import create_sale
-from client_management import create_client, search_clients, update_client, delete_client, update_client_credit
+from client_management import create_client, search_clients, delete_client, update_client_credit
 
 
 # Importa funcion para crear la base de datos siesta no esta creada
