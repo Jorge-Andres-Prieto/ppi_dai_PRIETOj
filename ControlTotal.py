@@ -454,6 +454,14 @@ def search_product_form():
     if st.button("Buscar Producto"):
         products = search_products(search_query)
         if products:
+            st.session_state['products'] = products
+        else:
+            st.error("No se encontraron productos con ese criterio.")
+            st.session_state['products'] = []
+
+    if 'products' in st.session_state:
+        products = st.session_state['products']
+        if products:
             # Crear una tabla para mostrar la información de los productos
             product_data = []
             for product in products:
@@ -464,8 +472,7 @@ def search_product_form():
             df = pd.DataFrame(product_data, columns=["Product ID", "Nombre", "Marca", "Categoría", "Subcategoría", "Precio", "Total en Tienda", "Total en Bodega"])
             st.table(df)
 
-            if len(products) > 0:
-                product = products[0]
+            for product in products:
                 with st.form(f"transfer_to_tienda_form_{product.product_id}"):
                     transfer_to_tienda = st.number_input(f"Cantidad a transferir de Bodega a Tienda para {product.name}", min_value=0, max_value=product.total_bodega, step=1, key=f"to_tienda_{product.product_id}")
                     transfer_to_tienda_submitted = st.form_submit_button("Transferir a Tienda")
@@ -485,8 +492,6 @@ def search_product_form():
                             st.success(f"Transferencia a Bodega exitosa para el producto {product.name}.")
                         else:
                             st.error(result)
-        else:
-            st.error("No se encontraron productos con ese criterio.")
 
 
 def update_product_form():
