@@ -672,52 +672,53 @@ def handle_sales():
             total = df['Importe'].sum()
             st.write(f"Total: {total}")
 
-        # Opciones de pago
-        efectivo = st.number_input("Pago en Efectivo", min_value=0.0, format="%.2f")
-        transferencia = st.number_input("Pago por Transferencia", min_value=0.0, format="%.2f")
-        if client_type == "Cliente Registrado":
+            # Opciones de pago
+            efectivo = st.number_input("Pago en Efectivo", min_value=0.0, format="%.2f")
+            transferencia = st.number_input("Pago por Transferencia", min_value=0.0, format="%.2f")
             credito = 0
-            if st.button("Pagar"):
-                total_pagado = efectivo + transferencia
-                if total_pagado < total:
-                    credito = total - total_pagado
-                st.write(f"Crédito: {credito}")
-                if credito > 0:
-                    st.write("¿Quieres registrar la deuda en crédito?")
-                    if st.button("Sí, registrar en crédito"):
-                        selected_client = st.session_state['selected_client']
-                        update_client_credit(selected_client.id, selected_client.credito + decimal.Decimal(credito))
-                        st.write(f"Deuda registrada: {credito}")
+
+            if client_type == "Cliente Registrado":
+                if st.button("Pagar"):
+                    total_pagado = efectivo + transferencia
+                    if total_pagado < total:
+                        credito = total - total_pagado
+                    st.write(f"Crédito: {credito}")
+                    if credito > 0:
+                        st.write("¿Quieres registrar la deuda en crédito?")
+                        if st.button("Sí, registrar en crédito"):
+                            selected_client = st.session_state['selected_client']
+                            update_client_credit(selected_client.id, selected_client.credito + decimal.Decimal(credito))
+                            st.write(f"Deuda registrada: {credito}")
+                            create_sale(st.session_state['user'].id, decimal.Decimal(efectivo),
+                                        decimal.Decimal(transferencia), st.session_state['current_sale'])
+                            st.write("Pago realizado con éxito")
+                            reset_sale()
+                        elif st.button("No, volver a intentar"):
+                            pass
+                    else:
                         create_sale(st.session_state['user'].id, decimal.Decimal(efectivo),
                                     decimal.Decimal(transferencia), st.session_state['current_sale'])
                         st.write("Pago realizado con éxito")
                         reset_sale()
-                    elif st.button("No, volver a intentar"):
-                        pass
                 else:
-                    create_sale(st.session_state['user'].id, decimal.Decimal(efectivo), decimal.Decimal(transferencia),
-                                st.session_state['current_sale'])
-                    st.write("Pago realizado con éxito")
-                    reset_sale()
-            else:
-                if efectivo + transferencia >= total:
-                    create_sale(st.session_state['user'].id, decimal.Decimal(efectivo), decimal.Decimal(transferencia),
-                                st.session_state['current_sale'])
-                    st.write("Pago realizado con éxito")
-                    reset_sale()
-                else:
-                    st.error("Pago insuficiente")
+                    if efectivo + transferencia >= total:
+                        create_sale(st.session_state['user'].id, decimal.Decimal(efectivo),
+                                    decimal.Decimal(transferencia), st.session_state['current_sale'])
+                        st.write("Pago realizado con éxito")
+                        reset_sale()
+                    else:
+                        st.error("Pago insuficiente")
 
-        elif client_type == "Cliente No Registrado":
-            if st.button("Pagar"):
-                total_pagado = efectivo + transferencia
-                if total_pagado >= total:
-                    create_sale(st.session_state['user'].id, decimal.Decimal(efectivo), decimal.Decimal(transferencia),
-                                st.session_state['current_sale'])
-                    st.write("Pago realizado con éxito")
-                    reset_sale()
-                else:
-                    st.error("Pago insuficiente")
+            elif client_type == "Cliente No Registrado":
+                if st.button("Pagar"):
+                    total_pagado = efectivo + transferencia
+                    if total_pagado >= total:
+                        create_sale(st.session_state['user'].id, decimal.Decimal(efectivo),
+                                    decimal.Decimal(transferencia), st.session_state['current_sale'])
+                        st.write("Pago realizado con éxito")
+                        reset_sale()
+                    else:
+                        st.error("Pago insuficiente")
 
         # Cancelar compra
         if st.button("Cancelar Compra"):
