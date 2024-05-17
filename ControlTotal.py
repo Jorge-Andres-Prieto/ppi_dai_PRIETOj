@@ -786,22 +786,21 @@ def create_client_form():
                 st.error(result)
 
 def search_client_form():
-    with st.form("Buscar Cliente"):
-        search_query = st.text_input("Introduzca el nombre o cédula del cliente a buscar")
-        submitted = st.form_submit_button("Buscar Cliente")
-        if submitted:
-            clients = search_clients(search_query)
-            if clients:
-                for client in clients:
-                    st.write(f"Nombre: {client.nombre}, Dirección: {client.direccion}, Teléfono: {client.telefono}, Cédula: {client.cedula}, Crédito: {client.credito}")
-                    # Campo para abonar al crédito
+    search_query = st.text_input("Introduzca el nombre o cédula del cliente a buscar")
+    if st.button("Buscar Cliente"):
+        clients = search_clients(search_query)
+        if clients:
+            for client in clients:
+                st.write(f"Nombre: {client.nombre}, Dirección: {client.direccion}, Teléfono: {client.telefono}, Cédula: {client.cedula}, Crédito: {client.credito}")
+                with st.form(f"abono_form_{client.id}"):
                     abono = st.number_input(f"Abonar al crédito de {client.nombre}", min_value=0.0, max_value=float(client.credito), format="%.2f", key=f"abono_{client.id}")
-                    if st.button(f"Abonar a {client.nombre}", key=f"abonar_{client.id}"):
+                    abonar = st.form_submit_button("Abonar")
+                    if abonar:
                         nuevo_credito = client.credito - decimal.Decimal(abono)
                         resultado = update_client_credit(client.id, nuevo_credito)
                         st.write(resultado)
-            else:
-                st.write("No se encontraron clientes")
+        else:
+            st.write("No se encontraron clientes")
 
 def update_client_form():
     with st.form("Actualizar Cliente"):
