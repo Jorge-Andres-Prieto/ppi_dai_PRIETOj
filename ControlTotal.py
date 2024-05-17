@@ -464,21 +464,26 @@ def search_product_form():
             df = pd.DataFrame(product_data, columns=["Product ID", "Nombre", "Marca", "Categoría", "Subcategoría", "Precio", "Total en Tienda", "Total en Bodega"])
             st.table(df)
 
-            # Formularios para transferir productos
             for product in products:
                 with st.form(f"transfer_to_tienda_form_{product.product_id}"):
                     transfer_to_tienda = st.number_input(f"Cantidad a transferir de Bodega a Tienda para {product.name}", min_value=0, max_value=product.total_bodega, step=1, key=f"to_tienda_{product.product_id}")
                     transfer_to_tienda_submitted = st.form_submit_button("Transferir a Tienda")
                     if transfer_to_tienda_submitted:
                         result = update_product(product.product_id, inventory_adjustment_tienda=transfer_to_tienda, inventory_adjustment_bodega=-transfer_to_tienda)
-                        st.write(result)
+                        if "éxito" in result:
+                            st.success(f"Transferencia a Tienda exitosa para el producto {product.name}.")
+                        else:
+                            st.error(result)
 
                 with st.form(f"transfer_to_bodega_form_{product.product_id}"):
                     transfer_to_bodega = st.number_input(f"Cantidad a transferir de Tienda a Bodega para {product.name}", min_value=0, max_value=product.total_tienda, step=1, key=f"to_bodega_{product.product_id}")
                     transfer_to_bodega_submitted = st.form_submit_button("Transferir a Bodega")
                     if transfer_to_bodega_submitted:
                         result = update_product(product.product_id, inventory_adjustment_tienda=-transfer_to_bodega, inventory_adjustment_bodega=transfer_to_bodega)
-                        st.write(result)
+                        if "éxito" in result:
+                            st.success(f"Transferencia a Bodega exitosa para el producto {product.name}.")
+                        else:
+                            st.error(result)
         else:
             st.error("No se encontraron productos con ese criterio.")
 
