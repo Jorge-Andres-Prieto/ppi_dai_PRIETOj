@@ -781,8 +781,14 @@ def create_client_form():
             else:
                 st.error(result)
 
-
 def search_client_form():
+    if 'cliente_seleccionado' not in st.session_state:
+        st.session_state['cliente_seleccionado'] = None
+    if 'abono' not in st.session_state:
+        st.session_state['abono'] = 0.0
+    if 'confirmar_abono' not in st.session_state:
+        st.session_state['confirmar_abono'] = False
+
     search_query = st.text_input("Introduzca el nombre o cédula del cliente a buscar")
     if st.button("Buscar Cliente"):
         clients = search_clients(search_query)
@@ -794,18 +800,35 @@ def search_client_form():
                 ])
             df = pd.DataFrame(client_data, columns=["Nombre", "Dirección", "Teléfono", "Cédula", "Crédito"])
             st.table(df)
-
-            abono = st.number_input("Cantidad a abonar al crédito", min_value=0.0, format="%.2f")
-            if st.button("Abonar al Crédito"):
-                if len(clients) == 1:  # Asegurarse de que solo hay un cliente para abonar
-                    cliente = clients[0]
-                    nuevo_credito = Decimal(cliente.credito) - Decimal(abono)
-                    result = update_client_credit(cliente.cedula, nuevo_credito)
-                    st.write(result)
-                else:
-                    st.error("Por favor, refine su búsqueda para obtener un único cliente.")
+            if len(clients) == 1:
+                st.session_state['cliente_seleccionado'] = clients[0]
+            else:
+                st.error("Por favor, refine su búsqueda para obtener un único cliente.")
         else:
             st.error("No se encontraron clientes")
+
+    if st.session_state['cliente_seleccionado']:
+        cliente = st.session_state['cliente_seleccionado']
+        st.write(f"Cliente seleccionado: {cliente.nombre}")
+        st.write(f"Cédula: {cliente.cedula}")
+        st.write(f"Crédito actual: ${cliente.credito:.2f}")
+
+        st.session_state['abono'] = st.number_input("Cantidad a abonar al crédito", min_value=0.0, format="%.2f")
+
+        if st.button("Abonar al Crédito"):
+            st.session_state['confirmar_abono'] = True
+
+    if st.session_state['confirmar_abono']:
+        if st.button("Confirmar Abono"):
+            cliente = st.session_state['cliente_seleccionado']
+            nuevo_credito = Decimal(cliente.credito) - Decimal(st.session_state['abono'])
+            result = update_client_credit(cliente.cedula, nuevo_credito)
+            st.write(result)
+            st.session_state['confirmar_abono'] = False
+            st.session_state['cliente_seleccionado'] = None
+            st.session_state['abono'] = 0.0
+        elif st.button("Cancelar"):
+            st.session_state['confirmar_abono'] = False
 
 def update_client_form():
     with st.form("Actualizar Cliente"):

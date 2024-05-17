@@ -29,7 +29,7 @@ def update_client_credit(cedula, nuevo_credito):
     try:
         client = session.query(Cliente).filter(Cliente.cedula == str(cedula)).first()  # Asegurarse de que cédula es una cadena
         if client:
-            client.credito = nuevo_credito
+            client.credito = Decimal(nuevo_credito)
             session.commit()
             return "Crédito del cliente actualizado con éxito."
         else:
