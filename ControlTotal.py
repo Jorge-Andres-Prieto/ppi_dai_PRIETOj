@@ -615,14 +615,9 @@ def handle_sales():
     sitio = st.session_state.get('sitio', 'Tienda')
 
     # Tipo de Cliente
-    col1, col2 = st.columns(2)
-    with col1:
-        cliente_registrado = st.radio("Cliente Registrado", ("Sí", "No"), index=0)
-    with col2:
-        cliente_no_registrado = st.radio("Cliente No Registrado", ("No", "Sí"),
-                                         index=1 if cliente_registrado == "No" else 0)
+    cliente_registrado = st.radio("Tipo de Cliente", ("Cliente Registrado", "Cliente No Registrado"))
 
-    if cliente_registrado == "Sí":
+    if cliente_registrado == "Cliente Registrado":
         # Buscar Cliente
         col1, col2 = st.columns(2)
         with col1:
@@ -682,7 +677,7 @@ def handle_sales():
         if st.session_state['carrito']:
             efectivo = st.number_input("Pago en Efectivo", min_value=0.0, format="%.2f")
             transferencia = st.number_input("Pago por Transferencia", min_value=0.0, format="%.2f")
-            if cliente_registrado == "Sí":
+            if cliente_registrado == "Cliente Registrado":
                 credito = st.number_input("Deuda", min_value=0.0, format="%.2f")
             else:
                 credito = 0.0
