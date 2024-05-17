@@ -464,7 +464,8 @@ def search_product_form():
             df = pd.DataFrame(product_data, columns=["Product ID", "Nombre", "Marca", "Categoría", "Subcategoría", "Precio", "Total en Tienda", "Total en Bodega"])
             st.table(df)
 
-            for product in products:
+            if len(products) > 0:
+                product = products[0]
                 with st.form(f"transfer_to_tienda_form_{product.product_id}"):
                     transfer_to_tienda = st.number_input(f"Cantidad a transferir de Bodega a Tienda para {product.name}", min_value=0, max_value=product.total_bodega, step=1, key=f"to_tienda_{product.product_id}")
                     transfer_to_tienda_submitted = st.form_submit_button("Transferir a Tienda")
