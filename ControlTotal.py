@@ -785,6 +785,7 @@ def create_client_form():
             else:
                 st.error(result)
 
+
 def search_client_form():
     search_query = st.text_input("Introduzca el nombre o cédula del cliente a buscar")
     if st.button("Buscar Cliente"):
@@ -796,22 +797,30 @@ def search_client_form():
 
     if 'clients' in st.session_state:
         for client in st.session_state['clients']:
-            st.write(f"Nombre: {client.nombre}, Dirección: {client.direccion}, Teléfono: {client.telefono}, Cédula: {client.cedula}, Crédito: {client.credito}")
-            abono = st.number_input(f"Abonar al crédito de {client.nombre}", min_value=0.0, max_value=float(client.credito), format="%.2f", key=f"abono_{client.id}")
-            if st.button(f"Abonar a {client.nombre}", key=f"abonar_{client.id}"):
-                st.session_state[f"abono_{client.id}"] = abono
-                st.session_state[f"confirm_abono_{client.id}"] = True
+            st.write(
+                f"Nombre: {client.nombre}, Dirección: {client.direccion}, Teléfono: {client.telefono}, Cédula: {client.cedula}, Crédito: {client.credito}")
+            abono_key = f"abono_{client.id}"
+            confirm_abono_key = f"confirm_abono_{client.id}"
 
-    for client in st.session_state.get('clients', []):
-        if st.session_state.get(f"confirm_abono_{client.id}", False):
-            st.write(f"¿Estás seguro de que deseas abonar {st.session_state[f'abono_{client.id}']} al crédito de {client.nombre}?")
-            if st.button(f"Sí, confirmar abono a {client.nombre}", key=f"confirmar_abono_{client.id}"):
-                nuevo_credito = client.credito - decimal.Decimal(st.session_state[f"abono_{client.id}"])
-                resultado = update_client_credit(client.id, nuevo_credito)
-                st.write(resultado)
-                st.session_state[f"confirm_abono_{client.id}"] = False
-            if st.button(f"No, cancelar abono a {client.nombre}", key=f"cancelar_abono_{client.id}"):
-                st.session_state[f"confirm_abono_{client.id}"] = False
+            if abono_key not in st.session_state:
+                st.session_state[abono_key] = 0.0
+
+            abono = st.number_input(f"Abonar al crédito de {client.nombre}", min_value=0.0,
+                                    max_value=float(client.credito), format="%.2f", key=abono_key)
+
+            if st.button(f"Abonar a {client.nombre}", key=f"abonar_{client.id}"):
+                st.session_state[confirm_abono_key] = True
+
+            if st.session_state.get(confirm_abono_key, False):
+                st.write(
+                    f"¿Estás seguro de que deseas abonar {st.session_state[abono_key]} al crédito de {client.nombre}?")
+                if st.button(f"Sí, confirmar abono a {client.nombre}", key=f"confirmar_abono_{client.id}"):
+                    nuevo_credito = client.credito - decimal.Decimal(st.session_state[abono_key])
+                    resultado = update_client_credit(client.id, nuevo_credito)
+                    st.write(resultado)
+                    st.session_state[confirm_abono_key] = False
+                if st.button(f"No, cancelar abono a {client.nombre}", key=f"cancelar_abono_{client.id}"):
+                    st.session_state[confirm_abono_key] = False
 
 def update_client_form():
     with st.form("Actualizar Cliente"):
