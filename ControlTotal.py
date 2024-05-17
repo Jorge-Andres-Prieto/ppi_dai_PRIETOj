@@ -614,25 +614,50 @@ def handle_sales():
 
     sitio = st.session_state.get('sitio', 'Tienda')
 
-    st.title("Ventas")
-    client_type = st.radio("Tipo de Cliente", ("Cliente Registrado", "Cliente No Registrado"))
+    st.title("Sistema de Ventas")
+
+    # Información del cliente
+    col1, col2 = st.columns([2, 1])
+    with col1:
+        client_type = st.radio("Tipo de Cliente", ("Cliente Registrado", "Cliente No Registrado"))
 
     if client_type == "Cliente Registrado":
-        search_query = st.text_input("Buscar Cliente por Cédula o Nombre")
-        if st.button("Buscar Cliente"):
-            client = search_clients(search_query)
-            if client:
-                st.session_state['cliente'] = client[0]
-                st.success(f"Cliente encontrado: {client[0].nombre}")
-            else:
-                st.error("Cliente no encontrado")
+        with col1:
+            search_query = st.text_input("Buscar Cliente por Cédula o Nombre")
+            if st.button("Buscar Cliente"):
+                client = search_clients(search_query)
+                if client:
+                    st.session_state['cliente'] = client[0]
+                    st.success(f"Cliente encontrado: {client[0].nombre}")
+                else:
+                    st.error("Cliente no encontrado")
 
-    col1, col2 = st.columns(2)
+        if 'cliente' in st.session_state:
+            with col2:
+                client_info = st.session_state['cliente']
+                st.write(f"**Cliente:** {client_info.nombre}")
+                st.write(f"**Cédula:** {client_info.cedula}")
+                st.write(f"**Crédito:** ${client_info.credito:.2f}")
 
+    # Tabla de productos
+    col1, col2 = st.columns([3, 2])
     with col1:
-        st.subheader("Agregar Producto")
+        products = search_products("")
+        product_data = []
+        for product in products:
+            product_data.append([
+                product.product_id, product.name, product.brand, product.category,
+                product.subcategory, f"${product.price:.2f}", product.total_tienda, product.total_bodega
+            ])
+        df = pd.DataFrame(product_data, columns=["Product ID", "Nombre", "Marca", "Categoría", "Subcategoría", "Precio",
+                                                 "Total en Tienda", "Total en Bodega"])
+        st.table(df)
+
+    # Agregar productos al carrito
+    with col2:
         product_id = st.text_input("ID del Producto")
         cantidad = st.number_input("Cantidad", min_value=1, step=1)
+
         if st.button("Agregar al Carrito"):
             product = next((p for p in products if p.product_id == product_id), None)
             if product and cantidad <= product.total_tienda:
@@ -642,60 +667,47 @@ def handle_sales():
             else:
                 st.error("Producto no encontrado o cantidad no disponible en tienda")
 
-    with col2:
-        if st.session_state['carrito']:
-            st.subheader("Carrito de Compras")
-            cart_data = []
-            for item in st.session_state['carrito']:
-                product = item['product']
-                cart_data.append([
-                    product.product_id, product.name, f"${product.price:.2f}", item['quantity'], f"${product.price * item['quantity']:.2f}"
-                ])
-            cart_df = pd.DataFrame(cart_data, columns=["Product ID", "Nombre", "Precio Unitario", "Cantidad", "Importe"])
-            st.table(cart_df)
-            st.write(f"Total: ${st.session_state['total']:.2f}")
+    # Carrito de compras
+    if st.session_state['carrito']:
+        st.write("### Carrito de Compras")
+        cart_data = []
+        for item in st.session_state['carrito']:
+            product = item['product']
+            cart_data.append([
+                product.product_id, product.name, f"${product.price:.2f}", item['quantity'],
+                f"${product.price * item['quantity']:.2f}"
+            ])
+        cart_df = pd.DataFrame(cart_data, columns=["Product ID", "Nombre", "Precio Unitario", "Cantidad", "Importe"])
+        st.table(cart_df)
+        st.write(f"Total: ${st.session_state['total']:.2f}")
 
-    col3, col4 = st.columns(2)
-
-    with col3:
-        if st.session_state['carrito']:
-            st.subheader("Métodos de Pago")
+    # Pago
+    if st.session_state['carrito']:
+        col1, col2, col3 = st.columns(3)
+        with col1:
             efectivo = st.number_input("Pago en Efectivo", min_value=0.0, format="%.2f")
+        with col2:
             transferencia = st.number_input("Pago por Transferencia", min_value=0.0, format="%.2f")
+        with col3:
             if client_type == "Cliente Registrado":
                 credito = st.number_input("Deuda", min_value=0.0, format="%.2f")
             else:
                 credito = 0.0
 
-    with col4:
-        if st.session_state['carrito']:
-            if st.button("Pagar"):
-                if efectivo + transferencia + credito >= st.session_state['total']:
-                    productos_vendidos = st.session_state['carrito']
-                    user_id = st.session_state['user'].id
-                    total_efectivo = efectivo
-                    total_transferencia = transferencia
-                    total_credito = credito
-                    result = create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos, total_credito, sitio)
-                    st.success(result)
-                    st.session_state['carrito'] = []
-                    st.session_state['total'] = 0.0
-                else:
-                    st.error("Pago insuficiente")
-
-    if 'products' in st.session_state:
-        products = st.session_state['products']
-        if products:
-            # Mostrar la tabla de productos solo después de la búsqueda
-            st.subheader("Productos Disponibles")
-            product_data = []
-            for product in products:
-                product_data.append([
-                    product.product_id, product.name, product.brand, product.category,
-                    product.subcategory, f"${product.price:.2f}", product.total_tienda, product.total_bodega
-                ])
-            df = pd.DataFrame(product_data, columns=["Product ID", "Nombre", "Marca", "Categoría", "Subcategoría", "Precio", "Total en Tienda", "Total en Bodega"])
-            st.table(df)
+        if st.button("Pagar"):
+            if efectivo + transferencia + credito >= st.session_state['total']:
+                productos_vendidos = st.session_state['carrito']
+                user_id = st.session_state['user'].id
+                total_efectivo = efectivo
+                total_transferencia = transferencia
+                total_credito = credito
+                result = create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos, total_credito,
+                                     sitio)
+                st.success(result)
+                st.session_state['carrito'] = []
+                st.session_state['total'] = 0.0
+            else:
+                st.error("Pago insuficiente")
 
 
 def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos, total_credito, sitio):
