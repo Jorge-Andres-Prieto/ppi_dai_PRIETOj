@@ -626,7 +626,6 @@ def handle_sales():
                 client = search_clients(search_query)
                 if client:
                     st.session_state['cliente'] = client[0]
-                    st.success(f"Cliente encontrado: {client[0].nombre}")
                 else:
                     st.error("Cliente no encontrado")
 
@@ -650,7 +649,6 @@ def handle_sales():
                 if cantidad <= product.total_tienda:
                     st.session_state['carrito'].append({'product': product, 'quantity': cantidad})
                     st.session_state['total'] += float(product.price) * cantidad
-                    st.success(f"Producto {product.name} agregado al carrito")
                 else:
                     st.error("Cantidad no disponible en tienda")
             else:
