@@ -13,11 +13,14 @@ from user_management import create_user, search_users, update_user, delete_user,
 # Importa funciones para la gestión de productos
 from product_management import search_products, delete_product, update_product, add_product
 
-from client_management import create_client, search_clients, update_client, delete_client
+from client_management import create_client, search_clients, update_client_credit, delete_client
 
 
 # Importa funcion para crear la base de datos siesta no esta creada
 from database import init_db
+
+from database import Session
+from models import Venta
 
 # importa las variables donde se encuentra toda la información de tdp(tratamiento de
 # datos personales), información del autor e información de la app.
@@ -599,34 +602,86 @@ def handle_sales():
             selected_client = client_options[selected_client_cedula]
             st.write(
                 f"Cliente encontrado: {selected_client.nombre} (Cédula: {selected_client.cedula}, Crédito: {selected_client.credito})")
+            st.session_state['selected_client'] = selected_client
         else:
             st.error("Cliente no encontrado")
 
-    product_id = st.text_input("ID del Producto")
-    quantity = st.number_input("Cantidad", min_value=1, step=1)
-    if st.button("Agregar Producto"):
-        products = search_products(product_id)
-        if products:
-            product = products[0]  # Asumimos que solo hay un producto con ese ID
-            st.write(f"Producto agregado: {product.name} (Precio: {product.price}, Cantidad: {quantity})")
-            # Aquí añade la lógica para almacenar la venta temporalmente
-        else:
-            st.error("Producto no encontrado")
+    if 'selected_client' in st.session_state:
+        product_id = st.text_input("ID del Producto")
+        quantity = st.number_input("Cantidad", min_value=1, step=1)
+        if st.button("Agregar Producto"):
+            products = search_products(product_id)
+            if products:
+                product = products[0]  # Asumimos que solo hay un producto con ese ID
+                st.write(f"Producto agregado: {product.name} (Precio: {product.price}, Cantidad: {quantity})")
+                # Aquí añade la lógica para almacenar la venta temporalmente
+                if 'current_sale' not in st.session_state:
+                    st.session_state['current_sale'] = []
+                st.session_state['current_sale'].append({
+                    'product': product,
+                    'quantity': quantity
+                })
+            else:
+                st.error("Producto no encontrado")
 
-    # Aquí se agregarán las opciones para eliminar o ajustar la cantidad de productos
+        if 'current_sale' in st.session_state:
+            total = sum(item['product'].price * item['quantity'] for item in st.session_state['current_sale'])
+            st.write(f"Total: {total}")
 
-    if st.button("Cancelar Compra"):
-        if st.confirm("¿Estás seguro de que deseas cancelar la compra?"):
-            st.session_state["venta_actual"] = None
-            st.write("Compra cancelada")
+            if st.button("Cancelar Compra"):
+                st.session_state['cancel_sale'] = True
 
-    efectivo = st.number_input("Pago en Efectivo", min_value=0.0, format="%.2f")
-    transferencia = st.number_input("Pago por Transferencia", min_value=0.0, format="%.2f")
-    if st.button("Pagar"):
-        # Lógica para procesar el pago y generar la factura
-        st.write(f"Total Pagado en Efectivo: {efectivo}")
-        st.write(f"Total Pagado por Transferencia: {transferencia}")
-        # Aquí se incluirá la lógica para crear la entrada en la tabla de ventas
+        if st.session_state.get('cancel_sale', False):
+            st.write("¿Estás seguro de que deseas cancelar la compra?")
+            if st.button("Sí, cancelar"):
+                st.session_state['current_sale'] = []
+                st.session_state['cancel_sale'] = False
+                st.write("Compra cancelada")
+            elif st.button("No, continuar con la compra"):
+                st.session_state['cancel_sale'] = False
+
+        efectivo = st.number_input("Pago en Efectivo", min_value=0.0, format="%.2f")
+        transferencia = st.number_input("Pago por Transferencia", min_value=0.0, format="%.2f")
+        if st.button("Pagar"):
+            st.session_state['confirm_payment'] = True
+
+        if st.session_state.get('confirm_payment', False):
+            total_pagado = efectivo + transferencia
+            if total_pagado < total:
+                st.write("Pago insuficiente. ¿Quieres registrar la deuda en crédito?")
+                if st.button("Sí, registrar en crédito"):
+                    # Lógica para registrar la deuda en crédito
+                    deuda = total - total_pagado
+                    selected_client = st.session_state['selected_client']
+                    update_client_credit(selected_client.id, selected_client.credito + deuda)
+                    st.write(f"Deuda registrada: {deuda}")
+                    st.session_state['confirm_payment'] = False
+                elif st.button("No, volver a intentar"):
+                    st.session_state['confirm_payment'] = False
+            else:
+                # Lógica para procesar el pago completo y generar la factura
+                create_sale(st.session_state['user'].id, efectivo, transferencia, st.session_state['current_sale'])
+                st.write("Pago realizado con éxito")
+                st.session_state['current_sale'] = []
+                st.session_state['confirm_payment'] = False
+
+
+def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos):
+    session = Session()
+    try:
+        productos_vendidos_str = ', '.join(
+            [f"{item['product'].name} x {item['quantity']}" for item in productos_vendidos])
+        new_sale = Venta(user_id=user_id, total_efectivo=total_efectivo, total_transferencia=total_transferencia,
+                         productos_vendidos=productos_vendidos_str)
+        session.add(new_sale)
+        session.commit()
+        return "Venta registrada con éxito."
+    except Exception as e:
+        session.rollback()
+        return f"Error al registrar la venta: {str(e)}"
+    finally:
+        session.close()
+
 
 def client_management_menu():
     selected = option_menu(
@@ -685,7 +740,7 @@ def update_client_form():
 
         submitted = st.form_submit_button("Actualizar Cliente")
         if submitted:
-            result = update_client(
+            result = update_client_credit(
                 cedula,
                 new_nombre if new_nombre else None,
                 new_direccion if new_direccion else None,
