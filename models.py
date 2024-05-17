@@ -45,12 +45,12 @@ class Product(Base):
         id (Column): Identificador único del usuario, clave primaria.
         product_id (Column): Identificador específico del producto.
         name (Column): Nombre del producto, debe ser no nulo.
-        brand (Column): Marca del producto
+        brand (Column): Marca del producto.
         category (Column): Categoría del producto, no puede ser nulo.
-        subcategory (Column): Subcategoria del producto.
+        subcategory (Column): Subcategoría del producto.
         price (Column): Precio del producto, no puede ser nulo.
-        sitio (Column): Ubicación del producto (tienda o bodega).
-        cantidad (Column): Cantidad del producto.
+        total_tienda (Column): Cantidad del producto en tienda.
+        total_bodega (Column): Cantidad del producto en bodega.
 
     Args:
         None
@@ -66,8 +66,8 @@ class Product(Base):
     category = Column(String, nullable=False)
     subcategory = Column(String)
     price = Column(Numeric(10, 2), nullable=False)
-    sitio = Column(String, nullable=False)  # Nueva columna para la ubicación
-    cantidad = Column(Integer, nullable=False)  # Nueva columna para la cantidad
+    total_tienda = Column(Integer, nullable=False, default=0)
+    total_bodega = Column(Integer, nullable=False, default=0)
 
 class Cliente(Base):
     __tablename__ = 'clientes'

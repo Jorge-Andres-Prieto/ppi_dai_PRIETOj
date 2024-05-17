@@ -53,18 +53,18 @@ def view_product_details(product_id):
     finally:
         session.close()
 
-def update_product(product_id, new_name=None, new_brand=None, new_category=None, new_subcategory=None, new_price=None, sitio=None, inventory_adjustment=None):
+def update_product(product_id, new_name=None, new_brand=None, new_category=None, new_subcategory=None, new_price=None, inventory_adjustment_tienda=None, inventory_adjustment_bodega=None):
     """Actualiza la información de un producto existente.
 
     Args:
-        product_id (int): ID del producto a actualizar.
+        product_id (str): ID del producto a actualizar.
         new_name (str): Nuevo nombre del producto.
         new_brand (str): Nueva marca del producto.
         new_category (str): Nueva categoría del producto.
         new_subcategory (str): Nueva subcategoría del producto.
         new_price (float): Nuevo precio del producto.
-        sitio (str): Nueva ubicación del producto (tienda o bodega).
-        inventory_adjustment (int): Ajuste de inventario (positivo para añadir, negativo para reducir).
+        inventory_adjustment_tienda (int): Ajuste de inventario en tienda.
+        inventory_adjustment_bodega (int): Ajuste de inventario en bodega.
 
     Returns:
         str: Mensaje indicando si el producto fue actualizado o no.
@@ -83,13 +83,16 @@ def update_product(product_id, new_name=None, new_brand=None, new_category=None,
                 product.subcategory = new_subcategory
             if new_price is not None:
                 product.price = new_price
-            if sitio:
-                product.sitio = sitio
-            if inventory_adjustment is not None:
-                product.cantidad += inventory_adjustment
-                if product.cantidad < 0:
-                    session.rollback()  # Hacer rollback si la cantidad es negativa
-                    return "La cantidad del producto no puede ser negativa."
+            if inventory_adjustment_tienda is not None:
+                product.total_tienda += inventory_adjustment_tienda
+                if product.total_tienda < 0:
+                    session.rollback()
+                    return "La cantidad en tienda no puede ser negativa."
+            if inventory_adjustment_bodega is not None:
+                product.total_bodega += inventory_adjustment_bodega
+                if product.total_bodega < 0:
+                    session.rollback()
+                    return "La cantidad en bodega no puede ser negativa."
             session.commit()
             return "Producto actualizado con éxito."
         else:
@@ -100,10 +103,7 @@ def update_product(product_id, new_name=None, new_brand=None, new_category=None,
     finally:
         session.close()
 
-
-
-
-def add_product(product_id, name, brand, category, subcategory, price, sitio, cantidad):
+def add_product(product_id, name, brand, category, subcategory, price, cantidad):
     """Añade un nuevo producto a la base de datos.
 
     Args:
@@ -113,7 +113,6 @@ def add_product(product_id, name, brand, category, subcategory, price, sitio, ca
         category (str): Categoría del nuevo producto.
         subcategory (str): Subcategoría del nuevo producto.
         price (float): Precio del nuevo producto.
-        sitio (str): Ubicación del producto (tienda o bodega).
         cantidad (int): Cantidad del nuevo producto.
 
     Returns:
@@ -121,7 +120,7 @@ def add_product(product_id, name, brand, category, subcategory, price, sitio, ca
     """
     session = Session()
     try:
-        new_product = Product(product_id=product_id, name=name, brand=brand, category=category, subcategory=subcategory, price=price, sitio=sitio, cantidad=cantidad)
+        new_product = Product(product_id=product_id, name=name, brand=brand, category=category, subcategory=subcategory, price=price, total_tienda=0, total_bodega=cantidad)
         session.add(new_product)
         session.commit()
         return "Producto añadido con éxito."
@@ -130,6 +129,8 @@ def add_product(product_id, name, brand, category, subcategory, price, sitio, ca
         return f"Error al añadir el producto: {str(e)}"
     finally:
         session.close()
+
+
 
 
 

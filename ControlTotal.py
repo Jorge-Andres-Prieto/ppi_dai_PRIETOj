@@ -25,7 +25,7 @@ from client_management import create_client, search_clients, delete_client, upda
 from database import init_db
 
 from database import Session
-from models import Venta
+from models import Venta, Product
 
 # importa las variables donde se encuentra toda la información de tdp(tratamiento de
 # datos personales), información del autor e información de la app.
@@ -79,27 +79,27 @@ def login_page():
     Returns:
         None
     """
-
     # Función de streamlit para dividir la página en columnas
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.title("Control Total")
         username = st.text_input("Nombre de Usuario")
         password = st.text_input("Contraseña", type="password")
+        sitio = st.selectbox("Ubicación", ["Tienda", "Bodega"])
         user = verify_user(username, password, check_only=True)
 
         if user:
             if user.tdp == "No Aceptado":
                 # Aquí usamos Markdown para mostrar las políticas
-                policies_text = (tdp)
+                policies_text = tdp
                 st.markdown(policies_text)
 
-                accept_policies = st.checkbox(
-                    "Acepto las políticas de tratamiento de datos personales al iniciar sesión.")
+                accept_policies = st.checkbox("Acepto las políticas de tratamiento de datos personales al iniciar sesión.")
                 if st.button("Ingresar"):
                     if accept_policies:
                         update_tdp_status(user.id, "Aceptado")
                         st.session_state['user'] = user
+                        st.session_state['sitio'] = sitio
                         st.experimental_rerun()
                     else:
                         st.error("Debes aceptar las políticas de tratamiento de datos personales para iniciar sesión.")
@@ -107,6 +107,7 @@ def login_page():
             else:
                 if st.button("Ingresar"):
                     st.session_state['user'] = user
+                    st.session_state['sitio'] = sitio
                     st.experimental_rerun()
         else:
             if st.button("Ingresar"):
@@ -464,7 +465,18 @@ def search_product_form():
             products = search_products(search_query)
             if products:
                 for product in products:
-                    st.write(f"ID: {product.id}, Product ID: {product.product_id}, Nombre: {product.name}, Marca: {product.brand}, Categoría: {product.category}, Subcategoría: {product.subcategory}, Precio: ${product.price}, Sitio: {product.sitio}, Cantidad: {product.cantidad}")
+                    st.write(f"ID: {product.id}, Product ID: {product.product_id}, Nombre: {product.name}, Marca: {product.brand}, Categoría: {product.category}, Subcategoría: {product.subcategory}, Precio: ${product.price}, Total en Tienda: {product.total_tienda}, Total en Bodega: {product.total_bodega}")
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        transfer_to_tienda = st.number_input(f"Transferir de Bodega a Tienda ({product.name})", min_value=0, max_value=product.total_bodega, step=1)
+                        if st.button(f"Transferir a Tienda ({product.product_id})"):
+                            result = update_product(product.product_id, inventory_adjustment_tienda=transfer_to_tienda, inventory_adjustment_bodega=-transfer_to_tienda)
+                            st.write(result)
+                    with col2:
+                        transfer_to_bodega = st.number_input(f"Transferir de Tienda a Bodega ({product.name})", min_value=0, max_value=product.total_tienda, step=1)
+                        if st.button(f"Transferir a Bodega ({product.product_id})"):
+                            result = update_product(product.product_id, inventory_adjustment_tienda=-transfer_to_bodega, inventory_adjustment_bodega=transfer_to_bodega)
+                            st.write(result)
             else:
                 st.error("No se encontraron productos con ese criterio.")
 
@@ -473,14 +485,14 @@ def search_product_form():
 def update_product_form():
     """Formulario para modificar información de un producto existente."""
     with st.form("Modificar Producto"):
-        product_id = st.number_input("ID del Producto a modificar", step=1, format="%d")
+        product_id = st.text_input("ID del Producto a modificar")
         new_name = st.text_input("Nuevo Nombre del Producto", placeholder="Dejar en blanco si no desea cambiar")
         new_brand = st.text_input("Nueva Marca del Producto", placeholder="Dejar en blanco si no desea cambiar")
         new_category = st.text_input("Nueva Categoría del Producto", placeholder="Dejar en blanco si no desea cambiar")
         new_subcategory = st.text_input("Nueva Subcategoría del Producto", placeholder="Dejar en blanco si no desea cambiar")
         new_price = st.number_input("Nuevo Precio del Producto", format="%.2f", help="Dejar en blanco para mantener el precio actual", value=0.0)
-        sitio = st.selectbox("Nueva Ubicación del Producto", ["", "Tienda", "Bodega"])
-        inventory_adjustment = st.number_input("Ajuste de Inventario (positivo para añadir, negativo para reducir)", value=0, format="%d", step=1)
+        inventory_adjustment_tienda = st.number_input("Ajuste de Inventario en Tienda (positivo para añadir, negativo para reducir)", value=0, format="%d", step=1)
+        inventory_adjustment_bodega = st.number_input("Ajuste de Inventario en Bodega (positivo para añadir, negativo para reducir)", value=0, format="%d", step=1)
         submitted = st.form_submit_button("Actualizar")
 
         if submitted:
@@ -491,14 +503,13 @@ def update_product_form():
                 new_category if new_category else None,
                 new_subcategory if new_subcategory else None,
                 new_price if new_price != 0.0 else None,
-                sitio if sitio else None,
-                inventory_adjustment if inventory_adjustment else None
+                inventory_adjustment_tienda if inventory_adjustment_tienda else None,
+                inventory_adjustment_bodega if inventory_adjustment_bodega else None
             )
             if "éxito" in result:
                 st.success(result)
             else:
                 st.error(result)
-
 
 
 def add_product_form():
@@ -510,12 +521,11 @@ def add_product_form():
         category = st.text_input("Categoría del Producto")
         subcategory = st.text_input("Subcategoría del Producto")
         price = st.number_input("Precio del Producto", min_value=0.01, format="%.2f")
-        sitio = st.selectbox("Ubicación del Producto", ["Tienda", "Bodega"])
         cantidad = st.number_input("Cantidad del Producto", min_value=0, step=1)
         submitted = st.form_submit_button("Agregar")
 
         if submitted:
-            result = add_product(product_id, name, brand, category, subcategory, price, sitio, cantidad)
+            result = add_product(product_id, name, brand, category, subcategory, price, cantidad)
             if "éxito" in result:
                 st.success(result)
             else:
@@ -705,7 +715,7 @@ def handle_sales():
                 st.session_state['cancel_sale'] = False
 
 
-def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos, total_credito):
+def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos, total_credito, sitio):
     session = Session()
     try:
         productos_vendidos_str = ', '.join(
@@ -713,6 +723,16 @@ def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos
         new_sale = Venta(user_id=user_id, total_efectivo=total_efectivo, total_transferencia=total_transferencia,
                          productos_vendidos=productos_vendidos_str, total_credito=total_credito)
         session.add(new_sale)
+
+        # Descontar la cantidad de productos vendidos del inventario en tienda o bodega
+        for item in productos_vendidos:
+            product = session.query(Product).filter(Product.product_id == item['product'].product_id).one_or_none()
+            if product:
+                if sitio == 'tienda':
+                    product.total_tienda -= item['quantity']
+                else:
+                    product.total_bodega -= item['quantity']
+
         session.commit()
         return "Venta registrada con éxito."
     except Exception as e:
@@ -721,19 +741,6 @@ def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos
     finally:
         session.close()
 
-def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos, total_credito):
-    session = Session()
-    try:
-        productos_vendidos_str = ', '.join([f"{item['product'].name} x {item['quantity']}" for item in productos_vendidos])
-        new_sale = Venta(user_id=user_id, total_efectivo=total_efectivo, total_transferencia=total_transferencia, productos_vendidos=productos_vendidos_str, total_credito=total_credito)
-        session.add(new_sale)
-        session.commit()
-        return "Venta registrada con éxito."
-    except Exception as e:
-        session.rollback()
-        return f"Error al registrar la venta: {str(e)}"
-    finally:
-        session.close()
 
 def client_management_menu():
     selected = option_menu(
