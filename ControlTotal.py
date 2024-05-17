@@ -626,6 +626,7 @@ def handle_sales():
                 client = search_clients(search_query)
                 if client:
                     st.session_state['cliente'] = client[0]
+                    st.success(f"Cliente encontrado: {client[0].nombre}")
                 else:
                     st.error("Cliente no encontrado")
 
@@ -649,6 +650,7 @@ def handle_sales():
                 if cantidad <= product.total_tienda:
                     st.session_state['carrito'].append({'product': product, 'quantity': cantidad})
                     st.session_state['total'] += float(product.price) * cantidad
+                    st.success(f"Producto {product.name} agregado al carrito")
                 else:
                     st.error("Cantidad no disponible en tienda")
             else:
@@ -689,6 +691,14 @@ def handle_sales():
                     total_credito = credito
                     result = create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos,
                                          total_credito, sitio)
+
+                    if cliente_registrado == "Cliente Registrado" and credito > 0:
+                        cliente = st.session_state['cliente']
+                        nuevo_credito = cliente.credito + credito
+                        update_client_credit(cliente.cedula, nuevo_credito)
+                        st.session_state['cliente'].credito = nuevo_credito
+                        st.write(f"**Nuevo Crédito:** ${nuevo_credito:.2f}")
+
                     st.success(result)
                     st.session_state['carrito'] = []
                     st.session_state['total'] = 0.0
