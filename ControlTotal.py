@@ -627,62 +627,75 @@ def handle_sales():
             else:
                 st.error("Cliente no encontrado")
 
-    # Tabla de productos
-    products = search_products("")
-    product_data = []
-    for product in products:
-        product_data.append([
-            product.product_id, product.name, product.brand, product.category,
-            product.subcategory, f"${product.price:.2f}", product.total_tienda, product.total_bodega
-        ])
-    df = pd.DataFrame(product_data, columns=["Product ID", "Nombre", "Marca", "Categoría", "Subcategoría", "Precio", "Total en Tienda", "Total en Bodega"])
-    st.table(df)
+    col1, col2 = st.columns(2)
 
-    product_id = st.text_input("ID del Producto")
-    cantidad = st.number_input("Cantidad", min_value=1, step=1)
-
-    if st.button("Agregar al Carrito"):
-        product = next((p for p in products if p.product_id == product_id), None)
-        if product and cantidad <= product.total_tienda:
-            st.session_state['carrito'].append({'product': product, 'quantity': cantidad})
-            st.session_state['total'] += float(product.price) * cantidad
-            st.success(f"Producto {product.name} agregado al carrito")
-        else:
-            st.error("Producto no encontrado o cantidad no disponible en tienda")
-
-    if st.session_state['carrito']:
-        st.write("Carrito de Compras")
-        cart_data = []
-        for item in st.session_state['carrito']:
-            product = item['product']
-            cart_data.append([
-                product.product_id, product.name, f"${product.price:.2f}", item['quantity'], f"${product.price * item['quantity']:.2f}"
-            ])
-        cart_df = pd.DataFrame(cart_data, columns=["Product ID", "Nombre", "Precio Unitario", "Cantidad", "Importe"])
-        st.table(cart_df)
-        st.write(f"Total: ${st.session_state['total']:.2f}")
-
-    if st.session_state['carrito']:
-        efectivo = st.number_input("Pago en Efectivo", min_value=0.0, format="%.2f")
-        transferencia = st.number_input("Pago por Transferencia", min_value=0.0, format="%.2f")
-        if client_type == "Cliente Registrado":
-            credito = st.number_input("Deuda", min_value=0.0, format="%.2f")
-        else:
-            credito = 0.0
-
-        if st.button("Pagar"):
-            if efectivo + transferencia + credito >= st.session_state['total']:
-                productos_vendidos = st.session_state['carrito']
-                user_id = st.session_state['user'].id
-                total_efectivo = efectivo
-                total_transferencia = transferencia
-                total_credito = credito
-                result = create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos, total_credito, sitio)
-                st.success(result)
-                st.session_state['carrito'] = []
-                st.session_state['total'] = 0.0
+    with col1:
+        st.subheader("Agregar Producto")
+        product_id = st.text_input("ID del Producto")
+        cantidad = st.number_input("Cantidad", min_value=1, step=1)
+        if st.button("Agregar al Carrito"):
+            product = next((p for p in products if p.product_id == product_id), None)
+            if product and cantidad <= product.total_tienda:
+                st.session_state['carrito'].append({'product': product, 'quantity': cantidad})
+                st.session_state['total'] += float(product.price) * cantidad
+                st.success(f"Producto {product.name} agregado al carrito")
             else:
-                st.error("Pago insuficiente")
+                st.error("Producto no encontrado o cantidad no disponible en tienda")
+
+    with col2:
+        if st.session_state['carrito']:
+            st.subheader("Carrito de Compras")
+            cart_data = []
+            for item in st.session_state['carrito']:
+                product = item['product']
+                cart_data.append([
+                    product.product_id, product.name, f"${product.price:.2f}", item['quantity'], f"${product.price * item['quantity']:.2f}"
+                ])
+            cart_df = pd.DataFrame(cart_data, columns=["Product ID", "Nombre", "Precio Unitario", "Cantidad", "Importe"])
+            st.table(cart_df)
+            st.write(f"Total: ${st.session_state['total']:.2f}")
+
+    col3, col4 = st.columns(2)
+
+    with col3:
+        if st.session_state['carrito']:
+            st.subheader("Métodos de Pago")
+            efectivo = st.number_input("Pago en Efectivo", min_value=0.0, format="%.2f")
+            transferencia = st.number_input("Pago por Transferencia", min_value=0.0, format="%.2f")
+            if client_type == "Cliente Registrado":
+                credito = st.number_input("Deuda", min_value=0.0, format="%.2f")
+            else:
+                credito = 0.0
+
+    with col4:
+        if st.session_state['carrito']:
+            if st.button("Pagar"):
+                if efectivo + transferencia + credito >= st.session_state['total']:
+                    productos_vendidos = st.session_state['carrito']
+                    user_id = st.session_state['user'].id
+                    total_efectivo = efectivo
+                    total_transferencia = transferencia
+                    total_credito = credito
+                    result = create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos, total_credito, sitio)
+                    st.success(result)
+                    st.session_state['carrito'] = []
+                    st.session_state['total'] = 0.0
+                else:
+                    st.error("Pago insuficiente")
+
+    if 'products' in st.session_state:
+        products = st.session_state['products']
+        if products:
+            # Mostrar la tabla de productos solo después de la búsqueda
+            st.subheader("Productos Disponibles")
+            product_data = []
+            for product in products:
+                product_data.append([
+                    product.product_id, product.name, product.brand, product.category,
+                    product.subcategory, f"${product.price:.2f}", product.total_tienda, product.total_bodega
+                ])
+            df = pd.DataFrame(product_data, columns=["Product ID", "Nombre", "Marca", "Categoría", "Subcategoría", "Precio", "Total en Tienda", "Total en Bodega"])
+            st.table(df)
 
 
 def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos, total_credito, sitio):
