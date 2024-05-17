@@ -794,6 +794,12 @@ def search_client_form():
             if clients:
                 for client in clients:
                     st.write(f"Nombre: {client.nombre}, Dirección: {client.direccion}, Teléfono: {client.telefono}, Cédula: {client.cedula}, Crédito: {client.credito}")
+                    # Campo para abonar al crédito
+                    abono = st.number_input(f"Abonar al crédito de {client.nombre}", min_value=0.0, max_value=float(client.credito), format="%.2f", key=f"abono_{client.id}")
+                    if st.button(f"Abonar a {client.nombre}", key=f"abonar_{client.id}"):
+                        nuevo_credito = client.credito - decimal.Decimal(abono)
+                        resultado = update_client_credit(client.id, nuevo_credito)
+                        st.write(resultado)
             else:
                 st.write("No se encontraron clientes")
 
