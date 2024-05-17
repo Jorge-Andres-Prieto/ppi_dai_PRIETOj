@@ -677,7 +677,7 @@ def handle_sales():
 
             # Opción para quitar productos
             idx_to_remove = st.number_input("Índice del Producto a Quitar", min_value=0, step=1,
-                                            max_value=len(st.session_state['carrito']) - 1)
+                                            max_value=max(len(st.session_state['carrito']) - 1, 0))
             cantidad_to_remove = st.number_input("Cantidad a Quitar", min_value=1, step=1)
             if st.button("Quitar del Carrito"):
                 if idx_to_remove < len(st.session_state['carrito']):
