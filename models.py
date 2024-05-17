@@ -2,8 +2,11 @@
 from sqlalchemy.ext.declarative import declarative_base
 
 # Importa tipos de columnas específicos de SQLAlchemy para definir propiedades de modelo
-from sqlalchemy import Column, Integer, String, Numeric
+from sqlalchemy import Column, Integer, String, Numeric, ForeignKey, DateTime
 
+from sqlalchemy.orm import relationship
+
+from datetime import datetime
 
 # Crea una instancia base para los modelos ORM, que es necesario para definir clases de modelos
 Base = declarative_base()
@@ -70,3 +73,14 @@ class Cliente(Base):
     telefono = Column(String, nullable=False)
     cedula = Column(String, nullable=False, unique=True)
     credito = Column(Numeric(10, 2))
+
+class Venta(Base):
+    __tablename__ = 'ventas'
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    fecha_hora = Column(DateTime, default=datetime.utcnow)
+    total_efectivo = Column(Numeric(10, 2), nullable=False)
+    total_transferencia = Column(Numeric(10, 2), nullable=False)
+    productos_vendidos = Column(String, nullable=False)
+
+    user = relationship("User")

@@ -581,10 +581,46 @@ def sales_menu():
     )
 
     if selected == "Ventas":
-        st.subheader("Gestión de Ventas")
-        # Aquí agregar funciones o formularios para manejar las ventas
+        handle_sales()
     elif selected == "Clientes":
         client_management_menu()
+
+
+def handle_sales():
+    st.header("Nueva Venta")
+
+    client_id = st.text_input("Cédula o Nombre del Cliente")
+    if st.button("Buscar Cliente"):
+        client = search_clients(client_id)
+        if client:
+            st.write(f"Cliente encontrado: {client.nombre} (Cédula: {client.cedula}, Crédito: {client.credito})")
+        else:
+            st.error("Cliente no encontrado")
+
+    product_id = st.text_input("ID del Producto")
+    quantity = st.number_input("Cantidad", min_value=1, step=1)
+    if st.button("Agregar Producto"):
+        product = search_products(product_id)
+        if product:
+            st.write(f"Producto agregado: {product.name} (Precio: {product.price}, Cantidad: {quantity})")
+            # Aquí añade la lógica para almacenar la venta temporalmente
+        else:
+            st.error("Producto no encontrado")
+
+    # Aquí se agregarán las opciones para eliminar o ajustar la cantidad de productos
+
+    if st.button("Cancelar Compra"):
+        if st.confirm("¿Estás seguro de que deseas cancelar la compra?"):
+            st.session_state["venta_actual"] = None
+            st.write("Compra cancelada")
+
+    efectivo = st.number_input("Pago en Efectivo", min_value=0.0, format="%.2f")
+    transferencia = st.number_input("Pago por Transferencia", min_value=0.0, format="%.2f")
+    if st.button("Pagar"):
+        # Lógica para procesar el pago y generar la factura
+        st.write(f"Total Pagado en Efectivo: {efectivo}")
+        st.write(f"Total Pagado por Transferencia: {transferencia}")
+        # Aquí se incluirá la lógica para crear la entrada en la tabla de ventas
 
 def client_management_menu():
     selected = option_menu(
