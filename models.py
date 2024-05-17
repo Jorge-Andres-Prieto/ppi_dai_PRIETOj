@@ -39,25 +39,6 @@ class User(Base):
 
 
 class Product(Base):
-    """Define la estructura de la tabla 'products' para almacenar datos de productos.
-
-    Attributes:
-        id (Column): Identificador único del usuario, clave primaria.
-        product_id (Column): Identificador específico del producto.
-        name (Column): Nombre del producto, debe ser no nulo.
-        brand (Column): Marca del producto.
-        category (Column): Categoría del producto, no puede ser nulo.
-        subcategory (Column): Subcategoría del producto.
-        price (Column): Precio del producto, no puede ser nulo.
-        total_tienda (Column): Cantidad del producto en tienda.
-        total_bodega (Column): Cantidad del producto en bodega.
-
-    Args:
-        None
-
-    Returns:
-        None
-    """
     __tablename__ = 'products'
     id = Column(Integer, primary_key=True)
     product_id = Column(String, nullable=False, unique=True)

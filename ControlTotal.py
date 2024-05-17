@@ -70,6 +70,7 @@ def reset_sale():
     st.session_state['selected_client'] = None
     st.session_state['cancel_sale'] = False
     st.session_state['confirm_payment'] = False
+
 def login_page():
     """Crea y gestiona la página de inicio de sesión.
 
@@ -79,7 +80,6 @@ def login_page():
     Returns:
         None
     """
-    # Función de streamlit para dividir la página en columnas
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         st.title("Control Total")
@@ -90,10 +90,8 @@ def login_page():
 
         if user:
             if user.tdp == "No Aceptado":
-                # Aquí usamos Markdown para mostrar las políticas
                 policies_text = tdp
                 st.markdown(policies_text)
-
                 accept_policies = st.checkbox("Acepto las políticas de tratamiento de datos personales al iniciar sesión.")
                 if st.button("Ingresar"):
                     if accept_policies:
@@ -112,6 +110,7 @@ def login_page():
         else:
             if st.button("Ingresar"):
                 st.error("Usuario o contraseña incorrectos.")
+
 
 
 def main_menu(user):
@@ -450,14 +449,6 @@ def inventory_management_menu():
         delete_product_form()
 
 def search_product_form():
-    """Formulario para buscar productos por nombre o ID.
-
-    Args:
-        None
-
-    Returns:
-        None
-    """
     with st.form("Buscar Producto"):
         search_query = st.text_input("Nombre o ID del Producto a buscar")
         submitted = st.form_submit_button("Buscar")
@@ -469,21 +460,19 @@ def search_product_form():
                     col1, col2 = st.columns(2)
                     with col1:
                         transfer_to_tienda = st.number_input(f"Transferir de Bodega a Tienda ({product.name})", min_value=0, max_value=product.total_bodega, step=1)
-                        if st.button(f"Transferir a Tienda ({product.product_id})"):
+                        if st.form_submit_button(f"Transferir a Tienda ({product.product_id})"):
                             result = update_product(product.product_id, inventory_adjustment_tienda=transfer_to_tienda, inventory_adjustment_bodega=-transfer_to_tienda)
                             st.write(result)
                     with col2:
                         transfer_to_bodega = st.number_input(f"Transferir de Tienda a Bodega ({product.name})", min_value=0, max_value=product.total_tienda, step=1)
-                        if st.button(f"Transferir a Bodega ({product.product_id})"):
+                        if st.form_submit_button(f"Transferir a Bodega ({product.product_id})"):
                             result = update_product(product.product_id, inventory_adjustment_tienda=-transfer_to_bodega, inventory_adjustment_bodega=transfer_to_bodega)
                             st.write(result)
             else:
                 st.error("No se encontraron productos con ese criterio.")
 
 
-
 def update_product_form():
-    """Formulario para modificar información de un producto existente."""
     with st.form("Modificar Producto"):
         product_id = st.text_input("ID del Producto a modificar")
         new_name = st.text_input("Nuevo Nombre del Producto", placeholder="Dejar en blanco si no desea cambiar")
@@ -512,8 +501,8 @@ def update_product_form():
                 st.error(result)
 
 
+
 def add_product_form():
-    """Formulario para añadir un nuevo producto."""
     with st.form("Agregar Producto"):
         product_id = st.text_input("ID del Producto")
         name = st.text_input("Nombre del Producto")
@@ -530,6 +519,7 @@ def add_product_form():
                 st.success(result)
             else:
                 st.error(result)
+
 
 def delete_product_form():
     """Formulario para eliminar un producto existente.

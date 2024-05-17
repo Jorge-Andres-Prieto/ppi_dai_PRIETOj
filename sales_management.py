@@ -3,7 +3,7 @@ from models import Venta, Product, Cliente
 from datetime import datetime
 
 
-def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos, total_credito):
+def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos, total_credito, sitio):
     session = Session()
     try:
         productos_vendidos_str = ', '.join(
@@ -12,11 +12,12 @@ def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos
                          productos_vendidos=productos_vendidos_str, total_credito=total_credito)
         session.add(new_sale)
 
-        # Descontar la cantidad de productos vendidos del inventario
+        # Descontar la cantidad de productos vendidos del inventario en tienda
         for item in productos_vendidos:
-            product = session.query(Product).filter(Product.id == item['product'].id).one_or_none()
+            product = session.query(Product).filter(Product.product_id == item['product'].product_id).one_or_none()
             if product:
-                product.cantidad -= item['quantity']
+                if sitio == 'Tienda':
+                    product.total_tienda -= item['quantity']
 
         session.commit()
         return "Venta registrada con éxito."

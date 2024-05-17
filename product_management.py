@@ -54,21 +54,6 @@ def view_product_details(product_id):
         session.close()
 
 def update_product(product_id, new_name=None, new_brand=None, new_category=None, new_subcategory=None, new_price=None, inventory_adjustment_tienda=None, inventory_adjustment_bodega=None):
-    """Actualiza la información de un producto existente.
-
-    Args:
-        product_id (str): ID del producto a actualizar.
-        new_name (str): Nuevo nombre del producto.
-        new_brand (str): Nueva marca del producto.
-        new_category (str): Nueva categoría del producto.
-        new_subcategory (str): Nueva subcategoría del producto.
-        new_price (float): Nuevo precio del producto.
-        inventory_adjustment_tienda (int): Ajuste de inventario en tienda.
-        inventory_adjustment_bodega (int): Ajuste de inventario en bodega.
-
-    Returns:
-        str: Mensaje indicando si el producto fue actualizado o no.
-    """
     session = Session()
     try:
         product = session.query(Product).filter(Product.product_id == product_id).first()
@@ -104,20 +89,6 @@ def update_product(product_id, new_name=None, new_brand=None, new_category=None,
         session.close()
 
 def add_product(product_id, name, brand, category, subcategory, price, cantidad):
-    """Añade un nuevo producto a la base de datos.
-
-    Args:
-        product_id (str): Identificador del producto.
-        name (str): Nombre del nuevo producto.
-        brand (str): Marca del nuevo producto.
-        category (str): Categoría del nuevo producto.
-        subcategory (str): Subcategoría del nuevo producto.
-        price (float): Precio del nuevo producto.
-        cantidad (int): Cantidad del nuevo producto.
-
-    Returns:
-        str: Mensaje indicando si el producto fue añadido o no.
-    """
     session = Session()
     try:
         new_product = Product(product_id=product_id, name=name, brand=brand, category=category, subcategory=subcategory, price=price, total_tienda=0, total_bodega=cantidad)
@@ -129,9 +100,6 @@ def add_product(product_id, name, brand, category, subcategory, price, cantidad)
         return f"Error al añadir el producto: {str(e)}"
     finally:
         session.close()
-
-
-
 
 
 def delete_product(product_id):
