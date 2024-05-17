@@ -6,7 +6,7 @@ from streamlit_option_menu import option_menu
 
 import numpy as np
 import pandas as pd
-import decimal
+from decimal import Decimal
 
 
 # Importa la función para verificar la autenticidad del usuario
@@ -694,7 +694,7 @@ def handle_sales():
 
                     if cliente_registrado == "Cliente Registrado" and credito > 0:
                         cliente = st.session_state['cliente']
-                        nuevo_credito = cliente.credito + credito
+                        nuevo_credito = cliente.credito + Decimal(credito)
                         update_client_credit(cliente.cedula, nuevo_credito)
                         st.session_state['cliente'].credito = nuevo_credito
                         st.write(f"**Nuevo Crédito:** ${nuevo_credito:.2f}")

@@ -24,12 +24,12 @@ def search_clients(query):
         session.close()
 
 
-def update_client_credit(client_id, new_credit):
+def update_client_credit(cedula, nuevo_credito):
     session = Session()
     try:
-        client = session.query(Cliente).filter(Cliente.id == client_id).first()
+        client = session.query(Cliente).filter(Cliente.cedula == cedula).first()
         if client:
-            client.credito = new_credit
+            client.credito = nuevo_credito
             session.commit()
             return "Crédito del cliente actualizado con éxito."
         else:
