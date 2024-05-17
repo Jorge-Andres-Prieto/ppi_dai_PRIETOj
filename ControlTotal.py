@@ -114,21 +114,12 @@ def login_page():
 
 
 def main_menu(user):
-    """Crea y muestra el menú principal para la navegación de la aplicación.
-
-    Args:
-        user (dict): Diccionario que contiene la información del usuario autenticado.
-
-    Returns:
-        None
-    """
-    # Condicionales para mostrar el menú admin o el menú empleado
+    """Crea y muestra el menú principal para la navegación de la aplicación."""
     if user.role == "Admin":
         with st.sidebar:
             selected = option_menu(
                 None,
-                ["Control Total", "Admin", "Ventas y Facturación", "Gestión de inventarios",
-                 "Análisis estadísticos", "Domicilios", "Sobre el Autor"],
+                ["Control Total", "Admin", "Ventas y Facturación", "Gestión de inventarios", "Análisis estadísticos", "Domicilios", "Sobre el Autor"],
                 icons=["cast", "person-circle", "currency-dollar", "archive", "graph-up", "truck", "info-circle"],
                 menu_icon="list",
                 default_index=0
@@ -138,49 +129,32 @@ def main_menu(user):
 
         if selected == 'Control Total':
             st.markdown(info_control_total)
-
-        if selected == 'Admin':
+        elif selected == 'Admin':
             admin_menu()
-
-        if selected == 'Gestión de inventarios':
+        elif selected == 'Gestión de inventarios':
             inventory_management_menu()
-
-        if selected == 'Ventas y Facturación':
+        elif selected == 'Ventas y Facturación':
             sales_menu()
-
-        if selected == 'Sobre el Autor':
+        elif selected == 'Sobre el Autor':
             st.markdown(info_sobre_autor)
 
     elif user.role == "Empleado":
         with st.sidebar:
             selected = option_menu(
                 None,
-                ["Control Total", "Ventas y Facturación", "Gestión de inventarios",
-                 "Análisis estadísticos", "Domicilios", "Sobre el Autor"],
-                icons=["cast","currency-dollar", "archive", "graph-up",
-                       "truck", "info-circle"],
-                menu_icon="cast",
+                ["Ventas y Facturación", "Gestión de inventarios", "Domicilios", "Sobre el Autor"],
+                icons=["currency-dollar", "archive", "truck", "info-circle"],
+                menu_icon="list",
                 default_index=0
             )
             if st.button("Cerrar Sesión"):
                 logout()
 
-        if selected == 'Control Total':
-            st.markdown(info_control_total)
-
         if selected == 'Gestión de inventarios':
             inventory_management_menu()
-
-        if selected == 'Ventas y Facturación':
-            with st.expander("Opciones de Ventas y Facturación"):
-                sales_client_menu = st.radio(
-                    "Selecciona una opción",
-                    ('Ventas', 'Clientes')
-                )
-                if sales_client_menu == 'Clientes':
-                    client_management_menu()
-
-        if selected == 'Sobre el Autor':
+        elif selected == 'Ventas y Facturación':
+            sales_menu()
+        elif selected == 'Sobre el Autor':
             st.markdown(info_sobre_autor)
 
 
