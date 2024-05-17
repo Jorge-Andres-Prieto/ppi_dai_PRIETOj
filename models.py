@@ -81,6 +81,7 @@ class Venta(Base):
     fecha_hora = Column(DateTime, default=datetime.utcnow)
     total_efectivo = Column(Numeric(10, 2), nullable=False)
     total_transferencia = Column(Numeric(10, 2), nullable=False)
+    total_credito = Column(Numeric(10, 2), nullable=False)  # Nueva columna
     productos_vendidos = Column(String, nullable=False)
 
     user = relationship("User")

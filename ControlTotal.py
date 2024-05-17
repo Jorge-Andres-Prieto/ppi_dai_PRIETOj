@@ -611,17 +611,23 @@ def handle_sales():
     # Selección de tipo de cliente
     client_type = st.radio("Selecciona el tipo de cliente", ["Cliente Registrado", "Cliente No Registrado"])
 
-    if client_type == "Cliente Registrado":
-        client_id = st.text_input("Cédula o Nombre del Cliente")
-        if st.button("Buscar Cliente"):
-            clients = search_clients(client_id)
-            if clients:
-                selected_client = clients[0]
-                st.write(
-                    f"Cliente encontrado: {selected_client.nombre} (Cédula: {selected_client.cedula}, Crédito: {selected_client.credito})")
-                st.session_state['selected_client'] = selected_client
-            else:
-                st.error("Cliente no encontrado")
+    col_client, col_info = st.columns([1, 2])
+    with col_client:
+        if client_type == "Cliente Registrado":
+            client_id = st.text_input("Cédula o Nombre del Cliente")
+            if st.button("Buscar Cliente"):
+                clients = search_clients(client_id)
+                if clients:
+                    selected_client = clients[0]
+                    st.session_state['selected_client'] = selected_client
+                else:
+                    st.error("Cliente no encontrado")
+
+    with col_info:
+        if st.session_state['selected_client']:
+            selected_client = st.session_state['selected_client']
+            st.write(
+                f"Cliente encontrado: {selected_client.nombre} (Cédula: {selected_client.cedula}, Crédito: {selected_client.credito})")
 
     if 'selected_client' in st.session_state or client_type == "Cliente No Registrado":
         col1, col2, col3 = st.columns(3)
@@ -673,52 +679,27 @@ def handle_sales():
             st.write(f"Total: {total}")
 
             # Opciones de pago
-            efectivo = st.number_input("Pago en Efectivo", min_value=0.0, format="%.2f")
-            transferencia = st.number_input("Pago por Transferencia", min_value=0.0, format="%.2f")
-            credito = 0
+            col_efectivo, col_transferencia, col_credito = st.columns(3)
+            with col_efectivo:
+                efectivo = st.number_input("Pago en Efectivo", min_value=0.0, format="%.2f")
+            with col_transferencia:
+                transferencia = st.number_input("Pago por Transferencia", min_value=0.0, format="%.2f")
+            with col_credito:
+                credito = st.number_input("Deuda", min_value=0.0, format="%.2f")
 
-            if client_type == "Cliente Registrado":
-                if st.button("Pagar"):
-                    total_pagado = efectivo + transferencia
-                    if total_pagado < total:
-                        credito = total - total_pagado
-                    st.write(f"Crédito: {credito}")
-                    if credito > 0:
-                        st.write("¿Quieres registrar la deuda en crédito?")
-                        if st.button("Sí, registrar en crédito"):
-                            selected_client = st.session_state['selected_client']
-                            update_client_credit(selected_client.id, selected_client.credito + decimal.Decimal(credito))
-                            st.write(f"Deuda registrada: {credito}")
-                            create_sale(st.session_state['user'].id, decimal.Decimal(efectivo),
-                                        decimal.Decimal(transferencia), st.session_state['current_sale'])
-                            st.write("Pago realizado con éxito")
-                            reset_sale()
-                        elif st.button("No, volver a intentar"):
-                            pass
-                    else:
-                        create_sale(st.session_state['user'].id, decimal.Decimal(efectivo),
-                                    decimal.Decimal(transferencia), st.session_state['current_sale'])
-                        st.write("Pago realizado con éxito")
-                        reset_sale()
+            if st.button("Pagar"):
+                total_pagado = efectivo + transferencia + credito
+                if total_pagado >= total:
+                    if client_type == "Cliente Registrado":
+                        selected_client = st.session_state['selected_client']
+                        update_client_credit(selected_client.id, selected_client.credito + decimal.Decimal(credito))
+                        st.write(f"Deuda registrada: {credito}")
+                    create_sale(st.session_state['user'].id, decimal.Decimal(efectivo), decimal.Decimal(transferencia),
+                                st.session_state['current_sale'], decimal.Decimal(credito))
+                    st.write("Pago realizado con éxito")
+                    reset_sale()
                 else:
-                    if efectivo + transferencia >= total:
-                        create_sale(st.session_state['user'].id, decimal.Decimal(efectivo),
-                                    decimal.Decimal(transferencia), st.session_state['current_sale'])
-                        st.write("Pago realizado con éxito")
-                        reset_sale()
-                    else:
-                        st.error("Pago insuficiente")
-
-            elif client_type == "Cliente No Registrado":
-                if st.button("Pagar"):
-                    total_pagado = efectivo + transferencia
-                    if total_pagado >= total:
-                        create_sale(st.session_state['user'].id, decimal.Decimal(efectivo),
-                                    decimal.Decimal(transferencia), st.session_state['current_sale'])
-                        st.write("Pago realizado con éxito")
-                        reset_sale()
-                    else:
-                        st.error("Pago insuficiente")
+                    st.error("Pago insuficiente")
 
         # Cancelar compra
         if st.button("Cancelar Compra"):
@@ -731,6 +712,23 @@ def handle_sales():
                 st.write("Compra cancelada")
             elif st.button("No, continuar con la compra"):
                 st.session_state['cancel_sale'] = False
+
+
+def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos, total_credito):
+    session = Session()
+    try:
+        productos_vendidos_str = ', '.join(
+            [f"{item['product'].name} x {item['quantity']}" for item in productos_vendidos])
+        new_sale = Venta(user_id=user_id, total_efectivo=total_efectivo, total_transferencia=total_transferencia,
+                         productos_vendidos=productos_vendidos_str, total_credito=total_credito)
+        session.add(new_sale)
+        session.commit()
+        return "Venta registrada con éxito."
+    except Exception as e:
+        session.rollback()
+        return f"Error al registrar la venta: {str(e)}"
+    finally:
+        session.close()
 
 
 def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos):
