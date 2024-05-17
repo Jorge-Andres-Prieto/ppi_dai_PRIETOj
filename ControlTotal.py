@@ -676,34 +676,27 @@ def handle_sales():
             st.write(f"Total: ${st.session_state['total']:.2f}")
 
             # Opción para quitar productos
-            col1, col2 = st.columns(2)
-            with col1:
-                idx_to_remove = st.number_input("Índice del Producto a Quitar", min_value=0, step=1)
-            with col2:
-                cantidad_to_remove = st.number_input("Cantidad a Quitar", min_value=1, step=1)
-                if st.button("Quitar del Carrito"):
-                    if idx_to_remove < len(st.session_state['carrito']):
-                        item = st.session_state['carrito'][idx_to_remove]
-                        if cantidad_to_remove >= item['quantity']:
-                            st.session_state['total'] -= float(item['product'].price) * item['quantity']
-                            del st.session_state['carrito'][idx_to_remove]
-                        else:
-                            item['quantity'] -= cantidad_to_remove
-                            st.session_state['total'] -= float(item['product'].price) * cantidad_to_remove
-                        st.success(f"Producto {item['product'].name} actualizado en el carrito")
+            idx_to_remove = st.number_input("Índice del Producto a Quitar", min_value=0, step=1)
+            cantidad_to_remove = st.number_input("Cantidad a Quitar", min_value=1, step=1)
+            if st.button("Quitar del Carrito"):
+                if idx_to_remove < len(st.session_state['carrito']):
+                    item = st.session_state['carrito'][idx_to_remove]
+                    if cantidad_to_remove >= item['quantity']:
+                        st.session_state['total'] -= float(item['product'].price) * item['quantity']
+                        del st.session_state['carrito'][idx_to_remove]
+                    else:
+                        item['quantity'] -= cantidad_to_remove
+                        st.session_state['total'] -= float(item['product'].price) * cantidad_to_remove
+                    st.success(f"Producto {item['product'].name} actualizado en el carrito")
 
     with col2:
         if st.session_state['carrito']:
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                efectivo = st.number_input("Pago en Efectivo", min_value=0.0, format="%.2f")
-            with col2:
-                transferencia = st.number_input("Pago por Transferencia", min_value=0.0, format="%.2f")
-            with col3:
-                if cliente_registrado == "Cliente Registrado":
-                    credito = st.number_input("Deuda", min_value=0.0, format="%.2f")
-                else:
-                    credito = 0.0
+            efectivo = st.number_input("Pago en Efectivo", min_value=0.0, format="%.2f")
+            transferencia = st.number_input("Pago por Transferencia", min_value=0.0, format="%.2f")
+            if cliente_registrado == "Cliente Registrado":
+                credito = st.number_input("Deuda", min_value=0.0, format="%.2f")
+            else:
+                credito = 0.0
 
             col1, col2 = st.columns(2)
             with col1:
