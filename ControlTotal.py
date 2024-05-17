@@ -6,6 +6,7 @@ from streamlit_option_menu import option_menu
 
 import numpy as np
 import pandas as pd
+import decimal
 
 
 # Importa la función para verificar la autenticidad del usuario
@@ -654,8 +655,8 @@ def handle_sales():
                 'ID': item['product'].id,
                 'Nombre': item['product'].name,
                 'Cantidad': item['quantity'],
-                'Precio Unitario': item['product'].price,
-                'Importe': item['product'].price * item['quantity']
+                'Precio Unitario': float(item['product'].price),  # Convertir Decimal a float
+                'Importe': float(item['product'].price) * item['quantity']  # Convertir Decimal a float
             } for item in st.session_state['current_sale']])
             st.table(df)
             total = df['Importe'].sum()
@@ -667,16 +668,17 @@ def handle_sales():
         if st.button("Pagar"):
             total_pagado = efectivo + transferencia
             if 'selected_client' in st.session_state:
-                credito = total_pagado - total if total_pagado < total else 0
+                credito = total - total_pagado if total_pagado < total else 0
                 st.write(f"Crédito: {credito}")
                 if credito > 0:
                     st.write("¿Quieres registrar la deuda en crédito?")
                     if st.button("Sí, registrar en crédito"):
                         selected_client = st.session_state['selected_client']
-                        update_client_credit(selected_client.id, selected_client.credito + credito)
+                        update_client_credit(selected_client.id, selected_client.credito + decimal.Decimal(credito))
                         st.write(f"Deuda registrada: {credito}")
             if total_pagado >= total:
-                create_sale(st.session_state['user'].id, efectivo, transferencia, st.session_state['current_sale'])
+                create_sale(st.session_state['user'].id, decimal.Decimal(efectivo), decimal.Decimal(transferencia),
+                            st.session_state['current_sale'])
                 st.write("Pago realizado con éxito")
                 st.session_state['current_sale'] = []
             else:
