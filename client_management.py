@@ -1,6 +1,7 @@
 from database import Session
 from models import Cliente
 from sqlalchemy import or_
+from decimal import Decimal
 
 def create_client(nombre, direccion, telefono, cedula, credito):
     session = Session()
