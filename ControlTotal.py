@@ -611,8 +611,8 @@ def handle_sales():
         st.session_state['carrito'] = []
     if 'total' not in st.session_state:
         st.session_state['total'] = 0.0
-    if 'cliente' in st.session_state:
-        del st.session_state['cliente']
+    if 'cliente' not in st.session_state:
+        st.session_state['cliente'] = None
 
     sitio = st.session_state.get('sitio', 'Tienda')
 
@@ -633,7 +633,7 @@ def handle_sales():
                     st.error("Cliente no encontrado")
 
         with col3:
-            if 'cliente' in st.session_state:
+            if st.session_state['cliente'] is not None:
                 client_info = st.session_state['cliente']
                 st.write(f"**Cliente:** {client_info.nombre}")
                 st.write(f"**Cédula:** {client_info.cedula}")
@@ -676,7 +676,8 @@ def handle_sales():
             st.write(f"Total: ${st.session_state['total']:.2f}")
 
             # Opción para quitar productos
-            idx_to_remove = st.number_input("Índice del Producto a Quitar", min_value=0, step=1)
+            idx_to_remove = st.number_input("Índice del Producto a Quitar", min_value=0, step=1,
+                                            max_value=len(st.session_state['carrito']) - 1)
             cantidad_to_remove = st.number_input("Cantidad a Quitar", min_value=1, step=1)
             if st.button("Quitar del Carrito"):
                 if idx_to_remove < len(st.session_state['carrito']):
@@ -721,7 +722,8 @@ def handle_sales():
                         st.session_state['carrito'] = []
                         st.session_state['total'] = 0.0
                         if cliente_registrado == "Cliente Registrado":
-                            del st.session_state['cliente']
+                            st.session_state['cliente'] = None
+                        st.experimental_rerun()
                     else:
                         st.error("Pago insuficiente")
 
