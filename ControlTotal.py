@@ -18,7 +18,7 @@ from user_management import create_user, search_users, update_user, delete_user,
 # Importa funciones para la gestión de productos
 from product_management import search_products, delete_product, update_product, add_product
 from sales_management import create_sale
-from client_management import create_client, search_clients, delete_client, update_client_credit
+from client_management import create_client, search_clients, delete_client, update_client_credit, update_client
 
 
 # Importa funcion para crear la base de datos siesta no esta creada
@@ -816,26 +816,39 @@ def search_client_form():
             st.session_state['confirmar_abono'] = False
 
 def update_client_form():
-    with st.form("Actualizar Cliente"):
-        cedula = st.text_input("Cédula del Cliente a actualizar", help="Usa la cédula para buscar el cliente")
-        new_nombre = st.text_input("Nuevo Nombre", placeholder="Dejar en blanco si no desea cambiar")
-        new_direccion = st.text_input("Nueva Dirección", placeholder="Dejar en blanco si no desea cambiar")
-        new_telefono = st.text_input("Nuevo Teléfono", placeholder="Dejar en blanco si no desea cambiar")
-        new_credito = st.number_input("Nuevo Crédito", format="%.2f", value=0.0, help="Dejar en blanco para mantener el crédito actual")
+    """Formulario para actualizar la información de un cliente existente."""
+    if 'cliente_seleccionado' not in st.session_state:
+        st.session_state['cliente_seleccionado'] = None
 
-        submitted = st.form_submit_button("Actualizar Cliente")
-        if submitted:
-            result = update_client_credit(
-                cedula,
+    search_query = st.text_input("Cédula del Cliente a actualizar", help="Usa la cédula para buscar el cliente")
+    if st.button("Buscar Cliente"):
+        clients = search_clients(search_query)
+        if clients:
+            st.session_state['cliente_seleccionado'] = clients[0]
+            st.success(f"Cliente encontrado: {clients[0].nombre}")
+        else:
+            st.error("Cliente no encontrado. Por favor, verifica la cédula e intenta de nuevo.")
+
+    if st.session_state['cliente_seleccionado']:
+        cliente = st.session_state['cliente_seleccionado']
+        new_nombre = st.text_input("Nuevo Nombre", value=cliente.nombre, placeholder="Dejar en blanco si no desea cambiar")
+        new_direccion = st.text_input("Nueva Dirección", value=cliente.direccion, placeholder="Dejar en blanco si no desea cambiar")
+        new_telefono = st.text_input("Nuevo Teléfono", value=cliente.telefono, placeholder="Dejar en blanco si no desea cambiar")
+        new_credito = st.number_input("Nuevo Crédito", value=float(cliente.credito), format="%.2f", help="Dejar en blanco para mantener el crédito actual")
+
+        if st.button("Actualizar Cliente"):
+            result = update_client(
+                cliente.cedula,
                 new_nombre if new_nombre else None,
                 new_direccion if new_direccion else None,
                 new_telefono if new_telefono else None,
-                new_credito if new_credito != 0.0 else None
+                Decimal(new_credito) if new_credito != 0.0 else None
             )
+            st.write(result)
             if "éxito" in result:
-                st.success(result)
+                st.session_state['cliente_seleccionado'] = None
             else:
-                st.error(result)
+                st.error("Hubo un error al actualizar el cliente.")
 
 
 def delete_client_form():
