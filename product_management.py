@@ -95,6 +95,14 @@ def add_product(product_id, name, brand, category, subcategory, price, cantidad)
 
 
 def delete_product(product_id):
+    """Elimina un producto existente de la base de datos.
+
+    Args:
+        product_id (int): ID del producto a eliminar.
+
+    Returns:
+        str: Mensaje indicando si el producto fue eliminado o no.
+    """
     session = Session()
     try:
         product = session.query(Product).filter(Product.product_id == product_id).one_or_none()

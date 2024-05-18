@@ -530,42 +530,31 @@ def add_product_form():
 
 
 def delete_product_form():
-    """Formulario para eliminar un producto existente.
+    """Formulario para eliminar un producto existente."""
+    if 'delete_id' not in st.session_state:
+        st.session_state.delete_id = None
+        st.session_state.confirmation_delete = False
 
-    Args:
-        None
-
-    Returns:
-        None
-    """
     with st.form("Eliminar Producto"):
         product_id = st.number_input("ID del Producto a eliminar", step=1, min_value=1)
         submitted = st.form_submit_button("Eliminar Producto")
-
-    if submitted:
-        # Guardar el ID del producto a eliminar en el estado de la sesión
-        st.session_state.delete_id = product_id
-        # Marca para mostrar los botones de confirmación
-        st.session_state.confirmation_delete = True
+        if submitted:
+            st.session_state.delete_id = product_id
+            st.session_state.confirmation_delete = True
 
     if st.session_state.get('confirmation_delete'):
         st.write("¿Estás seguro de que quieres eliminar este producto?")
         if st.button("Sí, eliminar"):
-            # Llamar a la función de eliminación con el ID guardado y manejar la respuesta
             result = delete_product(st.session_state.delete_id)
             if "éxito" in result:
                 st.success(result)
-                # Restablecer la confirmación
                 st.session_state.confirmation_delete = False
-                # Limpiar el ID almacenado
                 del st.session_state.delete_id
             else:
                 st.error(result)
         elif st.button("No, cancelar"):
             st.write("Eliminación cancelada.")
-            # Restablecer la confirmación
             st.session_state.confirmation_delete = False
-            # Limpiar el ID almacenado
             del st.session_state.delete_id
 
 
