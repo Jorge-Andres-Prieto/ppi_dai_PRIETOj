@@ -545,13 +545,16 @@ def delete_product_form():
     if st.session_state.get('confirmation_delete'):
         st.write("¿Estás seguro de que quieres eliminar este producto?")
         if st.button("Sí, eliminar"):
-            result = delete_product(st.session_state.delete_id)
-            if "éxito" in result:
-                st.success(result)
-                st.session_state.confirmation_delete = False
-                del st.session_state.delete_id
-            else:
-                st.error(result)
+            try:
+                result = delete_product(st.session_state.delete_id)
+                if "éxito" in result:
+                    st.success(result)
+                    st.session_state.confirmation_delete = False
+                    del st.session_state.delete_id
+                else:
+                    st.error(result)
+            except Exception as e:
+                st.error(f"Error al eliminar el producto: {e}")
         elif st.button("No, cancelar"):
             st.write("Eliminación cancelada.")
             st.session_state.confirmation_delete = False

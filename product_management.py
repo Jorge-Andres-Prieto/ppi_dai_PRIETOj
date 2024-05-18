@@ -112,5 +112,8 @@ def delete_product(product_id):
             return "Producto eliminado con éxito."
         else:
             return "Producto no encontrado."
+    except Exception as e:
+        session.rollback()
+        raise e  # Re-lanzar la excepción para que sea capturada en el formulario
     finally:
         session.close()
