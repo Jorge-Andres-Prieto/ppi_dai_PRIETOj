@@ -539,7 +539,7 @@ def delete_product_form():
         product_id = st.number_input("ID del Producto a eliminar", step=1, min_value=1)
         submitted = st.form_submit_button("Eliminar Producto")
         if submitted:
-            st.session_state.delete_id = product_id
+            st.session_state.delete_id = str(product_id)  # Convertir a cadena
             st.session_state.confirmation_delete = True
 
     if st.session_state.get('confirmation_delete'):

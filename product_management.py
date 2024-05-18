@@ -98,7 +98,7 @@ def delete_product(product_id):
     """Elimina un producto existente de la base de datos.
 
     Args:
-        product_id (int): ID del producto a eliminar.
+        product_id (str): ID del producto a eliminar.
 
     Returns:
         str: Mensaje indicando si el producto fue eliminado o no.
