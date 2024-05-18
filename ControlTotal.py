@@ -31,10 +31,18 @@ from models import Venta, Product
 # datos personales), información del autor e información de la app.
 from info import tdp, info_control_total, info_sobre_autor
 
+from geopy.geocoders import Nominatim
+from scipy.spatial.distance import pdist, squareform
+import matplotlib.pyplot as plt
+import geopandas as gpd
+from shapely.geometry import LineString
+import contextily as ctx
+
 
 #Función de streamlit para utilizar la página completa
 st.set_page_config(page_title="Control Total", layout="wide", page_icon="🐳")
 
+geolocator = Nominatim(user_agent="tsp_solver")
 def main():
     """Función principal que controla el flujo de la aplicación.
 
@@ -135,6 +143,8 @@ def main_menu(user):
             inventory_management_menu()
         elif selected == 'Ventas y Facturación':
             sales_menu()
+        elif selected == 'Domicilios':
+            dominos_menu()
         elif selected == 'Sobre el Autor':
             st.markdown(info_sobre_autor)
 
@@ -154,6 +164,8 @@ def main_menu(user):
             inventory_management_menu()
         elif selected == 'Ventas y Facturación':
             sales_menu()
+        elif selected == 'Domicilios':
+            dominos_menu()
         elif selected == 'Sobre el Autor':
             st.markdown(info_sobre_autor)
 
@@ -837,6 +849,103 @@ def delete_client_form():
             else:
                 st.error(result)
 
+def dominos_menu():
+    st.title("Optimización de Ruta de Entrega")
+
+    # Dirección de inicio fija
+    start_address = "Cl. 1 #77-129, Medellin, Colombia"
+    st.write(f"Dirección de inicio: {start_address}")
+
+    # Ingreso de direcciones manualmente
+    address_inputs = []
+    num_addresses = st.number_input("Número de direcciones de entrega", min_value=1, max_value=10, step=1)
+
+    for i in range(num_addresses):
+        address = st.text_input(f"Dirección {i+1}", key=f"address_{i}")
+        address_inputs.append(address)
+
+    if st.button("Calcular Ruta"):
+        addresses = [start_address] + address_inputs
+
+        # Obtener coordenadas
+        locations = []
+        for address in addresses:
+            location = geolocator.geocode(address)
+            if location:
+                locations.append((location.latitude, location.longitude))
+            else:
+                st.error(f"No se pudo geocodificar la dirección: {address}")
+                return
+
+        # Convertir a DataFrame
+        df_locations = pd.DataFrame(locations, columns=['Latitude', 'Longitude'])
+
+        # Calcular la matriz de distancias
+        coords = df_locations.to_numpy()
+        distance_matrix = squareform(pdist(coords, metric='euclidean'))
+
+        # Resolver el TSP usando la heurística de vecino más cercano
+        tour = nearest_neighbor(distance_matrix)
+        tour.append(tour[0])  # Volver al punto de partida
+
+        # Imprimir el Tour
+        st.write("Tour:", tour)
+
+        # Visualizar la ruta
+        plot_route(df_locations, tour)
+
+def nearest_neighbor(distance_matrix):
+    n = distance_matrix.shape[0]
+    visited = [False] * n
+    tour = [0]
+    visited[0] = True
+
+    for _ in range(n - 1):
+        last_visited = tour[-1]
+        nearest = np.argmin([distance_matrix[last_visited][j] if not visited[j] else np.inf for j in range(n)])
+        tour.append(nearest)
+        visited[nearest] = True
+
+    return tour
+
+def plot_route(df_locations, tour):
+    # Crear el GeoDataFrame
+    gdf_locations = gpd.GeoDataFrame(df_locations, geometry=gpd.points_from_xy(df_locations.Longitude, df_locations.Latitude), crs="EPSG:4326")
+
+    # Crear la ruta
+    route = [(df_locations.Longitude[i], df_locations.Latitude[i]) for i in tour]
+
+    # Crear la línea de la ruta
+    line = LineString(route)
+
+    # Crear un GeoDataFrame para la ruta
+    gdf_route = gpd.GeoDataFrame(geometry=[line], crs="EPSG:4326")
+
+    # Convertir a la proyección adecuada para contextily
+    gdf_locations = gdf_locations.to_crs(epsg=3857)
+    gdf_route = gdf_route.to_crs(epsg=3857)
+
+    # Plotear
+    fig, ax = plt.subplots(figsize=(10, 10))
+    gdf_locations.plot(ax=ax, color='red', marker='o', markersize=5)
+
+    # Destacar el punto de inicio
+    gdf_locations.iloc[[0]].plot(ax=ax, color='green', marker='o', markersize=100)
+
+    # Añadir números a los puntos
+    for i, (lon, lat) in enumerate(zip(gdf_locations.geometry.x, gdf_locations.geometry.y)):
+        ax.text(lon, lat, str(i), fontsize=12, ha='right')
+
+    gdf_route.plot(ax=ax, color='blue')
+
+    # Añadir el mapa base
+    ctx.add_basemap(ax, source=ctx.providers.CartoDB.Positron)
+
+    # Ocultar las etiquetas de los ejes
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+    st.pyplot(fig)
 
 if __name__ == "__main__":
     main()
