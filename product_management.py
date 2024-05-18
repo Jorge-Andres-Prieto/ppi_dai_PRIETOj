@@ -12,16 +12,23 @@ from sqlalchemy import func
 
 
 def search_products(search_query):
+    """Busca productos que coincidan con un criterio de búsqueda en el ID o el nombre.
+
+    Args:
+        search_query (str): Criterio de búsqueda.
+
+    Returns:
+        list: Lista de objetos Product que coinciden con la búsqueda.
+    """
     session = Session()
     try:
-        # Búsqueda por product_id o nombre del producto
-        products = session.query(Product).filter(
-            (Product.product_id.ilike(f"%{search_query}%")) | (Product.name.ilike(f"%{search_query}%"))
-        ).all()
+        if search_query.isdigit():
+            products = session.query(Product).filter(Product.product_id == search_query).all()
+        else:
+            products = session.query(Product).filter(Product.name.ilike(f"%{search_query}%")).all()
         return products
     finally:
         session.close()
-
 
 
 def view_product_details(product_id):
