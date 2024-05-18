@@ -891,7 +891,7 @@ def dominos_menu():
 
         # Mostrar el Tour de manera bonita
         tour_df = pd.DataFrame({
-            "Número": range(1, len(tour) + 1),  # Número empezando desde 1
+            "Número": tour,  # Usar los índices del tour directamente
             "Dirección": [addresses[i] for i in tour]
         })
 
