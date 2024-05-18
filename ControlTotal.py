@@ -849,6 +849,7 @@ def delete_client_form():
             else:
                 st.error(result)
 
+
 def dominos_menu():
     st.title("Optimización de Ruta de Entrega")
 
@@ -861,7 +862,7 @@ def dominos_menu():
     num_addresses = st.number_input("Número de direcciones de entrega", min_value=1, max_value=10, step=1)
 
     for i in range(num_addresses):
-        address = st.text_input(f"Dirección {i+1}", key=f"address_{i}")
+        address = st.text_input(f"Dirección {i + 1}", key=f"address_{i}")
         address_inputs.append(address)
 
     if st.button("Calcular Ruta"):
@@ -893,10 +894,14 @@ def dominos_menu():
             "Orden": range(len(tour)),
             "Dirección": [addresses[i] for i in tour]
         })
-        st.dataframe(tour_df)
 
-        # Visualizar la ruta
-        plot_route(df_locations, tour)
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.dataframe(tour_df)
+
+        with col2:
+            plot_route(df_locations, tour)
 
 def nearest_neighbor(distance_matrix):
     n = distance_matrix.shape[0]
@@ -930,7 +935,7 @@ def plot_route(df_locations, tour):
     gdf_route = gdf_route.to_crs(epsg=3857)
 
     # Plotear
-    fig, ax = plt.subplots(figsize=(5, 5))  # Tamaño ajustado a 1/3 del tamaño original
+    fig, ax = plt.subplots(figsize=(10, 10))  # Tamaño original del mapa
     gdf_locations.plot(ax=ax, color='red', marker='o', markersize=5)
 
     # Destacar el punto de inicio
