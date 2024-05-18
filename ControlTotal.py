@@ -888,8 +888,12 @@ def dominos_menu():
         tour = nearest_neighbor(distance_matrix)
         tour.append(tour[0])  # Volver al punto de partida
 
-        # Imprimir el Tour
-        st.write("Tour:", tour)
+        # Mostrar el Tour de manera bonita
+        tour_df = pd.DataFrame({
+            "Orden": range(len(tour)),
+            "Dirección": [addresses[i] for i in tour]
+        })
+        st.dataframe(tour_df)
 
         # Visualizar la ruta
         plot_route(df_locations, tour)
@@ -926,7 +930,7 @@ def plot_route(df_locations, tour):
     gdf_route = gdf_route.to_crs(epsg=3857)
 
     # Plotear
-    fig, ax = plt.subplots(figsize=(10, 10))
+    fig, ax = plt.subplots(figsize=(5, 5))  # Tamaño ajustado a 1/3 del tamaño original
     gdf_locations.plot(ax=ax, color='red', marker='o', markersize=5)
 
     # Destacar el punto de inicio
