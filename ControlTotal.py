@@ -88,7 +88,13 @@ def login_page():
     Returns:
         None
     """
+
+    logo_url = "https://i.imgur.com/gQ0A74k_d.jpg?maxwidth=520&shape=thumb&fidelity=high"
     col1, col2, col3 = st.columns([1, 2, 1])
+
+    with col1:
+        st.image(logo_url, use_column_width=True)
+
     with col2:
         st.title("Control Total")
         username = st.text_input("Nombre de Usuario")
