@@ -133,7 +133,7 @@ def main_menu(user):
         with st.sidebar:
 
             logo_url = "https://i.ibb.co/YQzrD31/Logo-Control-Total-removebg-preview.png"
-            st.image(logo_url, width=200, height=100)
+            st.image(logo_url, width=20, height=20)
 
             selected = option_menu(
                 None,
