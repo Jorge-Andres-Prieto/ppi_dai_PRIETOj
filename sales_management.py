@@ -2,11 +2,13 @@ from database import Session
 from models import Venta, Product, Cliente
 from datetime import datetime
 
+from datetime import datetime, timedelta
+
 def obtener_hora_colombia():
-    # Obtener la hora actual
+    # Obtener la hora actual en UTC
     now = datetime.now()
-    # Restar 5 horas
-    hora_colombia = now.replace(hour=(now.hour - 5) % 24)
+    # Restar 5 horas para obtener la hora en la zona horaria de Colombia
+    hora_colombia = now - timedelta(hours=5)
     return hora_colombia
 
 def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos, total_credito, sitio):
