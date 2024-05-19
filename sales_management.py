@@ -21,11 +21,7 @@ def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos
     session = Session()
     try:
         # Obtener la fecha y hora local del sistema
-        local_now = datetime.now()
-
-        # Convertir la hora local a la zona horaria de Colombia
-        colombia_tz = pytz.timezone('America/Bogota')
-        fecha_hora = colombia_tz.localize(local_now)
+        fecha_hora = datetime.now()
 
         # Crear una nueva venta
         new_sale = Venta(
