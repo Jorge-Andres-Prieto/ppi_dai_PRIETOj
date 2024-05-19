@@ -131,10 +131,6 @@ def main_menu(user):
     """Crea y muestra el menú principal para la navegación de la aplicación."""
     if user.role == "Admin":
         with st.sidebar:
-
-            logo_url = "https://i.ibb.co/YQzrD31/Logo-Control-Total-removebg-preview.png"
-            st.image(logo_url, width=160)
-
             selected = option_menu(
                 None,
                 ["Control Total", "Admin", "Ventas y Facturación", "Gestión de inventarios", "Análisis estadísticos", "Domicilios", "Sobre el Autor"],
@@ -144,6 +140,8 @@ def main_menu(user):
             )
             if st.button("Cerrar Sesión"):
                 logout()
+            logo_url = "https://i.ibb.co/YQzrD31/Logo-Control-Total-removebg-preview.png"
+            st.image(logo_url, width=160)
 
         if selected == 'Control Total':
             st.markdown(info_control_total)
