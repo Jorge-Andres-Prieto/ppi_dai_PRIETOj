@@ -434,26 +434,109 @@ def inventory_management_menu():
     elif selected == "Eliminar Producto":
         delete_product_form()
 
+
 def search_product_form():
-    """Formulario para buscar productos por ID o nombre."""
+    """Formulario para buscar productos por nombre o ID y gestionar inventario.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     with st.form("Buscar Producto"):
-        search_query = st.text_input("ID o Nombre del Producto a buscar")
+        search_query = st.text_input("Nombre o ID del Producto a buscar")
         submitted = st.form_submit_button("Buscar")
         if submitted:
             products = search_products(search_query)
-            product_data = []
-            for product in products:
-                product_data.append([
-                    product.product_id, product.name, product.brand, product.category, product.subcategory,
-                    f"${product.price:.2f}", product.total_tienda, product.total_bodega
-                ])
-            if product_data:
+            if products:
+                product_data = []
+                for product in products:
+                    product_data.append([
+                        product.product_id, product.name, product.brand, product.category,
+                        product.subcategory, f"${product.price:.2f}", product.total_tienda, product.total_bodega
+                    ])
                 df = pd.DataFrame(product_data, columns=[
-                    "ID Producto", "Nombre", "Marca", "Categoría", "Subcategoría", "Precio", "Total en Tienda", "Total en Bodega"
+                    "ID Producto", "Nombre", "Marca", "Categoría", "Subcategoría",
+                    "Precio", "Total en Tienda", "Total en Bodega"
                 ])
                 st.table(df)
+
+                # Gestión de inventario
+                col1, col2 = st.columns(2)
+                with col1:
+                    product_id_to_transfer = st.text_input("ID del Producto a Transferir")
+                    quantity_to_store = st.number_input("Cantidad a Transferir a Tienda", min_value=0, step=1)
+                    if st.button("Transferir a Tienda"):
+                        result = transfer_to_store(product_id_to_transfer, quantity_to_store)
+                        st.success(result) if "éxito" in result else st.error(result)
+
+                with col2:
+                    product_id_to_warehouse = st.text_input("ID del Producto a Transferir a Bodega")
+                    quantity_to_warehouse = st.number_input("Cantidad a Transferir a Bodega", min_value=0, step=1)
+                    if st.button("Transferir a Bodega"):
+                        result = transfer_to_warehouse(product_id_to_warehouse, quantity_to_warehouse)
+                        st.success(result) if "éxito" in result else st.error(result)
+
+
+def transfer_to_store(product_id, quantity):
+    """Transfiere una cantidad de productos de la bodega a la tienda.
+
+    Args:
+        product_id (str): ID del producto.
+        quantity (int): Cantidad a transferir.
+
+    Returns:
+        str: Mensaje indicando si la transferencia fue exitosa o no.
+    """
+    session = Session()
+    try:
+        product = session.query(Product).filter(Product.product_id == product_id).first()
+        if product:
+            if product.total_bodega >= quantity:
+                product.total_bodega -= quantity
+                product.total_tienda += quantity
+                session.commit()
+                return "Transferencia a tienda exitosa."
             else:
-                st.error("No se encontraron productos que coincidan con la búsqueda.")
+                return "Cantidad insuficiente en bodega."
+        else:
+            return "Producto no encontrado."
+    except Exception as e:
+        session.rollback()
+        return f"Error al transferir producto a tienda: {str(e)}"
+    finally:
+        session.close()
+
+
+def transfer_to_warehouse(product_id, quantity):
+    """Transfiere una cantidad de productos de la tienda a la bodega.
+
+    Args:
+        product_id (str): ID del producto.
+        quantity (int): Cantidad a transferir.
+
+    Returns:
+        str: Mensaje indicando si la transferencia fue exitosa o no.
+    """
+    session = Session()
+    try:
+        product = session.query(Product).filter(Product.product_id == product_id).first()
+        if product:
+            if product.total_tienda >= quantity:
+                product.total_tienda -= quantity
+                product.total_bodega += quantity
+                session.commit()
+                return "Transferencia a bodega exitosa."
+            else:
+                return "Cantidad insuficiente en tienda."
+        else:
+            return "Producto no encontrado."
+    except Exception as e:
+        session.rollback()
+        return f"Error al transferir producto a bodega: {str(e)}"
+    finally:
+        session.close()
 
 
 def update_product_form():
