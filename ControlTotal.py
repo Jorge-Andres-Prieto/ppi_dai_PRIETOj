@@ -89,7 +89,7 @@ def login_page():
         None
     """
 
-    logo_url = "https://i.imgur.com/gQ0A74k_d.jpg?maxwidth=520&shape=thumb&fidelity=high"
+    logo_url = "https://drive.google.com/file/d/1gmoiglNioHdiX8XphbK6paSllOeOPcKS/view?usp=drive_link"
     col1, col2, col3 = st.columns([1, 2, 1])
 
     with col1:
