@@ -89,7 +89,7 @@ def login_page():
         None
     """
 
-    logo_url = "https://drive.google.com/file/d/1gmoiglNioHdiX8XphbK6paSllOeOPcKS/view?usp=drive_link"
+    logo_url = "https://ibb.co/nmHW3bY"
     col1, col2, col3 = st.columns([1, 2, 1])
 
     with col1:
