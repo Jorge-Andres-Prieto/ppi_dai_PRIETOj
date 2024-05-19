@@ -27,8 +27,11 @@ def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos
     """
     session = Session()
     try:
-        # Obtener la fecha y hora de Colombia restando 5 horas a la hora actual
-        fecha_hora = obtener_hora_colombia()
+        # Obtener la fecha y hora actual
+        fecha_hora = datetime.now()
+
+        # Preparar los datos de productos vendidos como una cadena legible
+        productos_vendidos_str = ', '.join([f"{item['product'].product_id}:{item['quantity']}" for item in productos_vendidos])
 
         # Crear una nueva venta
         new_sale = Venta(
@@ -37,10 +40,7 @@ def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos
             total_efectivo=total_efectivo,
             total_transferencia=total_transferencia,
             total_credito=total_credito,
-            productos_vendidos=[{
-                'product_id': item['product'].product_id,
-                'cantidad': item['quantity']
-            } for item in productos_vendidos]
+            productos_vendidos=productos_vendidos_str
         )
 
         # Actualizar inventario
