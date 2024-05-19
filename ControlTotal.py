@@ -157,8 +157,6 @@ def main_menu(user):
     elif user.role == "Empleado":
         with st.sidebar:
 
-            logo_url = "https://i.ibb.co/HryLWKK/Logo-Control-Total-removebg-preview.png"
-            st.image(logo_url, use_column_width=True)
 
             selected = option_menu(
                 None,
