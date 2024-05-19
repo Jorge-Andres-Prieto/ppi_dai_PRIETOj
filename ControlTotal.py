@@ -93,7 +93,7 @@ def login_page():
     col1, col2, col3 = st.columns([1, 2, 1])
 
     with col1:
-        st.image(logo_url, height=500)
+        st.image(logo_url, width=500)
 
     with col2:
         st.title("Control Total")
