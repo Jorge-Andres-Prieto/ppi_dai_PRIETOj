@@ -96,7 +96,7 @@ def login_page():
         st.image(logo_url, width=500)
 
     with col2:
-        st.title("Control Total")
+        st.title.image("Control Total", logo_url, width=200)
         username = st.text_input("Nombre de Usuario")
         password = st.text_input("Contraseña", type="password")
         sitio = st.selectbox("Ubicación", ["Tienda", "Bodega"])
