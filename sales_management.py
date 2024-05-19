@@ -1,8 +1,15 @@
 from database import Session
 from models import Venta, Product, Cliente
-from datetime import datetime
-import pytz
-from datetime import datetime
+from datetime import datetime, timedelta
+
+def obtener_hora_colombia():
+    # Hora del servidor
+    now_utc = datetime.utcnow()
+    # Diferencia horaria entre UTC y Colombia (UTC-5)
+    diferencia_horaria = timedelta(hours=-5)
+    # Ajustar la hora
+    hora_colombia = now_utc + diferencia_horaria
+    return hora_colombia
 
 def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos, total_credito, sitio):
     """Registra una venta en la base de datos.
@@ -20,8 +27,8 @@ def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos
     """
     session = Session()
     try:
-        # Obtener la fecha y hora local del sistema
-        fecha_hora = datetime.now()
+        # Obtener la fecha y hora de Colombia
+        fecha_hora = obtener_hora_colombia()
 
         # Crear una nueva venta
         new_sale = Venta(
