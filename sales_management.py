@@ -1,12 +1,12 @@
 from database import Session
 from models import Venta, Product, Cliente
-from datetime import datetime, timedelta
+from datetime import datetime
 
 def obtener_hora_colombia():
-    # Obtener la hora actual en UTC
-    now_utc = datetime.utcnow()
-    # Restar 5 horas para obtener la hora en la zona horaria de Colombia
-    hora_colombia = now_utc - timedelta(hours=5)
+    # Obtener la hora actual
+    now = datetime.now()
+    # Restar 5 horas
+    hora_colombia = now.replace(hour=(now.hour - 5) % 24)
     return hora_colombia
 
 def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos, total_credito, sitio):
@@ -25,7 +25,7 @@ def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos
     """
     session = Session()
     try:
-        # Obtener la fecha y hora de Colombia restando 5 horas a la hora UTC actual
+        # Obtener la fecha y hora de Colombia restando 5 horas a la hora actual
         fecha_hora = obtener_hora_colombia()
 
         # Crear una nueva venta
