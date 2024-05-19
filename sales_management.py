@@ -22,7 +22,7 @@ def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos
     try:
         # Obtener la fecha y hora actual en la zona horaria de Colombia
         colombia_tz = pytz.timezone('America/Bogota')
-        fecha_hora = datetime.now(colombia_tz)
+        fecha_hora = datetime.now().astimezone(colombia_tz)
 
         # Crear una nueva venta
         new_sale = Venta(
