@@ -723,8 +723,8 @@ def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos
         # Obtener la fecha y hora actual
         fecha_hora = datetime.now()
 
-        # Preparar los datos de productos vendidos como una cadena legible
-        productos_vendidos_str = ', '.join([f"{item['product'].product_id}:{item['quantity']}" for item in productos_vendidos])
+        # Preparar los datos de productos vendidos como una cadena legible con nombre y cantidad
+        productos_vendidos_str = ', '.join([f"{item['product'].name}:{item['quantity']}" for item in productos_vendidos])
 
         # Crear una nueva venta
         new_sale = Venta(
