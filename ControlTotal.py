@@ -753,32 +753,6 @@ def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos
     finally:
         session.close()
 
-def get_sales():
-    """Recupera las ventas de la base de datos."""
-    session = Session()
-    try:
-        sales = session.query(Venta).all()
-        sales_data = []
-        for sale in sales:
-            sale_data = {
-                'id': sale.id,
-                'user_id': sale.user_id,
-                'fecha_hora': sale.fecha_hora,
-                'total_efectivo': sale.total_efectivo,
-                'total_transferencia': sale.total_transferencia,
-                'total_credito': sale.total_credito,
-                # Convertir productos_vendidos de la cadena a una lista de diccionarios
-                'productos_vendidos': [
-                    {'product_id': prod.split(':')[0], 'cantidad': int(prod.split(':')[1])}
-                    for prod in sale.productos_vendidos.split(', ')
-                ]
-            }
-            sales_data.append(sale_data)
-        return sales_data
-    finally:
-        session.close()
-
-
 def client_management_menu():
     selected = option_menu(
         None,

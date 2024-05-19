@@ -68,7 +68,7 @@ class Venta(Base):
     total_efectivo = Column(Numeric(10, 2), nullable=False)
     total_transferencia = Column(Numeric(10, 2), nullable=False)
     total_credito = Column(Numeric(10, 2), nullable=False)
-    productos_vendidos = Column(PickleType, nullable=False)  # Usar PickleType para listas de objetos
+    productos_vendidos = Column(String, nullable=False)  # Usar String para cadenas legibles
 
     def __init__(self, user_id, fecha_hora, total_efectivo, total_transferencia, total_credito, productos_vendidos):
         self.user_id = user_id
