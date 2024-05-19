@@ -79,38 +79,33 @@ def reset_sale():
     st.session_state['cancel_sale'] = False
     st.session_state['confirm_payment'] = False
 
-
 def login_page():
-    """Crea y gestiona la página de inicio de sesión."""
-    logo_url = "https://drive.google.com/uc?export=view&id=1gmoiglNioHdiX8XphbK6paSllOeOPcKS"
+    """Crea y gestiona la página de inicio de sesión.
 
-    # Divide la página en columnas
+    Args:
+        None
+
+    Returns:
+        None
+    """
     col1, col2, col3 = st.columns([1, 2, 1])
-
-    # Columna 1: Logo
-    with col1:
-        st.image(logo_url, use_column_width=True)
-
-    # Columna 2: Formulario de inicio de sesión
     with col2:
         st.title("Control Total")
         username = st.text_input("Nombre de Usuario")
         password = st.text_input("Contraseña", type="password")
+        sitio = st.selectbox("Ubicación", ["Tienda", "Bodega"])
         user = verify_user(username, password, check_only=True)
 
         if user:
             if user.tdp == "No Aceptado":
-                # Aquí usamos Markdown para mostrar las políticas
                 policies_text = tdp
                 st.markdown(policies_text)
-
-                accept_policies = st.checkbox(
-                    "Acepto las políticas de tratamiento de datos personales al iniciar sesión."
-                )
+                accept_policies = st.checkbox("Acepto las políticas de tratamiento de datos personales al iniciar sesión.")
                 if st.button("Ingresar"):
                     if accept_policies:
                         update_tdp_status(user.id, "Aceptado")
                         st.session_state['user'] = user
+                        st.session_state['sitio'] = sitio
                         st.experimental_rerun()
                     else:
                         st.error("Debes aceptar las políticas de tratamiento de datos personales para iniciar sesión.")
@@ -118,31 +113,21 @@ def login_page():
             else:
                 if st.button("Ingresar"):
                     st.session_state['user'] = user
+                    st.session_state['sitio'] = sitio
                     st.experimental_rerun()
         else:
             if st.button("Ingresar"):
                 st.error("Usuario o contraseña incorrectos.")
 
 
+
 def main_menu(user):
-    """Crea y muestra el menú principal para la navegación de la aplicación.
-
-    Args:
-        user (dict): Diccionario que contiene la información del usuario autenticado.
-
-    Returns:
-        None
-    """
-    logo_url = "https://drive.google.com/uc?export=view&id=1gmoiglNioHdiX8XphbK6paSllOeOPcKS"
-
-    # Condicionales para mostrar el menú admin o el menú empleado
+    """Crea y muestra el menú principal para la navegación de la aplicación."""
     if user.role == "Admin":
         with st.sidebar:
-            st.image(logo_url, width=100)  # Logo en la barra lateral
             selected = option_menu(
                 None,
-                ["Control Total", "Admin", "Ventas y Facturación", "Gestión de inventarios",
-                 "Análisis estadísticos", "Domicilios", "Sobre el Autor"],
+                ["Control Total", "Admin", "Ventas y Facturación", "Gestión de inventarios", "Análisis estadísticos", "Domicilios", "Sobre el Autor"],
                 icons=["cast", "person-circle", "currency-dollar", "archive", "graph-up", "truck", "info-circle"],
                 menu_icon="list",
                 default_index=0
@@ -152,49 +137,36 @@ def main_menu(user):
 
         if selected == 'Control Total':
             st.markdown(info_control_total)
-
-        if selected == 'Admin':
+        elif selected == 'Admin':
             admin_menu()
-
-        if selected == 'Gestión de inventarios':
+        elif selected == 'Gestión de inventarios':
             inventory_management_menu()
-
-        if selected == 'Ventas y Facturación':
+        elif selected == 'Ventas y Facturación':
             sales_menu()
-
-        if selected == 'Sobre el Autor':
+        elif selected == 'Domicilios':
+            dominos_menu()
+        elif selected == 'Sobre el Autor':
             st.markdown(info_sobre_autor)
 
     elif user.role == "Empleado":
         with st.sidebar:
-            st.image(logo_url, width=100)  # Logo en la barra lateral
             selected = option_menu(
                 None,
-                ["Control Total", "Ventas y Facturación", "Gestión de inventarios",
-                 "Domicilios", "Sobre el Autor"],
-                icons=["cast", "currency-dollar", "archive", "truck", "info-circle"],
-                menu_icon="cast",
+                ["Ventas y Facturación", "Gestión de inventarios", "Domicilios", "Sobre el Autor"],
+                icons=["currency-dollar", "archive", "truck", "info-circle"],
+                menu_icon="list",
                 default_index=0
             )
             if st.button("Cerrar Sesión"):
                 logout()
 
-        if selected == 'Control Total':
-            st.markdown(info_control_total)
-
         if selected == 'Gestión de inventarios':
             inventory_management_menu()
-
-        if selected == 'Ventas y Facturación':
-            with st.expander("Opciones de Ventas y Facturación"):
-                sales_client_menu = st.radio(
-                    "Selecciona una opción",
-                    ('Ventas', 'Clientes')
-                )
-                if sales_client_menu == 'Clientes':
-                    client_management_menu()
-
-        if selected == 'Sobre el Autor':
+        elif selected == 'Ventas y Facturación':
+            sales_menu()
+        elif selected == 'Domicilios':
+            dominos_menu()
+        elif selected == 'Sobre el Autor':
             st.markdown(info_sobre_autor)
 
 
