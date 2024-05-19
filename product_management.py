@@ -22,12 +22,10 @@ def search_products(search_query):
     """
     session = Session()
     try:
-        # Chequea si la entrada es numérica, asumiendo que es un ID
-        if search_query.isdigit():
-            product_id = int(search_query)
-            products = session.query(Product).filter(Product.product_id == product_id).all()
-        # De lo contrario, asume que es una búsqueda por nombre
-        else:
+        # Buscar por product_id como cadena
+        products = session.query(Product).filter(Product.product_id == search_query).all()
+        # Si no se encuentra, buscar por nombre
+        if not products:
             products = session.query(Product).filter(Product.name.ilike(f"%{search_query}%")).all()
         return products
     finally:
