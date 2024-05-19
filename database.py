@@ -1,5 +1,5 @@
 # Importa la función para crear motores de base de datos en SQLAlchemy
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 
 # Importa la función para crear fabricantes de sesiones en SQLAlchemy
 from sqlalchemy.orm import sessionmaker
@@ -13,6 +13,13 @@ DATABASE_URL = "postgresql://datos_usuarios_user:NNgnrDUS7HG3zQPuffAWnG3pyDvevRs
 
 # Crea un motor SQLAlchemy que gestiona las conexiones a la base de datos
 engine = create_engine(DATABASE_URL, echo=True)
+
+# Configura la zona horaria de la sesión a 'America/Bogota'
+@event.listens_for(engine, "connect")
+def set_timezone(dbapi_connection, connection_record):
+    cursor = dbapi_connection.cursor()
+    cursor.execute("SET TIMEZONE TO 'America/Bogota';")
+    cursor.close()
 
 # Crea una fábrica de sesiones de SQLAlchemy vinculada al motor
 Session = sessionmaker(bind=engine)
