@@ -89,7 +89,7 @@ def login_page():
         None
     """
 
-    logo_url = "https://i.ibb.co/YQzrD31/Logo-Control-Total-removebg-preview.png"
+    logo_url = "https://i.ibb.co/HryLWKK/Logo-Control-Total-removebg-preview.png"
     col1, col2, col3 = st.columns([1, 2, 1])
 
     with col1:
@@ -161,7 +161,7 @@ def main_menu(user):
     elif user.role == "Empleado":
         with st.sidebar:
 
-            logo_url = "https://i.ibb.co/YQzrD31/Logo-Control-Total-removebg-preview.png"
+            logo_url = "https://i.ibb.co/HryLWKK/Logo-Control-Total-removebg-preview.png"
             st.image(logo_url, use_column_width=True)
 
             selected = option_menu(
