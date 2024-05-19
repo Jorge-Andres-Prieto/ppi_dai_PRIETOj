@@ -4,6 +4,13 @@ from datetime import datetime
 
 from datetime import datetime, timedelta
 
+def obtener_hora_colombia():
+    # Obtener la hora actual
+    now = datetime.now()
+    # Restar 5 horas para obtener la hora en la zona horaria de Colombia
+    hora_colombia = now - timedelta(hours=5)
+    return hora_colombia
+
 def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos, total_credito, sitio):
     """Registra una venta en la base de datos.
 
@@ -20,8 +27,8 @@ def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos
     """
     session = Session()
     try:
-        # Obtener la fecha y hora actual
-        fecha_hora = datetime.now()
+        # Obtener la fecha y hora de Colombia restando 5 horas a la hora actual
+        fecha_hora = obtener_hora_colombia()
 
         # Crear una nueva venta
         new_sale = Venta(
