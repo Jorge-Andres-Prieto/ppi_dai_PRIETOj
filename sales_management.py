@@ -9,8 +9,8 @@ def obtener_hora_colombia():
         response.raise_for_status()  # Lanzar excepción si la respuesta es incorrecta
         data = response.json()
         datetime_str = data['datetime']
-        # Convertir a objeto datetime
-        datetime_obj = datetime.fromisoformat(datetime_str)
+        # Convertir a objeto datetime usando el formato ISO con zona horaria
+        datetime_obj = datetime.fromisoformat(datetime_str[:-1])
         return datetime_obj
     except Exception as e:
         print(f"Error al obtener la hora de Colombia: {e}")
