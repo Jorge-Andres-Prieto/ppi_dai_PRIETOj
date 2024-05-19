@@ -89,7 +89,7 @@ def login_page():
         None
     """
 
-    logo_url = "https://ibb.co/nmHW3bY"
+    logo_url = "https://i.ibb.co/YQzrD31/Logo-Control-Total-removebg-preview.png"
     col1, col2, col3 = st.columns([1, 2, 1])
 
     with col1:
