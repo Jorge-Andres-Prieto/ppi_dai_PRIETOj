@@ -2,7 +2,7 @@
 from sqlalchemy.ext.declarative import declarative_base
 
 # Importa tipos de columnas específicos de SQLAlchemy para definir propiedades de modelo
-from sqlalchemy import Column, Integer, String, Numeric, ForeignKey, DateTime
+from sqlalchemy import Column, Integer, String, Numeric, DateTime, PickleType
 
 from sqlalchemy.orm import relationship
 
@@ -61,12 +61,19 @@ class Cliente(Base):
 
 class Venta(Base):
     __tablename__ = 'ventas'
+
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
-    fecha_hora = Column(DateTime, default=datetime.utcnow)
+    user_id = Column(Integer, nullable=False)
+    fecha_hora = Column(DateTime, nullable=False)
     total_efectivo = Column(Numeric(10, 2), nullable=False)
     total_transferencia = Column(Numeric(10, 2), nullable=False)
-    total_credito = Column(Numeric(10, 2), nullable=False)  # Nueva columna
-    productos_vendidos = Column(String, nullable=False)
+    total_credito = Column(Numeric(10, 2), nullable=False)
+    productos_vendidos = Column(PickleType, nullable=False)  # Usar PickleType para listas de objetos
 
-    user = relationship("User")
+    def __init__(self, user_id, fecha_hora, total_efectivo, total_transferencia, total_credito, productos_vendidos):
+        self.user_id = user_id
+        self.fecha_hora = fecha_hora
+        self.total_efectivo = total_efectivo
+        self.total_transferencia = total_transferencia
+        self.total_credito = total_credito
+        self.productos_vendidos = productos_vendidos
