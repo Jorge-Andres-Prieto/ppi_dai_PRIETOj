@@ -93,7 +93,7 @@ def login_page():
     col1, col2, col3 = st.columns([1, 2, 1])
 
     with col1:
-        st.image(logo_url, use_column_width=True)
+        st.image(logo_url, height=500)
 
     with col2:
         st.title("Control Total")
@@ -140,8 +140,6 @@ def main_menu(user):
             )
             if st.button("Cerrar Sesión"):
                 logout()
-            logo_url = "https://i.ibb.co/YQzrD31/Logo-Control-Total-removebg-preview.png"
-            st.image(logo_url, width=160)
 
         if selected == 'Control Total':
             st.markdown(info_control_total)
