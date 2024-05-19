@@ -40,7 +40,7 @@ import contextily as ctx
 from datetime import datetime
 
 #Función de streamlit para utilizar la página completa
-st.set_page_config(page_title="Control Total", layout="wide", page_icon="🐳")
+st.set_page_config(page_title="Control Total", layout="wide", page_icon="🐯")
 
 geolocator = Nominatim(user_agent="tsp_solver")
 def main():
