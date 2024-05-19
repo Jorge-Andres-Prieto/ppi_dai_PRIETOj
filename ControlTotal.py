@@ -37,7 +37,7 @@ import matplotlib.pyplot as plt
 import geopandas as gpd
 from shapely.geometry import LineString
 import contextily as ctx
-
+from datetime import datetime
 
 #Función de streamlit para utilizar la página completa
 st.set_page_config(page_title="Control Total", layout="wide", page_icon="🐳")
