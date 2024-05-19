@@ -6,3 +6,4 @@ contextily
 scipy
 geopandas
 geopy
+requests

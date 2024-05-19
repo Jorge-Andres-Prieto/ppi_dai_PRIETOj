@@ -1,15 +1,24 @@
 from database import Session
 from models import Venta, Product, Cliente
-from datetime import datetime, timedelta
+from datetime import datetime
 
 def obtener_hora_colombia():
-    # Hora del servidor
-    now_utc = datetime.utcnow()
-    # Diferencia horaria entre UTC y Colombia (UTC-5)
-    diferencia_horaria = timedelta(hours=-5)
-    # Ajustar la hora
-    hora_colombia = now_utc + diferencia_horaria
-    return hora_colombia
+    try:
+        response = requests.get("http://worldtimeapi.org/api/timezone/America/Bogota")
+        if response.status_code == 200:
+            data = response.json()
+            datetime_str = data['datetime']
+            # Convertir a objeto datetime
+            datetime_obj = datetime.fromisoformat(datetime_str[:-1])
+            return datetime_obj
+        else:
+            raise Exception("Error al obtener la hora de la API")
+    except Exception as e:
+        print(f"Error al obtener la hora de Colombia: {e}")
+        # En caso de error, usar la hora UTC y ajustarla manualmente
+        now_utc = datetime.utcnow()
+        diferencia_horaria = timedelta(hours=-5)
+        return now_utc + diferencia_horaria
 
 def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos, total_credito, sitio):
     """Registra una venta en la base de datos.
@@ -27,7 +36,7 @@ def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos
     """
     session = Session()
     try:
-        # Obtener la fecha y hora de Colombia
+        # Obtener la fecha y hora de Colombia desde una API web
         fecha_hora = obtener_hora_colombia()
 
         # Crear una nueva venta
