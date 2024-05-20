@@ -1,9 +1,10 @@
 <h2 align="center">ControlTotal <br> Sistema de Inventario y Ventas</h2>
 
 <h3 align="center">Dale clic para ir a la App</h3>
-<h3 align="center">⬇️</h3>
 <p align="center">
-  <a href="https://controltotal.streamlit.app/"><img src="https://i.ibb.co/HryLWKK/Logo-Control-Total-removebg-preview.png" alt="ControlTotal" width="85" style="margin-right: 20px;"></a>
+  <a href="https://controltotal.streamlit.app/">
+    <img src="https://i.ibb.co/HryLWKK/Logo-Control-Total-removebg-preview.png" alt="ControlTotal" width="85" style="vertical-align: middle; margin-right: 10px;">
+  </a>
 </p>
 
 <h3>🗂️ Tabla de Contenido</h3>
