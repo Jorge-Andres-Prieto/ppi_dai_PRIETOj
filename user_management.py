@@ -1,11 +1,15 @@
 # Importa Session para manejar sesiones de base de datos
 from database import Session
+
 # Importa el modelo User para interactuar con la tabla de usuarios
 from models import User
+
 # Importa exc para manejar excepciones específicas de SQLAlchemy
 from sqlalchemy import exc
+
 # Importa string para generar contraseñas seguras
 import string
+
 # Importa random para seleccionar caracteres aleatorios
 import random
 
