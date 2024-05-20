@@ -3,7 +3,7 @@
 <h3 align="center">Dale clic para ir a la App</h3>
 <h3 align="center">⬇️</h3>
 <p align="center">
-  <a href="https://controltotal.streamlit.app/"><img src="https://i.ibb.co/HryLWKK/Logo-Control-Total-removebg-preview.png" alt="GitHub" width="85" style="margin-right: 20px;"></a>
+  <a href="https://controltotal.streamlit.app/"><img src="https://i.ibb.co/HryLWKK/Logo-Control-Total-removebg-preview.png" alt="ControlTotal" width="85" style="margin-right: 20px;"></a>
 </p>
 
 <h3>🗂️ Tabla de Contenido</h3>
@@ -16,7 +16,18 @@
 </ul>
 
 <h3 id="descripcion">📄 Descripción de la App</h3>
-<p>El proyecto <strong>ControlTotal</strong> es un sistema de inventario y ventas desarrollado con Python, MySQL, Streamlit y las librerías NumPy, Pandas, Matplotlib, SciPy y GeoPandas. Esta aplicación permite a los pequeños y medianos negocios gestionar eficazmente sus productos, ventas y clientes. La app incluye:</p>
+<p>El proyecto <strong>ControlTotal</strong> es un sistema de inventario y ventas desarrollado con:</p>
+<p>
+  <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
+  <img src="https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Streamlit-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white"/>
+  <img src="https://img.shields.io/badge/NumPy-013243?style=for-the-badge&logo=numpy&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Matplotlib-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
+  <img src="https://img.shields.io/badge/SciPy-8CAAE6?style=for-the-badge&logo=scipy&logoColor=white"/>
+  <img src="https://img.shields.io/badge/GeoPandas-1B1B1B?style=for-the-badge&logo=geopandas&logoColor=white"/>
+</p>
+<p>Esta aplicación permite a los pequeños y medianos negocios gestionar eficazmente sus productos, ventas y clientes. La app incluye:</p>
 <ul>
   <li>Logueo con indicación de la tienda desde la que se está ingresando.</li>
   <li>Políticas de tratamiento de datos.</li>
@@ -40,7 +51,7 @@
 
 <p align="center">
   <img src="https://images.pexels.com/photos/1181671/pexels-photo-1181671.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="Python" width="250" style="margin-right: 20px;">
-  <img src="https://img.freepik.com/vector-gratis/programador-trabajando-sql_52683-22997.jpg?w=740&t=st=1710632981~exp=1710633581~hmac=1663f1348d1ac8a5e5ec42821202ffd2dbab9bc1b9bf8d75d6e1a254337f6aff" alt="MySQL" width="250" style="margin-right: 20px;">
+  <img src="https://img.freepik.com/vector-gratis/programador-trabajando-sql_52683-22997.jpg?w=740&t=st=1710632981~exp=1710633581~hmac=1663f1348d1ac8a5e5ec42821202ffd2dbab9bc1b9bf8d75d6e1a254337f6aff" alt="SQL" width="250" style="margin-right: 20px;">
   <img src="https://cdn.pixabay.com/photo/2018/05/18/15/30/web-design-3411373_1280.jpg" alt="Streamlit" width="250">
 </p>
 
@@ -55,7 +66,7 @@
 
 <h3 id="buy-me-a-coffee">☕ Buy Me a Coffee</h3>
 <p>Si te gusta mi trabajo, puedes apoyarme invitándome a un café:</p>
-<p align="center">
+<p>
   <a href="https://www.buymeacoffee.com/Andres.Jimenez">
     <img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-FFDD00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" alt="Buy Me a Coffee"/>
   </a>
