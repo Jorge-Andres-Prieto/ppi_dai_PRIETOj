@@ -1,45 +1,36 @@
 # Importa el módulo de Streamlit para crear aplicaciones web
-import streamlit as st
+from datetime import datetime
+from decimal import Decimal
 
+import contextily as ctx
+import geopandas as gpd
+import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import streamlit as st
+from geopy.geocoders import Nominatim
+from scipy.spatial.distance import pdist, squareform
+import scipy.stats as stats
+from shapely.geometry import LineString, Point
 # Importa opciones de menú para la navegación en la aplicación
 from streamlit_option_menu import option_menu
 
-import numpy as np
-import pandas as pd
-from decimal import Decimal
-
-
 # Importa la función para verificar la autenticidad del usuario
 from auth import verify_user, update_tdp_status
-
-# Importa funciones para manejar la creación, búsqueda, actualización y eliminación de usuarios
-from user_management import create_user, search_users, update_user, delete_user, generate_password
-
-# Importa funciones para la gestión de productos
-from product_management import search_products, delete_product, update_product, add_product
-from sales_management import create_sale
 from client_management import create_client, search_clients, delete_client, update_client_credit, update_client
-
-
+from database import Session
 # Importa funcion para crear la base de datos siesta no esta creada
 from database import init_db
-
-from database import Session
-from models import Venta, Product
-
 # importa las variables donde se encuentra toda la información de tdp(tratamiento de
 # datos personales), información del autor e información de la app.
 from info import tdp, info_control_total, info_sobre_autor
-
-from geopy.geocoders import Nominatim
-from scipy.spatial.distance import pdist, squareform
-import matplotlib.pyplot as plt
-import geopandas as gpd
-from shapely.geometry import LineString
-import contextily as ctx
-from datetime import datetime
-import matplotlib.dates as mdates
-import scipy.stats as stats
+from models import Venta, Product
+# Importa funciones para la gestión de productos
+from product_management import search_products, delete_product, update_product, add_product
+from sales_management import create_sale
+# Importa funciones para manejar la creación, búsqueda, actualización y eliminación de usuarios
+from user_management import create_user, search_users, update_user, delete_user, generate_password
 
 #Función de streamlit para utilizar la página completa
 st.set_page_config(page_title="Control Total", layout="wide", page_icon="🐯")
@@ -130,7 +121,6 @@ def login_page():
 
 
 def main_menu(user):
-    """Crea y muestra el menú principal para la navegación de la aplicación."""
     if user.role == "Admin":
         with st.sidebar:
             selected = option_menu(
@@ -160,8 +150,6 @@ def main_menu(user):
 
     elif user.role == "Empleado":
         with st.sidebar:
-
-
             selected = option_menu(
                 None,
                 ["Ventas y Facturación", "Gestión de inventarios", "Domicilios", "Sobre el Autor"],
@@ -1024,13 +1012,50 @@ def cargar_datos_ventas():
 
 
 # Función para mostrar el menú de análisis estadísticos
+def calcular_estadisticas(datos_ventas):
+    ventas = datos_ventas[['total_efectivo', 'total_transferencia', 'total_credito']].to_numpy()
+    estadisticas = {
+        'media_efectivo': np.mean(ventas[:, 0]),
+        'media_transferencia': np.mean(ventas[:, 1]),
+        'media_credito': np.mean(ventas[:, 2]),
+        'desviacion_efectivo': np.std(ventas[:, 0]),
+        'desviacion_transferencia': np.std(ventas[:, 1]),
+        'desviacion_credito': np.std(ventas[:, 2]),
+    }
+    return estadisticas
+
+def mostrar_estadisticas(datos_ventas):
+    estadisticas = calcular_estadisticas(datos_ventas)
+    st.write("## Estadísticas Descriptivas")
+    st.write(f"Media Efectivo: ${estadisticas['media_efectivo']:.2f}")
+    st.write(f"Media Transferencia: ${estadisticas['media_transferencia']:.2f}")
+    st.write(f"Media Crédito: ${estadisticas['media_credito']:.2f}")
+    st.write(f"Desviación Estándar Efectivo: ${estadisticas['desviacion_efectivo']:.2f}")
+    st.write(f"Desviación Estándar Transferencia: ${estadisticas['desviacion_transferencia']:.2f}")
+    st.write(f"Desviación Estándar Crédito: ${estadisticas['desviacion_credito']:.2f}")
+
+def prueba_hipotesis(datos_ventas):
+    ventas_efectivo = datos_ventas['total_efectivo']
+    ventas_transferencia = datos_ventas['total_transferencia']
+    t_stat, p_value = stats.ttest_ind(ventas_efectivo, ventas_transferencia)
+
+    st.write("## Prueba de Hipótesis")
+    st.write(f"T-statistic: {t_stat:.2f}")
+    st.write(f"P-value: {p_value:.4f}")
+    if p_value < 0.05:
+        st.write("Rechazamos la hipótesis nula. Las ventas en efectivo y transferencia son significativamente diferentes.")
+    else:
+        st.write("No rechazamos la hipótesis nula. No hay diferencias significativas entre las ventas en efectivo y transferencia.")
+
+
+# Llama a esta función en analisis_estadisticos()
 def analisis_estadisticos():
     datos_ventas = cargar_datos_ventas()
 
     selected = option_menu(
         None,
-        ["Ventas por Día", "Método de Pago", "Cuadre de Caja"],
-        icons=["calendar", "credit-card", "cash-stack"],
+        ["Ventas por Día", "Método de Pago", "Cuadre de Caja", "Estadísticas Descriptivas", "Prueba de Hipótesis"],
+        icons=["calendar", "credit-card", "cash-stack", "bar-chart", "flask"],
         menu_icon="graph-up",
         default_index=0,
         orientation="horizontal"
@@ -1042,6 +1067,10 @@ def analisis_estadisticos():
         metodo_de_pago(datos_ventas)
     elif selected == "Cuadre de Caja":
         cuadre_de_caja(datos_ventas)
+    elif selected == "Estadísticas Descriptivas":
+        mostrar_estadisticas(datos_ventas)
+    elif selected == "Prueba de Hipótesis":
+        prueba_hipotesis(datos_ventas)
 
 
 # Función para análisis de ventas por día con selección de rangos de fechas
@@ -1122,6 +1151,41 @@ def cuadre_de_caja(datos_ventas):
         st.write(f"### Total Crédito: ${suma_credito:.2f}")
         st.write(f"### Suma Total: ${suma_total:.2f}")
         st.write(f"### Efectivo + Transferencia + Dinero Inicial: ${suma_efectivo_transferencia:.2f}")
+
+def visualizar_rutas(direcciones):
+    geolocator = Nominatim(user_agent="tsp_solver")
+    puntos = []
+    for direccion in direcciones:
+        location = geolocator.geocode(direccion)
+        if location:
+            puntos.append(Point(location.longitude, location.latitude))
+        else:
+            st.error(f"No se pudo geocodificar la dirección: {direccion}")
+            return
+
+    # Crear un GeoDataFrame con los puntos
+    gdf = gpd.GeoDataFrame(geometry=puntos, crs="EPSG:4326")
+    gdf = gdf.to_crs(epsg=3857)  # Convertir a la proyección adecuada para contextily
+
+    # Crear la ruta como una LineString
+    ruta = LineString(puntos)
+
+    # Crear un GeoDataFrame para la ruta
+    gdf_ruta = gpd.GeoDataFrame(geometry=[ruta], crs="EPSG:4326")
+    gdf_ruta = gdf_ruta.to_crs(epsg=3857)
+
+    # Plotear los puntos y la ruta
+    fig, ax = plt.subplots(figsize=(10, 10))
+    gdf.plot(ax=ax, color='red', marker='o', markersize=5)
+    gdf_ruta.plot(ax=ax, color='blue')
+
+    # Añadir el mapa base
+    ctx.add_basemap(ax, source=ctx.providers.CartoDB.Positron)
+
+    # Mostrar el gráfico en Streamlit
+    st.pyplot(fig)
+
+
 
 
 if __name__ == "__main__":
