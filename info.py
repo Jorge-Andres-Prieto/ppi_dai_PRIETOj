@@ -100,7 +100,7 @@ Si te gusta mi trabajo, puedes apoyarme invitándome a un café:
 info_sobre_autor = """
 ## Sobre el Autor
 
-Mi nombre es Jorge Prieto, desarrollador y creador de Control Total. Actualmente soy estudiante de ingeniería de sistemas e informática en la Universidad Nacional de Colombia en Medellín.
+Mi nombre es ANDRES JIMENEZ, desarrollador y creador de Control Total. Actualmente soy estudiante de ingeniería de sistemas e informática en la Universidad Nacional de Colombia en Medellín.
 
 ### 🛠️ Tecnologías que Uso
 - ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white) He utilizado librerías como NumPy, Pandas y Matplotlib para el análisis de datos y visualización.
