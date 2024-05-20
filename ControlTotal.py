@@ -1,37 +1,67 @@
 # Importa el módulo de Streamlit para crear aplicaciones web
+import streamlit as st
+
+# Importa la clase datetime para manejar fechas y horas
 from datetime import datetime
+
+# Importa la clase Decimal para manejo de números decimales
 from decimal import Decimal
 
+# Importa módulos y funciones para análisis de datos y visualización
 import contextily as ctx
 import geopandas as gpd
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import streamlit as st
+
+# Importa geocodificación y manejo de errores de geocodificación
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
+
+# Importa funciones para calcular distancias y análisis estadístico
 from scipy.spatial.distance import pdist, squareform
 import scipy.stats as stats
+
+# Importa módulos para manejo de geometría
 from shapely.geometry import LineString, Point
+
 # Importa opciones de menú para la navegación en la aplicación
 from streamlit_option_menu import option_menu
 
-# Importa la función para verificar la autenticidad del usuario
+# Importa funciones de autenticación de usuario
 from auth import verify_user, update_tdp_status
-from client_management import create_client, search_clients, delete_client, update_client_credit, update_client
+
+# Importa funciones para la gestión de clientes
+from client_management import (
+    create_client, search_clients, delete_client,
+    update_client_credit, update_client
+)
+
+# Importa la sesión de la base de datos
 from database import Session
-# Importa funcion para crear la base de datos siesta no esta creada
+
+# Importa la función para crear la base de datos si no está creada
 from database import init_db
-# importa las variables donde se encuentra toda la información de tdp(tratamiento de
-# datos personales), información del autor e información de la app.
+
+# Importa variables con información sobre tratamiento de datos personales, autor y la app
 from info import tdp, info_control_total, info_sobre_autor
+
+# Importa los modelos Venta y Producto
 from models import Venta, Product
+
 # Importa funciones para la gestión de productos
-from product_management import search_products, delete_product, update_product, add_product
+from product_management import (
+    search_products, delete_product, update_product, add_product
+)
+
+# Importa funciones para la gestión de ventas
 from sales_management import create_sale
-# Importa funciones para manejar la creación, búsqueda, actualización y eliminación de usuarios
-from user_management import create_user, search_users, update_user, delete_user, generate_password
+
+# Importa funciones para la gestión de usuarios
+from user_management import (
+    create_user, search_users, update_user, delete_user, generate_password
+)
 
 #Función de streamlit para utilizar la página completa
 st.set_page_config(page_title="Control Total", layout="wide", page_icon="🐯")
@@ -67,11 +97,20 @@ def main():
         main_menu(user)
 
 def reset_sale():
-    """Limpia el estado de la sesión para iniciar una nueva venta."""
+    """
+    Limpia el estado de la sesión para iniciar una nueva venta.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     st.session_state['current_sale'] = []
     st.session_state['selected_client'] = None
     st.session_state['cancel_sale'] = False
     st.session_state['confirm_payment'] = False
+
 
 def login_page():
     """Crea y gestiona la página de inicio de sesión.
@@ -122,12 +161,28 @@ def login_page():
 
 
 def main_menu(user):
+    """
+    Despliega el menú principal basado en el rol del usuario.
+
+    Args:
+        user (User): El objeto usuario que contiene la información del usuario.
+
+    Returns:
+        None
+    """
     if user.role == "Admin":
         with st.sidebar:
             selected = option_menu(
                 None,
-                ["Control Total", "Admin", "Ventas y Facturación", "Gestión de inventarios", "Análisis estadísticos", "Domicilios", "Sobre el Autor"],
-                icons=["cast", "person-circle", "currency-dollar", "archive", "graph-up", "truck", "info-circle"],
+                [
+                    "Control Total", "Admin", "Ventas y Facturación",
+                    "Gestión de inventarios", "Análisis estadísticos",
+                    "Domicilios", "Sobre el Autor"
+                ],
+                icons=[
+                    "cast", "person-circle", "currency-dollar", "archive",
+                    "graph-up", "truck", "info-circle"
+                ],
                 menu_icon="list",
                 default_index=0
             )
@@ -153,8 +208,13 @@ def main_menu(user):
         with st.sidebar:
             selected = option_menu(
                 None,
-                ["Ventas y Facturación", "Gestión de inventarios", "Domicilios", "Sobre el Autor"],
-                icons=["currency-dollar", "archive", "truck", "info-circle"],
+                [
+                    "Ventas y Facturación", "Gestión de inventarios",
+                    "Domicilios", "Sobre el Autor"
+                ],
+                icons=[
+                    "currency-dollar", "archive", "truck", "info-circle"
+                ],
                 menu_icon="list",
                 default_index=0
             )
@@ -305,32 +365,64 @@ def display_search_results(search_name):
         st.write("No se encontraron usuarios")
 
 def update_user_form():
-    """Formulario para actualizar la información de un usuario existente."""
+    """
+    Formulario para actualizar la información de un usuario existente.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     if 'user_info' not in st.session_state:
         st.session_state.user_info = None
         st.session_state.confirmation = False
 
     # Sección de búsqueda del usuario
     with st.form("Buscar Usuario"):
-        search_query = st.text_input("Nombre o ID del Usuario a actualizar", help="Escriba el ID o nombre del usuario para buscar")
+        search_query = st.text_input(
+            "Nombre o ID del Usuario a actualizar",
+            help="Escriba el ID o nombre del usuario para buscar"
+        )
         search_button = st.form_submit_button("Buscar Usuario")
         if search_button and search_query:
             user_info = search_users(search_query)
             if user_info:
                 st.session_state.user_info = user_info
-                st.success(f"Usuario encontrado: {user_info.full_name} (ID: {user_info.id})")
+                st.success(
+                    f"Usuario encontrado: {user_info.full_name} (ID: {user_info.id})"
+                )
             else:
-                st.error("Usuario no encontrado. Por favor, verifica el ID o nombre e intenta de nuevo.")
+                st.error(
+                    "Usuario no encontrado. Por favor, verifica el ID o nombre e intenta de nuevo."
+                )
                 st.session_state.user_info = None  # Reset user_info if not found
 
     # Sección para actualizar datos del usuario
     if st.session_state.user_info:
         with st.form("Actualizar Usuario"):
-            new_username = st.text_input("Nuevo Nombre de Usuario", placeholder="Dejar en blanco si no desea cambiar")
-            new_password = st.text_input("Nueva Contraseña", type="password", placeholder="Dejar en blanco si no desea cambiar")
-            new_role = st.selectbox("Nuevo Rol", ["", "Admin", "Empleado"], index=0)
-            new_full_name = st.text_input("Nuevo Nombre Completo", placeholder="Dejar en blanco si no desea cambiar")
-            new_phone_number = st.text_input("Nuevo Número de Celular", placeholder="Dejar en blanco si no desea cambiar")
+            new_username = st.text_input(
+                "Nuevo Nombre de Usuario",
+                placeholder="Dejar en blanco si no desea cambiar"
+            )
+            new_password = st.text_input(
+                "Nueva Contraseña",
+                type="password",
+                placeholder="Dejar en blanco si no desea cambiar"
+            )
+            new_role = st.selectbox(
+                "Nuevo Rol",
+                ["", "Admin", "Empleado"],
+                index=0
+            )
+            new_full_name = st.text_input(
+                "Nuevo Nombre Completo",
+                placeholder="Dejar en blanco si no desea cambiar"
+            )
+            new_phone_number = st.text_input(
+                "Nuevo Número de Celular",
+                placeholder="Dejar en blanco si no desea cambiar"
+            )
 
             submitted = st.form_submit_button("Actualizar")
             if submitted:
@@ -373,25 +465,46 @@ def update_user_form():
             st.session_state.confirmation = False
 
 def delete_user_form():
-    """Formulario para eliminar un usuario."""
+    """
+    Formulario para eliminar un usuario.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     if 'delete_user_info' not in st.session_state:
         st.session_state.delete_user_info = None
         st.session_state.confirmation_delete_user = False
 
+    # Sección de búsqueda del usuario para eliminar
     with st.form("Buscar Usuario para Eliminar"):
-        search_query = st.text_input("Nombre o ID del Usuario a eliminar", help="Escriba el ID o nombre del usuario para buscar")
+        search_query = st.text_input(
+            "Nombre o ID del Usuario a eliminar",
+            help="Escriba el ID o nombre del usuario para buscar"
+        )
         search_button = st.form_submit_button("Buscar y Eliminar Usuario")
         if search_button and search_query:
             user_info = search_users(search_query)
             if user_info:
                 st.session_state.delete_user_info = user_info
-                st.write(f"Usuario encontrado: {user_info.full_name} (ID: {user_info.id})")
+                st.write(
+                    f"Usuario encontrado: {user_info.full_name} (ID: {user_info.id})"
+                )
             else:
-                st.error("Usuario no encontrado. Por favor, verifica el ID o nombre e intenta de nuevo.")
+                st.error(
+                    "Usuario no encontrado. Por favor, verifica el ID o nombre e "
+                    "intenta de nuevo."
+                )
                 st.session_state.delete_user_info = None  # Reset user_info if not found
 
+    # Confirmación de eliminación del usuario
     if st.session_state.delete_user_info:
-        st.write(f"¿Estás seguro de que quieres eliminar a este usuario: {st.session_state.delete_user_info.full_name}?")
+        st.write(
+            f"¿Estás seguro de que quieres eliminar a este usuario: "
+            f"{st.session_state.delete_user_info.full_name}?"
+        )
         if st.button("Sí, eliminar"):
             result = delete_user(st.session_state.delete_user_info.id)
             if "éxito" in result:
@@ -404,6 +517,7 @@ def delete_user_form():
             st.write("Eliminación cancelada.")
             st.session_state.delete_user_info = None
             st.session_state.confirmation_delete_user = False
+
 
 
 
@@ -437,7 +551,15 @@ def inventory_management_menu():
 
 
 def search_product_form():
-    """Formulario para buscar productos por nombre o ID del producto."""
+    """
+    Formulario para buscar productos por nombre o ID del producto.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     search_query = st.text_input("Nombre o ID del Producto a buscar")
     if st.button("Buscar Producto"):
         products = search_products(search_query)
@@ -454,53 +576,110 @@ def search_product_form():
             product_data = []
             for product in products:
                 product_data.append([
-                    product.product_id, product.name, product.brand, product.category,
-                    product.subcategory, product.price, product.total_tienda, product.total_bodega
+                    product.product_id, product.name, product.brand,
+                    product.category, product.subcategory, product.price,
+                    product.total_tienda, product.total_bodega
                 ])
 
-            df = pd.DataFrame(product_data,
-                              columns=["Product ID", "Nombre", "Marca", "Categoría", "Subcategoría", "Precio",
-                                       "Total en Tienda", "Total en Bodega"])
+            df = pd.DataFrame(
+                product_data,
+                columns=[
+                    "Product ID", "Nombre", "Marca", "Categoría", "Subcategoría",
+                    "Precio", "Total en Tienda", "Total en Bodega"
+                ]
+            )
             st.table(df)
 
             for product in products:
                 with st.form(f"transfer_to_tienda_form_{product.product_id}"):
                     transfer_to_tienda = st.number_input(
-                        f"Cantidad a transferir de Bodega a Tienda para {product.name}", min_value=0,
-                        max_value=product.total_bodega, step=1, key=f"to_tienda_{product.product_id}")
-                    transfer_to_tienda_submitted = st.form_submit_button("Transferir a Tienda")
+                        f"Cantidad a transferir de Bodega a Tienda para {product.name}",
+                        min_value=0, max_value=product.total_bodega, step=1,
+                        key=f"to_tienda_{product.product_id}"
+                    )
+                    transfer_to_tienda_submitted = st.form_submit_button(
+                        "Transferir a Tienda"
+                    )
                     if transfer_to_tienda_submitted:
-                        result = update_product(product.product_id, inventory_adjustment_tienda=transfer_to_tienda,
-                                                inventory_adjustment_bodega=-transfer_to_tienda)
+                        result = update_product(
+                            product.product_id,
+                            inventory_adjustment_tienda=transfer_to_tienda,
+                            inventory_adjustment_bodega=-transfer_to_tienda
+                        )
                         if "éxito" in result:
-                            st.success(f"Transferencia a Tienda exitosa para el producto {product.name}.")
+                            st.success(
+                                f"Transferencia a Tienda exitosa para el producto "
+                                f"{product.name}."
+                            )
                         else:
                             st.error(result)
 
                 with st.form(f"transfer_to_bodega_form_{product.product_id}"):
                     transfer_to_bodega = st.number_input(
-                        f"Cantidad a transferir de Tienda a Bodega para {product.name}", min_value=0,
-                        max_value=product.total_tienda, step=1, key=f"to_bodega_{product.product_id}")
-                    transfer_to_bodega_submitted = st.form_submit_button("Transferir a Bodega")
+                        f"Cantidad a transferir de Tienda a Bodega para {product.name}",
+                        min_value=0, max_value=product.total_tienda, step=1,
+                        key=f"to_bodega_{product.product_id}"
+                    )
+                    transfer_to_bodega_submitted = st.form_submit_button(
+                        "Transferir a Bodega"
+                    )
                     if transfer_to_bodega_submitted:
-                        result = update_product(product.product_id, inventory_adjustment_tienda=-transfer_to_bodega,
-                                                inventory_adjustment_bodega=transfer_to_bodega)
+                        result = update_product(
+                            product.product_id,
+                            inventory_adjustment_tienda=-transfer_to_bodega,
+                            inventory_adjustment_bodega=transfer_to_bodega
+                        )
                         if "éxito" in result:
-                            st.success(f"Transferencia a Bodega exitosa para el producto {product.name}.")
+                            st.success(
+                                f"Transferencia a Bodega exitosa para el producto "
+                                f"{product.name}."
+                            )
                         else:
                             st.error(result)
 
 
 def update_product_form():
+    """
+    Formulario para modificar la información de un producto existente.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     with st.form("Modificar Producto"):
         product_id = st.text_input("ID del Producto a modificar")
-        new_name = st.text_input("Nuevo Nombre del Producto", placeholder="Dejar en blanco si no desea cambiar")
-        new_brand = st.text_input("Nueva Marca del Producto", placeholder="Dejar en blanco si no desea cambiar")
-        new_category = st.text_input("Nueva Categoría del Producto", placeholder="Dejar en blanco si no desea cambiar")
-        new_subcategory = st.text_input("Nueva Subcategoría del Producto", placeholder="Dejar en blanco si no desea cambiar")
-        new_price = st.number_input("Nuevo Precio del Producto", format="%.2f", help="Dejar en blanco para mantener el precio actual", value=0.0)
-        inventory_adjustment_tienda = st.number_input("Ajuste de Inventario en Tienda (positivo para añadir, negativo para reducir)", value=0, format="%d", step=1)
-        inventory_adjustment_bodega = st.number_input("Ajuste de Inventario en Bodega (positivo para añadir, negativo para reducir)", value=0, format="%d", step=1)
+        new_name = st.text_input(
+            "Nuevo Nombre del Producto",
+            placeholder="Dejar en blanco si no desea cambiar"
+        )
+        new_brand = st.text_input(
+            "Nueva Marca del Producto",
+            placeholder="Dejar en blanco si no desea cambiar"
+        )
+        new_category = st.text_input(
+            "Nueva Categoría del Producto",
+            placeholder="Dejar en blanco si no desea cambiar"
+        )
+        new_subcategory = st.text_input(
+            "Nueva Subcategoría del Producto",
+            placeholder="Dejar en blanco si no desea cambiar"
+        )
+        new_price = st.number_input(
+            "Nuevo Precio del Producto",
+            format="%.2f",
+            help="Dejar en blanco para mantener el precio actual",
+            value=0.0
+        )
+        inventory_adjustment_tienda = st.number_input(
+            "Ajuste de Inventario en Tienda (positivo para añadir, negativo para reducir)",
+            value=0, format="%d", step=1
+        )
+        inventory_adjustment_bodega = st.number_input(
+            "Ajuste de Inventario en Bodega (positivo para añadir, negativo para reducir)",
+            value=0, format="%d", step=1
+        )
         submitted = st.form_submit_button("Actualizar")
 
         if submitted:
@@ -520,39 +699,73 @@ def update_product_form():
                 st.error(result)
 
 
-
 def add_product_form():
+    """
+    Formulario para agregar un nuevo producto.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     with st.form("Agregar Producto"):
         product_id = st.text_input("ID del Producto")
         name = st.text_input("Nombre del Producto")
         brand = st.text_input("Marca del Producto")
         category = st.text_input("Categoría del Producto")
         subcategory = st.text_input("Subcategoría del Producto")
-        price = st.number_input("Precio del Producto", min_value=0.01, format="%.2f")
-        cantidad = st.number_input("Cantidad del Producto", min_value=0, step=1)
+        price = st.number_input(
+            "Precio del Producto",
+            min_value=0.01,
+            format="%.2f"
+        )
+        cantidad = st.number_input(
+            "Cantidad del Producto",
+            min_value=0,
+            step=1
+        )
         submitted = st.form_submit_button("Agregar")
 
         if submitted:
-            result = add_product(product_id, name, brand, category, subcategory, price, cantidad)
+            result = add_product(
+                product_id, name, brand, category,
+                subcategory, price, cantidad
+            )
             if "éxito" in result:
                 st.success(result)
             else:
                 st.error(result)
 
 
+
 def delete_product_form():
-    """Formulario para eliminar un producto existente."""
+    """
+    Formulario para eliminar un producto existente.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    # Inicializar variables de estado en la sesión
     if 'delete_id' not in st.session_state:
         st.session_state.delete_id = None
         st.session_state.confirmation_delete = False
 
+    # Formulario para ingresar el ID del producto a eliminar
     with st.form("Eliminar Producto"):
-        product_id = st.number_input("ID del Producto a eliminar", step=1, min_value=1)
+        product_id = st.number_input(
+            "ID del Producto a eliminar",
+            step=1, min_value=1
+        )
         submitted = st.form_submit_button("Eliminar Producto")
         if submitted:
             st.session_state.delete_id = str(product_id)  # Convertir a cadena
             st.session_state.confirmation_delete = True
 
+    # Confirmación de eliminación del producto
     if st.session_state.get('confirmation_delete'):
         st.write("¿Estás seguro de que quieres eliminar este producto?")
         if st.button("Sí, eliminar"):
@@ -573,6 +786,16 @@ def delete_product_form():
 
 
 def sales_menu():
+    """
+    Muestra el menú de ventas y permite seleccionar entre la gestión de ventas
+    y la gestión de clientes.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     selected = option_menu(
         menu_title=None,  # Sin título para el menú
         options=["Ventas", "Clientes"],  # Opciones del menú
@@ -582,10 +805,12 @@ def sales_menu():
         styles={
             "container": {"padding": "0!important", "background-color": "#fafafa"},
             "icon": {"color": "orange", "font-size": "18px"},
-            "nav-link": {"font-size": "13px", "text-align": "left", "margin": "0px", "padding": "8px",
-                         "border-radius": "0", "background-color": "#25d366", "color": "white"},
-            "nav-link-selected": {"background-color": "green"
-                                  },
+            "nav-link": {
+                "font-size": "13px", "text-align": "left", "margin": "0px",
+                "padding": "8px", "border-radius": "0",
+                "background-color": "#25d366", "color": "white"
+            },
+            "nav-link-selected": {"background-color": "green"},
         }
     )
 
@@ -596,6 +821,17 @@ def sales_menu():
 
 
 def handle_sales():
+    """
+    Gestiona el proceso de ventas, incluyendo la búsqueda de clientes y productos,
+    la adición de productos al carrito y la finalización de la venta.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    # Inicializar variables de estado en la sesión
     if 'carrito' not in st.session_state:
         st.session_state['carrito'] = []
     if 'total' not in st.session_state:
@@ -605,7 +841,10 @@ def handle_sales():
 
     col1, col2, col3 = st.columns(3)
     with col1:
-        cliente_registrado = st.radio("Tipo de Cliente", ("Cliente Registrado", "Cliente No Registrado"))
+        cliente_registrado = st.radio(
+            "Tipo de Cliente",
+            ("Cliente Registrado", "Cliente No Registrado")
+        )
 
     if cliente_registrado == "Cliente Registrado":
         with col2:
@@ -635,7 +874,9 @@ def handle_sales():
             if products:
                 product = products[0]
                 if cantidad <= product.total_tienda:
-                    st.session_state['carrito'].append({'product': product, 'quantity': cantidad})
+                    st.session_state['carrito'].append(
+                        {'product': product, 'quantity': cantidad}
+                    )
                     st.session_state['total'] += float(product.price) * cantidad
                     st.success(f"Producto {product.name} agregado al carrito")
                 else:
@@ -651,18 +892,30 @@ def handle_sales():
             for i, item in enumerate(st.session_state['carrito']):
                 product = item['product']
                 cart_data.append([
-                    product.product_id, product.name, f"${product.price:.2f}", item['quantity'],
+                    product.product_id, product.name,
+                    f"${product.price:.2f}", item['quantity'],
                     f"${product.price * item['quantity']:.2f}", i
                 ])
-            cart_df = pd.DataFrame(cart_data,
-                                   columns=["Product ID", "Nombre", "Precio Unitario", "Cantidad", "Importe", "Index"])
+            cart_df = pd.DataFrame(
+                cart_data,
+                columns=[
+                    "Product ID", "Nombre", "Precio Unitario",
+                    "Cantidad", "Importe", "Index"
+                ]
+            )
             st.table(cart_df.drop(columns=["Index"]))
 
-            index_to_remove = st.number_input("Índice de producto a quitar", min_value=0,
-                                              max_value=len(st.session_state['carrito']) - 1, step=1)
+            index_to_remove = st.number_input(
+                "Índice de producto a quitar",
+                min_value=0,
+                max_value=len(st.session_state['carrito']) - 1,
+                step=1
+            )
             if st.button("Quitar Producto"):
                 item_to_remove = st.session_state['carrito'].pop(index_to_remove)
-                st.session_state['total'] -= float(item_to_remove['product'].price) * item_to_remove['quantity']
+                st.session_state['total'] -= (
+                    float(item_to_remove['product'].price) * item_to_remove['quantity']
+                )
                 st.success(f"Producto {item_to_remove['product'].name} quitado del carrito")
 
             st.write(f"Total: ${st.session_state['total']:.2f}")
@@ -670,7 +923,9 @@ def handle_sales():
     with col2:
         if st.session_state['carrito']:
             efectivo = st.number_input("Pago en Efectivo", min_value=0.0, format="%.2f")
-            transferencia = st.number_input("Pago por Transferencia", min_value=0.0, format="%.2f")
+            transferencia = st.number_input(
+                "Pago por Transferencia", min_value=0.0, format="%.2f"
+            )
             if cliente_registrado == "Cliente Registrado":
                 credito = st.number_input("Deuda", min_value=0.0, format="%.2f")
             else:
@@ -683,8 +938,10 @@ def handle_sales():
                     total_efectivo = efectivo
                     total_transferencia = transferencia
                     total_credito = credito
-                    result = create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos,
-                                         total_credito, sitio)
+                    result = create_sale(
+                        user_id, total_efectivo, total_transferencia,
+                        productos_vendidos, total_credito, sitio
+                    )
 
                     if cliente_registrado == "Cliente Registrado" and credito > 0:
                         cliente = st.session_state['cliente']
@@ -755,6 +1012,16 @@ def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos
         session.close()
 
 def client_management_menu():
+    """
+    Muestra el menú de gestión de clientes y permite seleccionar entre las
+    opciones de crear, buscar, actualizar y eliminar clientes.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     selected = option_menu(
         None,
         ["Crear Cliente", "Buscar Cliente", "Actualizar Cliente", "Eliminar Cliente"],
@@ -764,6 +1031,7 @@ def client_management_menu():
         orientation="horizontal"
     )
 
+    # Llamar a la función correspondiente según la opción seleccionada
     if selected == 'Crear Cliente':
         create_client_form()
     elif selected == 'Buscar Cliente':
@@ -773,13 +1041,28 @@ def client_management_menu():
     elif selected == 'Eliminar Cliente':
         delete_client_form()
 
+
 def create_client_form():
+    """
+    Formulario para crear un nuevo cliente.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     with st.form("Crear Cliente"):
         nombre = st.text_input("Nombre Completo")
         direccion = st.text_input("Dirección")
         telefono = st.text_input("Teléfono")
         cedula = st.text_input("Cédula")
-        credito = st.number_input("Crédito", format="%f", step=0.01, value=0.00)
+        credito = st.number_input(
+            "Crédito",
+            format="%f",
+            step=0.01,
+            value=0.00
+        )
 
         submitted = st.form_submit_button("Crear Cliente")
         if submitted:
@@ -791,6 +1074,16 @@ def create_client_form():
 
 
 def search_client_form():
+    """
+    Formulario para buscar un cliente y gestionar el abono a su crédito.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    # Inicializar variables de estado en la sesión
     if 'cliente_seleccionado' not in st.session_state:
         st.session_state['cliente_seleccionado'] = None
     if 'abono' not in st.session_state:
@@ -798,6 +1091,7 @@ def search_client_form():
     if 'confirmar_abono' not in st.session_state:
         st.session_state['confirmar_abono'] = False
 
+    # Entrada de búsqueda del cliente
     search_query = st.text_input("Introduzca el nombre o cédula del cliente a buscar")
     if st.button("Buscar Cliente"):
         clients = search_clients(search_query)
@@ -808,23 +1102,34 @@ def search_client_form():
                 st.session_state['cliente_seleccionado'] = None
                 st.error("Por favor, refine su búsqueda para obtener un único cliente.")
 
+            # Mostrar la información de los clientes encontrados
             client_data = []
             for client in clients:
                 client_data.append([
-                    client.nombre, client.direccion, client.telefono, client.cedula, f"${client.credito:.2f}"
+                    client.nombre, client.direccion, client.telefono, client.cedula,
+                    f"${client.credito:.2f}"
                 ])
-            df = pd.DataFrame(client_data, columns=["Nombre", "Dirección", "Teléfono", "Cédula", "Crédito"])
+            df = pd.DataFrame(
+                client_data,
+                columns=["Nombre", "Dirección", "Teléfono", "Cédula", "Crédito"]
+            )
             st.table(df)
         else:
             st.error("No se encontraron clientes")
 
+    # Gestión del abono al crédito del cliente seleccionado
     if st.session_state['cliente_seleccionado']:
         cliente = st.session_state['cliente_seleccionado']
-        st.session_state['abono'] = st.number_input("Cantidad a abonar al crédito", min_value=0.0, format="%.2f")
+        st.session_state['abono'] = st.number_input(
+            "Cantidad a abonar al crédito",
+            min_value=0.0,
+            format="%.2f"
+        )
 
         if st.button("Abonar al Crédito"):
             st.session_state['confirmar_abono'] = True
 
+    # Confirmación del abono
     if st.session_state['confirmar_abono']:
         if st.button("Confirmar Abono"):
             cliente = st.session_state['cliente_seleccionado']
@@ -837,27 +1142,62 @@ def search_client_form():
         elif st.button("Cancelar"):
             st.session_state['confirmar_abono'] = False
 
+
 def update_client_form():
-    """Formulario para actualizar la información de un cliente existente."""
+    """
+    Formulario para actualizar la información de un cliente existente.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    # Inicializar variable de estado en la sesión
     if 'cliente_seleccionado' not in st.session_state:
         st.session_state['cliente_seleccionado'] = None
 
-    search_query = st.text_input("Cédula del Cliente a actualizar", help="Usa la cédula para buscar el cliente")
+    # Entrada de búsqueda del cliente por cédula
+    search_query = st.text_input(
+        "Cédula del Cliente a actualizar",
+        help="Usa la cédula para buscar el cliente"
+    )
     if st.button("Buscar Cliente"):
         clients = search_clients(search_query)
         if clients:
             st.session_state['cliente_seleccionado'] = clients[0]
             st.success(f"Cliente encontrado: {clients[0].nombre}")
         else:
-            st.error("Cliente no encontrado. Por favor, verifica la cédula e intenta de nuevo.")
+            st.error(
+                "Cliente no encontrado. Por favor, verifica la cédula e intenta de nuevo."
+            )
 
+    # Formulario para actualizar la información del cliente
     if st.session_state['cliente_seleccionado']:
         cliente = st.session_state['cliente_seleccionado']
-        new_nombre = st.text_input("Nuevo Nombre", value=cliente.nombre, placeholder="Dejar en blanco si no desea cambiar")
-        new_direccion = st.text_input("Nueva Dirección", value=cliente.direccion, placeholder="Dejar en blanco si no desea cambiar")
-        new_telefono = st.text_input("Nuevo Teléfono", value=cliente.telefono, placeholder="Dejar en blanco si no desea cambiar")
-        new_credito = st.number_input("Nuevo Crédito", value=float(cliente.credito), format="%.2f", help="Dejar en blanco para mantener el crédito actual")
+        new_nombre = st.text_input(
+            "Nuevo Nombre",
+            value=cliente.nombre,
+            placeholder="Dejar en blanco si no desea cambiar"
+        )
+        new_direccion = st.text_input(
+            "Nueva Dirección",
+            value=cliente.direccion,
+            placeholder="Dejar en blanco si no desea cambiar"
+        )
+        new_telefono = st.text_input(
+            "Nuevo Teléfono",
+            value=cliente.telefono,
+            placeholder="Dejar en blanco si no desea cambiar"
+        )
+        new_credito = st.number_input(
+            "Nuevo Crédito",
+            value=float(cliente.credito),
+            format="%.2f",
+            help="Dejar en blanco para mantener el crédito actual"
+        )
 
+        # Botón para actualizar la información del cliente
         if st.button("Actualizar Cliente"):
             result = update_client(
                 cliente.cedula,
@@ -874,9 +1214,20 @@ def update_client_form():
 
 
 def delete_client_form():
+    """
+    Formulario para eliminar un cliente existente.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     with st.form("Eliminar Cliente"):
         cedula = st.text_input("Cédula del Cliente a eliminar")
         submitted = st.form_submit_button("Eliminar Cliente")
+
+        # Si se envía el formulario, se intenta eliminar el cliente
         if submitted:
             result = delete_client(cedula)
             if "éxito" in result:
@@ -884,7 +1235,18 @@ def delete_client_form():
             else:
                 st.error(result)
 
+
 def dominos_menu():
+    """
+    Muestra el menú para la optimización de rutas de entrega y permite calcular
+    la ruta óptima para varias direcciones de entrega.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     st.title("Optimización de Ruta de Entrega")
 
     # Dirección de inicio fija
@@ -893,17 +1255,23 @@ def dominos_menu():
 
     # Ingreso de direcciones manualmente
     address_inputs = []
-    num_addresses = st.number_input("Número de direcciones de entrega", min_value=1, max_value=10, step=1)
+    num_addresses = st.number_input(
+        "Número de direcciones de entrega",
+        min_value=1,
+        max_value=10,
+        step=1
+    )
 
     for i in range(num_addresses):
         address = st.text_input(f"Dirección {i + 1}", key=f"address_{i}")
         address_inputs.append(address)
 
+    # Botón para calcular la ruta
     if st.button("Calcular Ruta"):
         addresses = [start_address] + address_inputs
 
         try:
-            # Obtener coordenadas
+            # Obtener coordenadas de las direcciones
             locations = []
             geolocator = Nominatim(user_agent="tsp_solver")
             for address in addresses:
@@ -911,10 +1279,14 @@ def dominos_menu():
                 if coordenadas:
                     locations.append(coordenadas)
                 else:
+                    st.error(f"No se pudieron obtener coordenadas para: {address}")
                     return
 
-            # Convertir a DataFrame
-            df_locations = pd.DataFrame(locations, columns=['Latitude', 'Longitude'])
+            # Convertir las coordenadas a DataFrame
+            df_locations = pd.DataFrame(
+                locations,
+                columns=['Latitude', 'Longitude']
+            )
 
             # Calcular la matriz de distancias
             coords = df_locations.to_numpy()
@@ -924,7 +1296,7 @@ def dominos_menu():
             tour = nearest_neighbor(distance_matrix)
             tour.append(tour[0])  # Volver al punto de partida
 
-            # Mostrar el Tour de manera bonita
+            # Mostrar el tour de manera ordenada
             tour_df = pd.DataFrame({
                 "Número": tour,  # Usar los índices del tour directamente
                 "Dirección": [addresses[i] for i in tour]
@@ -935,7 +1307,18 @@ def dominos_menu():
         except Exception as e:
             st.error(f"Error al calcular la ruta: {e}")
 
+
 def nearest_neighbor(distance_matrix):
+    """
+    Resuelve el problema del viajante (TSP) utilizando la heurística del
+    vecino más cercano.
+
+    Args:
+        distance_matrix (ndarray): Matriz de distancias entre las ubicaciones.
+
+    Returns:
+        list: Orden de las ubicaciones visitadas en el tour.
+    """
     n = distance_matrix.shape[0]
     visited = [False] * n
     tour = [0]
@@ -943,24 +1326,46 @@ def nearest_neighbor(distance_matrix):
 
     for _ in range(n - 1):
         last_visited = tour[-1]
-        nearest = np.argmin([distance_matrix[last_visited][j] if not visited[j] else np.inf for j in range(n)])
+        # Encontrar el vecino más cercano no visitado
+        nearest = np.argmin(
+            [
+                distance_matrix[last_visited][j] if not visited[j]
+                else np.inf for j in range(n)
+            ]
+        )
         tour.append(nearest)
         visited[nearest] = True
 
     return tour
 
+
 def plot_route(df_locations, tour):
+    """
+    Plotea la ruta de entrega en un mapa utilizando las coordenadas
+    de las ubicaciones y el orden del tour.
+
+    Args:
+        df_locations (DataFrame): DataFrame con las coordenadas de las
+        ubicaciones.
+        tour (list): Lista con el orden de las ubicaciones en el tour.
+
+    Returns:
+        None
+    """
     try:
-        # Crear la ruta
-        route = [(df_locations.Longitude[i], df_locations.Latitude[i]) for i in tour]
+        # Crear la ruta a partir del tour
+        route = [
+            (df_locations.Longitude[i], df_locations.Latitude[i])
+            for i in tour
+        ]
 
         # Crear la línea de la ruta
         line = LineString(route)
 
-        # Plotear
-        fig, ax = plt.subplots(figsize=(10, 10))  # Tamaño original del mapa
+        # Plotear la ruta y los puntos
+        fig, ax = plt.subplots(figsize=(10, 10))  # Tamaño del mapa
 
-        # Plotear los puntos
+        # Plotear los puntos de la ruta
         for lon, lat in route:
             ax.plot(lon, lat, 'ro', markersize=5)
 
@@ -979,21 +1384,41 @@ def plot_route(df_locations, tour):
         ax.set_xticks([])
         ax.set_yticks([])
 
+        # Mostrar el gráfico en Streamlit
         st.pyplot(fig)
     except Exception as e:
         st.error(f"Error al plotear la ruta: {e}")
 
 
-# Función para ajustar la fecha y hora
 def ajustar_fecha(fecha):
+    """
+    Ajusta la fecha y hora restando 5 horas.
+
+    Args:
+        fecha (datetime): La fecha y hora original.
+
+    Returns:
+        datetime: La fecha y hora ajustada.
+    """
     return fecha - pd.Timedelta(hours=5)
 
 
-# Función para cargar los datos de ventas
 def cargar_datos_ventas():
+    """
+    Carga los datos de ventas desde la base de datos y los convierte en un
+    DataFrame de pandas.
+
+    Args:
+        None
+
+    Returns:
+        DataFrame: Un DataFrame de pandas con los datos de ventas.
+    """
     session = Session()
     ventas = session.query(Venta).all()
     session.close()
+
+    # Convertir los datos de ventas a un DataFrame
     return pd.DataFrame([{
         'user_id': venta.user_id,
         'fecha_hora': ajustar_fecha(venta.fecha_hora),
@@ -1004,9 +1429,19 @@ def cargar_datos_ventas():
     } for venta in ventas])
 
 
-# Función para mostrar el menú de análisis estadísticos
 def calcular_estadisticas(datos_ventas):
-    ventas = datos_ventas[['total_efectivo', 'total_transferencia', 'total_credito']].to_numpy()
+    """
+    Calcula estadísticas descriptivas de las ventas.
+
+    Args:
+        datos_ventas (DataFrame): DataFrame con los datos de ventas.
+
+    Returns:
+        dict: Diccionario con las estadísticas calculadas.
+    """
+    ventas = datos_ventas[
+        ['total_efectivo', 'total_transferencia', 'total_credito']
+    ].to_numpy()
     estadisticas = {
         'media_efectivo': np.mean(ventas[:, 0]),
         'media_transferencia': np.mean(ventas[:, 1]),
@@ -1018,16 +1453,41 @@ def calcular_estadisticas(datos_ventas):
     return estadisticas
 
 def mostrar_estadisticas(datos_ventas):
+    """
+    Muestra las estadísticas descriptivas de las ventas.
+
+    Args:
+        datos_ventas (DataFrame): DataFrame con los datos de ventas.
+
+    Returns:
+        None
+    """
     estadisticas = calcular_estadisticas(datos_ventas)
     st.write("## Estadísticas Descriptivas")
     st.write(f"Media Efectivo: ${estadisticas['media_efectivo']:.2f}")
     st.write(f"Media Transferencia: ${estadisticas['media_transferencia']:.2f}")
     st.write(f"Media Crédito: ${estadisticas['media_credito']:.2f}")
-    st.write(f"Desviación Estándar Efectivo: ${estadisticas['desviacion_efectivo']:.2f}")
-    st.write(f"Desviación Estándar Transferencia: ${estadisticas['desviacion_transferencia']:.2f}")
-    st.write(f"Desviación Estándar Crédito: ${estadisticas['desviacion_credito']:.2f}")
+    st.write(
+        f"Desviación Estándar Efectivo: ${estadisticas['desviacion_efectivo']:.2f}"
+    )
+    st.write(
+        f"Desviación Estándar Transferencia: ${estadisticas['desviacion_transferencia']:.2f}"
+    )
+    st.write(
+        f"Desviación Estándar Crédito: ${estadisticas['desviacion_credito']:.2f}"
+    )
 
 def prueba_hipotesis(datos_ventas):
+    """
+    Realiza una prueba de hipótesis para comparar las ventas en efectivo y
+    por transferencia.
+
+    Args:
+        datos_ventas (DataFrame): DataFrame con los datos de ventas.
+
+    Returns:
+        None
+    """
     ventas_efectivo = datos_ventas['total_efectivo']
     ventas_transferencia = datos_ventas['total_transferencia']
     t_stat, p_value = stats.ttest_ind(ventas_efectivo, ventas_transferencia)
@@ -1036,18 +1496,35 @@ def prueba_hipotesis(datos_ventas):
     st.write(f"T-statistic: {t_stat:.2f}")
     st.write(f"P-value: {p_value:.4f}")
     if p_value < 0.05:
-        st.write("Rechazamos la hipótesis nula. Las ventas en efectivo y transferencia son significativamente diferentes.")
+        st.write(
+            "Rechazamos la hipótesis nula. Las ventas en efectivo y transferencia "
+            "son significativamente diferentes."
+        )
     else:
-        st.write("No rechazamos la hipótesis nula. No hay diferencias significativas entre las ventas en efectivo y transferencia.")
+        st.write(
+            "No rechazamos la hipótesis nula. No hay diferencias significativas "
+            "entre las ventas en efectivo y transferencia."
+        )
 
-
-# Llama a esta función en analisis_estadisticos()
 def analisis_estadisticos():
+    """
+    Muestra el menú de análisis estadísticos y llama a las funciones
+    correspondientes según la opción seleccionada.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
     datos_ventas = cargar_datos_ventas()
 
     selected = option_menu(
         None,
-        ["Ventas por Día", "Método de Pago", "Cuadre de Caja", "Estadísticas Descriptivas", "Prueba de Hipótesis"],
+        [
+            "Ventas por Día", "Método de Pago", "Cuadre de Caja",
+            "Estadísticas Descriptivas", "Prueba de Hipótesis"
+        ],
         icons=["calendar", "credit-card", "cash-stack", "bar-chart", "flask"],
         menu_icon="graph-up",
         default_index=0,
@@ -1065,17 +1542,36 @@ def analisis_estadisticos():
     elif selected == "Prueba de Hipótesis":
         prueba_hipotesis(datos_ventas)
 
-
-# Función para análisis de ventas por día con selección de rangos de fechas
 def ventas_por_dia(datos_ventas):
-    fecha_inicio = st.date_input("Selecciona la fecha de inicio", value=pd.to_datetime("today") - pd.Timedelta(days=7))
-    fecha_fin = st.date_input("Selecciona la fecha de fin", value=pd.to_datetime("today"))
+    """
+    Muestra un análisis de ventas por día con selección de rangos de fechas.
+
+    Args:
+        datos_ventas (DataFrame): DataFrame con los datos de ventas.
+
+    Returns:
+        None
+    """
+    fecha_inicio = st.date_input(
+        "Selecciona la fecha de inicio",
+        value=pd.to_datetime("today") - pd.Timedelta(days=7)
+    )
+    fecha_fin = st.date_input(
+        "Selecciona la fecha de fin",
+        value=pd.to_datetime("today")
+    )
 
     datos_ventas['fecha'] = datos_ventas['fecha_hora'].dt.date
-    ventas_rango = datos_ventas[(datos_ventas['fecha'] >= fecha_inicio) & (datos_ventas['fecha'] <= fecha_fin)]
+    ventas_rango = datos_ventas[
+        (datos_ventas['fecha'] >= fecha_inicio) &
+        (datos_ventas['fecha'] <= fecha_fin)
+    ]
 
     if ventas_rango.empty:
-        st.write("No se registraron ventas en el rango de fechas seleccionado o la fecha es futura.")
+        st.write(
+            "No se registraron ventas en el rango de fechas seleccionado o la "
+            "fecha es futura."
+        )
     else:
         ventas_dia = ventas_rango.groupby('fecha').agg({
             'total_efectivo': 'sum',
@@ -1083,8 +1579,10 @@ def ventas_por_dia(datos_ventas):
             'total_credito': 'sum'
         }).reset_index()
 
-        ventas_dia['total_ventas'] = ventas_dia['total_efectivo'] + ventas_dia['total_transferencia'] + ventas_dia[
-            'total_credito']
+        ventas_dia['total_ventas'] = (
+            ventas_dia['total_efectivo'] + ventas_dia['total_transferencia'] +
+            ventas_dia['total_credito']
+        )
 
         st.write(f"## Ventas desde {fecha_inicio} hasta {fecha_fin}")
         fig, ax = plt.subplots()
@@ -1097,40 +1595,78 @@ def ventas_por_dia(datos_ventas):
         ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
         ax.xaxis.set_major_locator(mdates.DayLocator(interval=1))
         fig.autofmt_xdate(rotation=45)
-        ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, loc: "${:,.2f}".format(x)))
+        ax.yaxis.set_major_formatter(
+            plt.FuncFormatter(lambda x, loc: "${:,.2f}".format(x))
+        )
 
         st.pyplot(fig)
 
-
-# Función para análisis de métodos de pago con selección de fecha
 def metodo_de_pago(datos_ventas):
-    fecha_seleccionada = st.date_input("Selecciona una fecha", value=pd.to_datetime("today"))
+    """
+    Muestra un análisis de los métodos de pago con selección de fecha.
+
+    Args:
+        datos_ventas (DataFrame): DataFrame con los datos de ventas.
+
+    Returns:
+        None
+    """
+    fecha_seleccionada = st.date_input(
+        "Selecciona una fecha",
+        value=pd.to_datetime("today")
+    )
     datos_ventas['fecha'] = datos_ventas['fecha_hora'].dt.date
     metodos_pago = datos_ventas[datos_ventas['fecha'] == fecha_seleccionada][
-        ['total_efectivo', 'total_transferencia', 'total_credito']].sum()
+        ['total_efectivo', 'total_transferencia', 'total_credito']
+    ].sum()
 
     if metodos_pago.sum() == 0:
-        st.write("No se registraron ventas en la fecha seleccionada o la fecha es futura.")
+        st.write(
+            "No se registraron ventas en la fecha seleccionada o la fecha es futura."
+        )
     else:
         st.write(f"## Método de Pago del día {fecha_seleccionada}")
         fig, ax = plt.subplots()
-        ax.pie(metodos_pago, labels=metodos_pago.index, autopct='%1.1f%%', startangle=90)
+        ax.pie(
+            metodos_pago, labels=metodos_pago.index,
+            autopct='%1.1f%%', startangle=90
+        )
         ax.axis('equal')
         st.pyplot(fig)
 
-
-# Función para cuadrar la caja del negocio por ID de empleado y selección de fecha
 def cuadre_de_caja(datos_ventas):
-    fecha_seleccionada = st.date_input("Selecciona una fecha", value=pd.to_datetime("today"))
+    """
+    Realiza el cuadre de caja del negocio por ID de empleado y selección de
+    fecha.
+
+    Args:
+        datos_ventas (DataFrame): DataFrame con los datos de ventas.
+
+    Returns:
+        None
+    """
+    fecha_seleccionada = st.date_input(
+        "Selecciona una fecha",
+        value=pd.to_datetime("today")
+    )
     empleado_id = st.number_input("ID del Empleado", min_value=1, step=1)
-    dinero_inicial = st.number_input("Dinero inicial del día", min_value=0.0, format="%.2f")
+    dinero_inicial = st.number_input(
+        "Dinero inicial del día",
+        min_value=0.0,
+        format="%.2f"
+    )
 
     datos_ventas['fecha'] = datos_ventas['fecha_hora'].dt.date
     ventas_empleado = datos_ventas[
-        (datos_ventas['fecha'] == fecha_seleccionada) & (datos_ventas['user_id'] == empleado_id)]
+        (datos_ventas['fecha'] == fecha_seleccionada) &
+        (datos_ventas['user_id'] == empleado_id)
+    ]
 
     if ventas_empleado.empty:
-        st.write("No se registraron ventas en la fecha seleccionada para el empleado o la fecha es futura.")
+        st.write(
+            "No se registraron ventas en la fecha seleccionada para el empleado o "
+            "la fecha es futura."
+        )
     else:
         suma_efectivo = ventas_empleado['total_efectivo'].sum()
         suma_transferencia = ventas_empleado['total_transferencia'].sum()
@@ -1138,14 +1674,29 @@ def cuadre_de_caja(datos_ventas):
         suma_total = suma_efectivo + suma_transferencia + suma_credito
         suma_efectivo_transferencia = suma_efectivo + suma_transferencia + dinero_inicial
 
-        st.write(f"## Cuadre de Caja del día {fecha_seleccionada} para el Empleado ID {empleado_id}")
+        st.write(
+            f"## Cuadre de Caja del día {fecha_seleccionada} para el Empleado ID "
+            f"{empleado_id}"
+        )
         st.write(f"### Total Efectivo: ${suma_efectivo:.2f}")
         st.write(f"### Total Transferencia: ${suma_transferencia:.2f}")
         st.write(f"### Total Crédito: ${suma_credito:.2f}")
         st.write(f"### Suma Total: ${suma_total:.2f}")
-        st.write(f"### Efectivo + Transferencia + Dinero Inicial: ${suma_efectivo_transferencia:.2f}")
+        st.write(
+            f"### Efectivo + Transferencia + Dinero Inicial: "
+            f"${suma_efectivo_transferencia:.2f}"
+        )
 
 def visualizar_rutas(locations):
+    """
+    Visualiza las rutas de entrega en un mapa utilizando las coordenadas.
+
+    Args:
+        locations (list): Lista de tuplas con las coordenadas (latitud, longitud).
+
+    Returns:
+        None
+    """
     try:
         # Crear la ruta como una LineString
         ruta = LineString([(lon, lat) for lat, lon in locations])
@@ -1177,6 +1728,20 @@ def visualizar_rutas(locations):
         st.error(f"Error al visualizar las rutas: {e}")
 
 def obtener_coordenadas(geolocator, direccion, max_reintentos=3):
+    """
+    Obtiene las coordenadas (latitud y longitud) de una dirección utilizando
+    un geolocalizador.
+
+    Args:
+        geolocator (Geolocator): Objeto geolocalizador.
+        direccion (str): Dirección a geolocalizar.
+        max_reintentos (int, optional): Número máximo de reintentos en caso de
+        fallo. Por defecto es 3.
+
+    Returns:
+        tuple: Tupla con las coordenadas (latitud, longitud) o None si no se
+        pudo obtener.
+    """
     reintentos = 0
     while reintentos < max_reintentos:
         try:
@@ -1188,19 +1753,35 @@ def obtener_coordenadas(geolocator, direccion, max_reintentos=3):
         except (GeocoderTimedOut, GeocoderServiceError):
             reintentos += 1
             if reintentos == max_reintentos:
-                st.error(f"No se pudo geocodificar la dirección: {direccion} después de {max_reintentos} intentos.")
+                st.error(
+                    f"No se pudo geocodificar la dirección: {direccion} después "
+                    f"de {max_reintentos} intentos."
+                )
                 return None
 
 def plot_geopandas_map(df_locations, tour):
+    """
+    Visualiza las rutas de entrega en un mapa utilizando geopandas.
+
+    Args:
+        df_locations (DataFrame): DataFrame con las coordenadas de las
+        ubicaciones.
+        tour (list): Lista con el orden de las ubicaciones en el tour.
+
+    Returns:
+        None
+    """
     try:
         # Crear la ruta utilizando el tour
-        route = [(df_locations.Longitude[i], df_locations.Latitude[i]) for i in tour]
+        route = [
+            (df_locations.Longitude[i], df_locations.Latitude[i]) for i in tour
+        ]
         route.append(route[0])  # Volver al punto de partida
 
         # Crear puntos de geometría con geopandas
         puntos = [Point(lon, lat) for lon, lat in route]
         gdf = gpd.GeoDataFrame(geometry=puntos, crs="EPSG:4326")
-        gdf = gdf.to_crs(epsg=3857)  # Convertir a la proyección adecuada para contextily
+        gdf = gdf.to_crs(epsg=3857)  # Convertir a la proyección adecuada
 
         # Crear la ruta como una LineString
         ruta = LineString(puntos)
@@ -1223,6 +1804,7 @@ def plot_geopandas_map(df_locations, tour):
         st.pyplot(fig)
     except Exception as e:
         st.error(f"Error al visualizar las rutas con geopandas: {e}")
+
 
 if __name__ == "__main__":
     main()
