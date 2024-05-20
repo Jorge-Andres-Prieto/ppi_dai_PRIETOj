@@ -939,7 +939,7 @@ def dominos_menu():
                 plot_route(df_locations, tour)
 
             # Añadir el mapa con geopandas
-            plot_geopandas_map(locations)
+            plot_geopandas_map(df_locations, tour)
         except Exception as e:
             st.error(f"Error al calcular la ruta: {e}")
 
@@ -1199,13 +1199,14 @@ def obtener_coordenadas(geolocator, direccion, max_reintentos=3):
                 st.error(f"No se pudo geocodificar la dirección: {direccion} después de {max_reintentos} intentos.")
                 return None
 
-def plot_geopandas_map(locations):
+def plot_geopandas_map(df_locations, tour):
     try:
-        # Asegurarse de que la ruta regrese al punto de inicio
-        locations.append(locations[0])
+        # Crear la ruta utilizando el tour
+        route = [(df_locations.Longitude[i], df_locations.Latitude[i]) for i in tour]
+        route.append(route[0])  # Volver al punto de partida
 
         # Crear puntos de geometría con geopandas
-        puntos = [Point(lon, lat) for lat, lon in locations]
+        puntos = [Point(lon, lat) for lon, lat in route]
         gdf = gpd.GeoDataFrame(geometry=puntos, crs="EPSG:4326")
         gdf = gdf.to_crs(epsg=3857)  # Convertir a la proyección adecuada para contextily
 
