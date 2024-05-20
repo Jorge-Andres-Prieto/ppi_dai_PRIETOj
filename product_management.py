@@ -52,7 +52,29 @@ def view_product_details(product_id):
     finally:
         session.close()
 
-def update_product(product_id, new_name=None, new_brand=None, new_category=None, new_subcategory=None, new_price=None, inventory_adjustment_tienda=None, inventory_adjustment_bodega=None):
+def update_product(
+    product_id, new_name=None, new_brand=None, new_category=None,
+    new_subcategory=None, new_price=None,
+    inventory_adjustment_tienda=None, inventory_adjustment_bodega=None
+):
+    """
+    Actualiza la información de un producto existente en la base de datos.
+
+    Args:
+        product_id (str): ID del producto a actualizar.
+        new_name (str, optional): Nuevo nombre del producto. Por defecto None.
+        new_brand (str, optional): Nueva marca del producto. Por defecto None.
+        new_category (str, optional): Nueva categoría del producto. Por defecto None.
+        new_subcategory (str, optional): Nueva subcategoría del producto. Por defecto None.
+        new_price (Decimal, optional): Nuevo precio del producto. Por defecto None.
+        inventory_adjustment_tienda (int, optional): Ajuste de inventario en tienda.
+                                                     Por defecto None.
+        inventory_adjustment_bodega (int, optional): Ajuste de inventario en bodega.
+                                                     Por defecto None.
+
+    Returns:
+        str: Mensaje indicando el resultado de la operación.
+    """
     session = Session()
     try:
         product = session.query(Product).filter(Product.product_id == product_id).first()
@@ -88,9 +110,28 @@ def update_product(product_id, new_name=None, new_brand=None, new_category=None,
         session.close()
 
 def add_product(product_id, name, brand, category, subcategory, price, cantidad):
+    """
+    Añade un nuevo producto a la base de datos.
+
+    Args:
+        product_id (str): ID del producto.
+        name (str): Nombre del producto.
+        brand (str): Marca del producto.
+        category (str): Categoría del producto.
+        subcategory (str): Subcategoría del producto.
+        price (Decimal): Precio del producto.
+        cantidad (int): Cantidad del producto en bodega.
+
+    Returns:
+        str: Mensaje indicando el resultado de la operación.
+    """
     session = Session()
     try:
-        new_product = Product(product_id=product_id, name=name, brand=brand, category=category, subcategory=subcategory, price=price, total_tienda=0, total_bodega=cantidad)
+        new_product = Product(
+            product_id=product_id, name=name, brand=brand, category=category,
+            subcategory=subcategory, price=price, total_tienda=0,
+            total_bodega=cantidad
+        )
         session.add(new_product)
         session.commit()
         return "Producto añadido con éxito."
@@ -99,7 +140,6 @@ def add_product(product_id, name, brand, category, subcategory, price, cantidad)
         return f"Error al añadir el producto: {str(e)}"
     finally:
         session.close()
-
 
 
 def delete_product(product_id):
@@ -122,6 +162,7 @@ def delete_product(product_id):
             return "Producto no encontrado."
     except Exception as e:
         session.rollback()
-        raise e  # Re-lanzar la excepción para que sea capturada en el formulario
+        # Re-lanzar la excepción para que sea capturada en el formulario
+        raise e
     finally:
         session.close()
