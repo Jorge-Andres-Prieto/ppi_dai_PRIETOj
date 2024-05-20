@@ -1002,6 +1002,7 @@ def plot_route(df_locations, tour):
     st.pyplot(fig)
 
 
+# Función para ajustar la fecha y hora
 def ajustar_fecha(fecha):
     return fecha - pd.Timedelta(hours=5)
 
@@ -1070,7 +1071,9 @@ def ventas_por_dia(datos_ventas):
         ax.set_title('Ventas por Día')
 
         # Ajustar el formato de las etiquetas de fecha y los precios
-        ax.set_xticklabels(ventas_dia['fecha'], rotation=45, ha='right', fontsize=10)
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
+        ax.xaxis.set_major_locator(mdates.DayLocator(interval=1))
+        fig.autofmt_xdate(rotation=45)
         ax.yaxis.set_major_formatter(plt.FuncFormatter(lambda x, loc: "${:,.2f}".format(x)))
 
         st.pyplot(fig)
