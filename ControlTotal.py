@@ -10,6 +10,7 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 from geopy.geocoders import Nominatim
+from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 from scipy.spatial.distance import pdist, squareform
 import scipy.stats as stats
 from shapely.geometry import LineString, Point
@@ -883,7 +884,6 @@ def delete_client_form():
             else:
                 st.error(result)
 
-
 def dominos_menu():
     st.title("Optimización de Ruta de Entrega")
 
@@ -907,11 +907,10 @@ def dominos_menu():
             locations = []
             geolocator = Nominatim(user_agent="tsp_solver")
             for address in addresses:
-                location = geolocator.geocode(address)
-                if location:
-                    locations.append((location.latitude, location.longitude))
+                coordenadas = obtener_coordenadas(geolocator, address)
+                if coordenadas:
+                    locations.append(coordenadas)
                 else:
-                    st.error(f"No se pudo geocodificar la dirección: {address}")
                     return
 
             # Convertir a DataFrame
@@ -1165,11 +1164,10 @@ def visualizar_rutas(direcciones):
         geolocator = Nominatim(user_agent="tsp_solver")
         puntos = []
         for direccion in direcciones:
-            location = geolocator.geocode(direccion)
-            if location:
-                puntos.append(Point(location.longitude, location.latitude))
+            coordenadas = obtener_coordenadas(geolocator, direccion)
+            if coordenadas:
+                puntos.append(Point(coordenadas[1], coordenadas[0]))  # Longitude, Latitude
             else:
-                st.error(f"No se pudo geocodificar la dirección: {direccion}")
                 return
 
         # Crear un GeoDataFrame con los puntos
@@ -1197,7 +1195,20 @@ def visualizar_rutas(direcciones):
         st.error(f"Error al visualizar las rutas: {e}")
 
 
-
+def obtener_coordenadas(geolocator, direccion, max_reintentos=3):
+    reintentos = 0
+    while reintentos < max_reintentos:
+        try:
+            location = geolocator.geocode(direccion)
+            if location:
+                return (location.latitude, location.longitude)
+            else:
+                return None
+        except (GeocoderTimedOut, GeocoderServiceError) as e:
+            reintentos += 1
+            if reintentos == max_reintentos:
+                st.error(f"No se pudo geocodificar la dirección: {direccion} después de {max_reintentos} intentos.")
+                return None
 
 if __name__ == "__main__":
     main()
