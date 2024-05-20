@@ -1175,6 +1175,10 @@ def visualizar_rutas(locations):
         # Añadir el mapa base
         ctx.add_basemap(ax, source=ctx.providers.CartoDB.Positron)
 
+        # Ocultar las etiquetas de los ejes
+        ax.set_xticks([])
+        ax.set_yticks([])
+
         # Mostrar el gráfico en Streamlit
         st.pyplot(fig)
     except Exception as e:
@@ -1197,6 +1201,9 @@ def obtener_coordenadas(geolocator, direccion, max_reintentos=3):
 
 def plot_geopandas_map(locations):
     try:
+        # Asegurarse de que la ruta regrese al punto de inicio
+        locations.append(locations[0])
+
         # Crear puntos de geometría con geopandas
         puntos = [Point(lon, lat) for lat, lon in locations]
         gdf = gpd.GeoDataFrame(geometry=puntos, crs="EPSG:4326")
@@ -1214,6 +1221,10 @@ def plot_geopandas_map(locations):
 
         # Añadir el mapa base
         ctx.add_basemap(ax, source=ctx.providers.CartoDB.Positron)
+
+        # Ocultar las etiquetas de los ejes
+        ax.set_xticks([])
+        ax.set_yticks([])
 
         # Mostrar el gráfico en Streamlit
         st.pyplot(fig)
