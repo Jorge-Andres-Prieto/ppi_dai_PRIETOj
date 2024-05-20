@@ -1002,6 +1002,7 @@ def plot_route(df_locations, tour):
     st.pyplot(fig)
 
 
+# Función para ajustar la fecha y hora
 def ajustar_fecha(fecha):
     return fecha - pd.Timedelta(hours=5)
 
@@ -1027,8 +1028,8 @@ def analisis_estadisticos():
 
     selected = option_menu(
         None,
-        ["Ventas por Día", "Método de Pago", "Análisis de Productos"],
-        icons=["calendar", "credit-card", "box-seam"],
+        ["Ventas por Día", "Método de Pago", "Cuadre de Caja"],
+        icons=["calendar", "credit-card", "cash-stack"],
         menu_icon="graph-up",
         default_index=0,
         orientation="horizontal"
@@ -1038,21 +1039,22 @@ def analisis_estadisticos():
         ventas_por_dia(datos_ventas)
     elif selected == "Método de Pago":
         metodo_de_pago(datos_ventas)
-    elif selected == "Análisis de Productos":
-        analisis_productos(datos_ventas)
+    elif selected == "Cuadre de Caja":
+        cuadre_de_caja(datos_ventas)
 
 
-# Función para análisis de ventas por día
+# Función para análisis de ventas por día con selección de fecha
 def ventas_por_dia(datos_ventas):
+    fecha_seleccionada = st.date_input("Selecciona una fecha", value=pd.to_datetime("today"))
     datos_ventas['fecha'] = datos_ventas['fecha_hora'].dt.date
-    ventas_dia = datos_ventas.groupby('fecha').agg({
+    ventas_dia = datos_ventas[datos_ventas['fecha'] == fecha_seleccionada].agg({
         'total_efectivo': 'sum',
         'total_transferencia': 'sum',
         'total_credito': 'sum'
     }).reset_index()
 
-    st.write("## Ventas por Día")
-    st.line_chart(ventas_dia.set_index('fecha'))
+    st.write(f"## Ventas del día {fecha_seleccionada}")
+    st.line_chart(ventas_dia.set_index('index'))
 
 
 # Función para análisis de métodos de pago
@@ -1066,20 +1068,23 @@ def metodo_de_pago(datos_ventas):
     st.pyplot(fig)
 
 
-# Función para análisis de productos
-def analisis_productos(datos_ventas):
-    productos = []
-    for _, row in datos_ventas.iterrows():
-        productos_vendidos = row['productos_vendidos'].split(', ')
-        for producto in productos_vendidos:
-            nombre, cantidad = producto.split(':')
-            productos.append({'producto': nombre, 'cantidad': int(cantidad)})
+# Función para cuadrar la caja del negocio
+def cuadre_de_caja(datos_ventas):
+    dinero_inicial = st.number_input("Dinero inicial del día", min_value=0.0, format="%.2f")
 
-    df_productos = pd.DataFrame(productos)
-    productos_agg = df_productos.groupby('producto').agg({'cantidad': 'sum'}).reset_index()
+    suma_efectivo = datos_ventas['total_efectivo'].sum()
+    suma_transferencia = datos_ventas['total_transferencia'].sum()
+    suma_credito = datos_ventas['total_credito'].sum()
+    suma_total = suma_efectivo + suma_transferencia + suma_credito
+    suma_efectivo_transferencia = suma_efectivo + suma_transferencia + dinero_inicial
 
-    st.write("## Análisis de Productos")
-    st.bar_chart(productos_agg.set_index('producto'))
+    st.write("## Cuadre de Caja")
+    st.write(f"### Total Efectivo: ${suma_efectivo:.2f}")
+    st.write(f"### Total Transferencia: ${suma_transferencia:.2f}")
+    st.write(f"### Total Crédito: ${suma_credito:.2f}")
+    st.write(f"### Suma Total: ${suma_total:.2f}")
+    st.write(f"### Efectivo + Transferencia + Dinero Inicial: ${suma_efectivo_transferencia:.2f}")
+
 
 if __name__ == "__main__":
     main()
