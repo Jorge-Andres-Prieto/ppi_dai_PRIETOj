@@ -1197,7 +1197,7 @@ def obtener_coordenadas(geolocator, direccion, max_reintentos=3):
                 return (location.latitude, location.longitude)
             else:
                 return None
-        except (GeocoderTimedOut, GeocoderServiceError) as e:
+        except (GeocoderTimedOut, GeocoderServiceError):
             reintentos += 1
             if reintentos == max_reintentos:
                 st.error(f"No se pudo geocodificar la dirección: {direccion} después de {max_reintentos} intentos.")
