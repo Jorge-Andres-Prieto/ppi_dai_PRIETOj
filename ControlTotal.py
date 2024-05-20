@@ -956,35 +956,26 @@ def nearest_neighbor(distance_matrix):
 
 def plot_route(df_locations, tour):
     try:
-        # Crear el GeoDataFrame
-        gdf_locations = gpd.GeoDataFrame(df_locations, geometry=gpd.points_from_xy(df_locations.Longitude, df_locations.Latitude), crs="EPSG:4326")
-
         # Crear la ruta
         route = [(df_locations.Longitude[i], df_locations.Latitude[i]) for i in tour]
 
         # Crear la línea de la ruta
         line = LineString(route)
 
-        # Crear un GeoDataFrame para la ruta
-        gdf_route = gpd.GeoDataFrame(geometry=[line], crs="EPSG:4326")
-        gdf_route = gdf_route.to_crs(epsg=3857)
-
-        # Convertir a la proyección adecuada para contextily
-        gdf_locations = gdf_locations.to_crs(epsg=3857)
-        gdf_route = gdf_route.to_crs(epsg=3857)
-
         # Plotear
         fig, ax = plt.subplots(figsize=(10, 10))  # Tamaño original del mapa
-        gdf_locations.plot(ax=ax, color='red', marker='o', markersize=5)
+
+        # Plotear los puntos
+        for lon, lat in route:
+            ax.plot(lon, lat, 'ro', markersize=5)
 
         # Destacar el punto de inicio
-        gdf_locations.iloc[[0]].plot(ax=ax, color='green', marker='o', markersize=100)
+        inicio = route[0]
+        ax.plot(inicio[0], inicio[1], 'go', markersize=10)
 
-        # Añadir números a los puntos
-        for i, (lon, lat) in enumerate(zip(gdf_locations.geometry.x, gdf_locations.geometry.y)):
-            ax.text(lon, lat, str(i), fontsize=12, ha='right')
-
-        gdf_route.plot(ax=ax, color='blue')
+        # Añadir la línea de la ruta
+        x, y = line.xy
+        ax.plot(x, y, color='blue')
 
         # Añadir el mapa base
         ctx.add_basemap(ax, source=ctx.providers.CartoDB.Positron)
@@ -1161,23 +1152,22 @@ def cuadre_de_caja(datos_ventas):
 
 def visualizar_rutas(locations):
     try:
-        puntos = [Point(lon, lat) for lat, lon in locations]
-
-        # Crear un GeoDataFrame con los puntos
-        gdf = gpd.GeoDataFrame(geometry=puntos, crs="EPSG:4326")
-        gdf = gdf.to_crs(epsg=3857)  # Convertir a la proyección adecuada para contextily
-
         # Crear la ruta como una LineString
-        ruta = LineString(puntos)
-
-        # Crear un GeoDataFrame para la ruta
-        gdf_ruta = gpd.GeoDataFrame(geometry=[ruta], crs="EPSG:4326")
-        gdf_ruta = gdf_ruta.to_crs(epsg=3857)
+        ruta = LineString([(lon, lat) for lat, lon in locations])
 
         # Plotear los puntos y la ruta
         fig, ax = plt.subplots(figsize=(10, 10))
-        gdf.plot(ax=ax, color='red', marker='o', markersize=5)
-        gdf_ruta.plot(ax=ax, color='blue')
+
+        for lat, lon in locations:
+            ax.plot(lon, lat, 'ro', markersize=5)
+
+        # Destacar el punto de inicio
+        inicio = locations[0]
+        ax.plot(inicio[1], inicio[0], 'go', markersize=10)
+
+        # Añadir la línea de la ruta
+        x, y = ruta.xy
+        ax.plot(x, y, color='blue')
 
         # Añadir el mapa base
         ctx.add_basemap(ax, source=ctx.providers.CartoDB.Positron)
@@ -1192,7 +1182,7 @@ def obtener_coordenadas(geolocator, direccion, max_reintentos=3):
     reintentos = 0
     while reintentos < max_reintentos:
         try:
-            location = geolocator.geocode(direccion)
+            location = geolocator.geocode(direccion, timeout=10)
             if location:
                 return (location.latitude, location.longitude)
             else:
