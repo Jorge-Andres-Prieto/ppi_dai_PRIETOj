@@ -1159,16 +1159,9 @@ def cuadre_de_caja(datos_ventas):
         st.write(f"### Suma Total: ${suma_total:.2f}")
         st.write(f"### Efectivo + Transferencia + Dinero Inicial: ${suma_efectivo_transferencia:.2f}")
 
-def visualizar_rutas(direcciones):
+def visualizar_rutas(locations):
     try:
-        geolocator = Nominatim(user_agent="tsp_solver")
-        puntos = []
-        for direccion in direcciones:
-            coordenadas = obtener_coordenadas(geolocator, direccion)
-            if coordenadas:
-                puntos.append(Point(coordenadas[1], coordenadas[0]))  # Longitude, Latitude
-            else:
-                return
+        puntos = [Point(lon, lat) for lat, lon in locations]
 
         # Crear un GeoDataFrame con los puntos
         gdf = gpd.GeoDataFrame(geometry=puntos, crs="EPSG:4326")
