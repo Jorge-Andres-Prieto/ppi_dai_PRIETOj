@@ -930,15 +930,7 @@ def dominos_menu():
                 "Dirección": [addresses[i] for i in tour]
             })
 
-            col1, col2 = st.columns(2)
-
-            with col1:
-                st.dataframe(tour_df)
-
-            with col2:
-                plot_route(df_locations, tour)
-
-            # Añadir el mapa con geopandas
+            st.dataframe(tour_df)
             plot_geopandas_map(df_locations, tour)
         except Exception as e:
             st.error(f"Error al calcular la ruta: {e}")
