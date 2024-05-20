@@ -1,18 +1,37 @@
+# Importa la sesión de la base de datos
 from database import Session
-from models import Venta, Product, Cliente
-from datetime import datetime
 
+# Importa los modelos Venta, Product y Cliente
+from models import Venta, Product, Cliente
+
+# Importa la clase datetime para manejar fechas y horas
 from datetime import datetime, timedelta
 
+
 def obtener_hora_colombia():
+    """
+    Obtiene la hora actual en la zona horaria de Colombia restando 5 horas a la
+    hora actual.
+
+    Args:
+        None
+
+    Returns:
+        datetime: La hora actual en la zona horaria de Colombia.
+    """
     # Obtener la hora actual
     now = datetime.now()
     # Restar 5 horas para obtener la hora en la zona horaria de Colombia
     hora_colombia = now - timedelta(hours=5)
     return hora_colombia
 
-def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos, total_credito, sitio):
-    """Registra una venta en la base de datos.
+
+def create_sale(
+    user_id, total_efectivo, total_transferencia, productos_vendidos,
+    total_credito, sitio
+):
+    """
+    Registra una venta en la base de datos.
 
     Args:
         user_id (int): ID del usuario que realiza la venta.
@@ -45,7 +64,9 @@ def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos
 
         # Actualizar inventario
         for item in productos_vendidos:
-            product = session.query(Product).filter(Product.product_id == item['product'].product_id).first()
+            product = session.query(Product).filter(
+                Product.product_id == item['product'].product_id
+            ).first()
             if sitio == 'Tienda':
                 product.total_tienda -= item['quantity']
             else:
@@ -62,6 +83,16 @@ def create_sale(user_id, total_efectivo, total_transferencia, productos_vendidos
 
 
 def update_client_credit(client_id, new_credit):
+    """
+    Actualiza el crédito de un cliente en la base de datos.
+
+    Args:
+        client_id (int): ID del cliente a actualizar.
+        new_credit (float): Nuevo crédito del cliente.
+
+    Returns:
+        str: Mensaje indicando si el crédito fue actualizado con éxito o no.
+    """
     session = Session()
     try:
         client = session.query(Cliente).filter(Cliente.id == client_id).first()
