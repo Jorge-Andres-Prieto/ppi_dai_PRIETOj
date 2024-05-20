@@ -1006,7 +1006,6 @@ def plot_route(df_locations, tour):
 def ajustar_fecha(fecha):
     return fecha - pd.Timedelta(hours=5)
 
-
 # Función para cargar los datos de ventas
 def cargar_datos_ventas():
     session = Session()
@@ -1020,7 +1019,6 @@ def cargar_datos_ventas():
         'total_credito': float(venta.total_credito),
         'productos_vendidos': venta.productos_vendidos
     } for venta in ventas])
-
 
 # Función para mostrar el menú de análisis estadísticos
 def analisis_estadisticos():
@@ -1042,7 +1040,6 @@ def analisis_estadisticos():
     elif selected == "Cuadre de Caja":
         cuadre_de_caja(datos_ventas)
 
-
 # Función para análisis de ventas por día con selección de fecha
 def ventas_por_dia(datos_ventas):
     fecha_seleccionada = st.date_input("Selecciona una fecha", value=pd.to_datetime("today"))
@@ -1056,34 +1053,40 @@ def ventas_por_dia(datos_ventas):
     st.write(f"## Ventas del día {fecha_seleccionada}")
     st.line_chart(ventas_dia.set_index('index'))
 
-
-# Función para análisis de métodos de pago
+# Función para análisis de métodos de pago con selección de fecha
 def metodo_de_pago(datos_ventas):
-    metodos_pago = datos_ventas[['total_efectivo', 'total_transferencia', 'total_credito']].sum()
+    fecha_seleccionada = st.date_input("Selecciona una fecha", value=pd.to_datetime("today"))
+    datos_ventas['fecha'] = datos_ventas['fecha_hora'].dt.date
+    metodos_pago = datos_ventas[datos_ventas['fecha'] == fecha_seleccionada][['total_efectivo', 'total_transferencia', 'total_credito']].sum()
 
-    st.write("## Método de Pago")
+    st.write(f"## Método de Pago del día {fecha_seleccionada}")
     fig, ax = plt.subplots()
     ax.pie(metodos_pago, labels=metodos_pago.index, autopct='%1.1f%%', startangle=90)
     ax.axis('equal')
     st.pyplot(fig)
 
-
-# Función para cuadrar la caja del negocio
+# Función para cuadrar la caja del negocio por ID de empleado y selección de fecha
 def cuadre_de_caja(datos_ventas):
+    fecha_seleccionada = st.date_input("Selecciona una fecha", value=pd.to_datetime("today"))
+    empleado_id = st.number_input("ID del Empleado", min_value=1, step=1)
     dinero_inicial = st.number_input("Dinero inicial del día", min_value=0.0, format="%.2f")
 
-    suma_efectivo = datos_ventas['total_efectivo'].sum()
-    suma_transferencia = datos_ventas['total_transferencia'].sum()
-    suma_credito = datos_ventas['total_credito'].sum()
+    datos_ventas['fecha'] = datos_ventas['fecha_hora'].dt.date
+    ventas_empleado = datos_ventas[(datos_ventas['fecha'] == fecha_seleccionada) & (datos_ventas['user_id'] == empleado_id)]
+
+    suma_efectivo = ventas_empleado['total_efectivo'].sum()
+    suma_transferencia = ventas_empleado['total_transferencia'].sum()
+    suma_credito = ventas_empleado['total_credito'].sum()
     suma_total = suma_efectivo + suma_transferencia + suma_credito
     suma_efectivo_transferencia = suma_efectivo + suma_transferencia + dinero_inicial
 
-    st.write("## Cuadre de Caja")
+    st.write(f"## Cuadre de Caja del día {fecha_seleccionada} para el Empleado ID {empleado_id}")
     st.write(f"### Total Efectivo: ${suma_efectivo:.2f}")
     st.write(f"### Total Transferencia: ${suma_transferencia:.2f}")
     st.write(f"### Total Crédito: ${suma_credito:.2f}")
     st.write(f"### Suma Total: ${suma_total:.2f}")
     st.write(f"### Efectivo + Transferencia + Dinero Inicial: ${suma_efectivo_transferencia:.2f}")
+
 
 
 if __name__ == "__main__":
