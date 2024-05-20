@@ -937,6 +937,9 @@ def dominos_menu():
 
             with col2:
                 plot_route(df_locations, tour)
+
+            # Añadir el mapa con geopandas
+            plot_geopandas_map(locations)
         except Exception as e:
             st.error(f"Error al calcular la ruta: {e}")
 
@@ -1177,7 +1180,6 @@ def visualizar_rutas(locations):
     except Exception as e:
         st.error(f"Error al visualizar las rutas: {e}")
 
-
 def obtener_coordenadas(geolocator, direccion, max_reintentos=3):
     reintentos = 0
     while reintentos < max_reintentos:
@@ -1192,6 +1194,31 @@ def obtener_coordenadas(geolocator, direccion, max_reintentos=3):
             if reintentos == max_reintentos:
                 st.error(f"No se pudo geocodificar la dirección: {direccion} después de {max_reintentos} intentos.")
                 return None
+
+def plot_geopandas_map(locations):
+    try:
+        # Crear puntos de geometría con geopandas
+        puntos = [Point(lon, lat) for lat, lon in locations]
+        gdf = gpd.GeoDataFrame(geometry=puntos, crs="EPSG:4326")
+        gdf = gdf.to_crs(epsg=3857)  # Convertir a la proyección adecuada para contextily
+
+        # Crear la ruta como una LineString
+        ruta = LineString(puntos)
+        gdf_ruta = gpd.GeoDataFrame(geometry=[ruta], crs="EPSG:4326")
+        gdf_ruta = gdf_ruta.to_crs(epsg=3857)
+
+        # Plotear los puntos y la ruta con geopandas
+        fig, ax = plt.subplots(figsize=(10, 10))
+        gdf.plot(ax=ax, color='red', marker='o', markersize=5)
+        gdf_ruta.plot(ax=ax, color='blue')
+
+        # Añadir el mapa base
+        ctx.add_basemap(ax, source=ctx.providers.CartoDB.Positron)
+
+        # Mostrar el gráfico en Streamlit
+        st.pyplot(fig)
+    except Exception as e:
+        st.error(f"Error al visualizar las rutas con geopandas: {e}")
 
 if __name__ == "__main__":
     main()
