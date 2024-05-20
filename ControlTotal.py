@@ -902,40 +902,44 @@ def dominos_menu():
     if st.button("Calcular Ruta"):
         addresses = [start_address] + address_inputs
 
-        # Obtener coordenadas
-        locations = []
-        for address in addresses:
-            location = geolocator.geocode(address)
-            if location:
-                locations.append((location.latitude, location.longitude))
-            else:
-                st.error(f"No se pudo geocodificar la dirección: {address}")
-                return
+        try:
+            # Obtener coordenadas
+            locations = []
+            geolocator = Nominatim(user_agent="tsp_solver")
+            for address in addresses:
+                location = geolocator.geocode(address)
+                if location:
+                    locations.append((location.latitude, location.longitude))
+                else:
+                    st.error(f"No se pudo geocodificar la dirección: {address}")
+                    return
 
-        # Convertir a DataFrame
-        df_locations = pd.DataFrame(locations, columns=['Latitude', 'Longitude'])
+            # Convertir a DataFrame
+            df_locations = pd.DataFrame(locations, columns=['Latitude', 'Longitude'])
 
-        # Calcular la matriz de distancias
-        coords = df_locations.to_numpy()
-        distance_matrix = squareform(pdist(coords, metric='euclidean'))
+            # Calcular la matriz de distancias
+            coords = df_locations.to_numpy()
+            distance_matrix = squareform(pdist(coords, metric='euclidean'))
 
-        # Resolver el TSP usando la heurística de vecino más cercano
-        tour = nearest_neighbor(distance_matrix)
-        tour.append(tour[0])  # Volver al punto de partida
+            # Resolver el TSP usando la heurística de vecino más cercano
+            tour = nearest_neighbor(distance_matrix)
+            tour.append(tour[0])  # Volver al punto de partida
 
-        # Mostrar el Tour de manera bonita
-        tour_df = pd.DataFrame({
-            "Número": tour,  # Usar los índices del tour directamente
-            "Dirección": [addresses[i] for i in tour]
-        })
+            # Mostrar el Tour de manera bonita
+            tour_df = pd.DataFrame({
+                "Número": tour,  # Usar los índices del tour directamente
+                "Dirección": [addresses[i] for i in tour]
+            })
 
-        col1, col2 = st.columns(2)
+            col1, col2 = st.columns(2)
 
-        with col1:
-            st.dataframe(tour_df)
+            with col1:
+                st.dataframe(tour_df)
 
-        with col2:
-            plot_route(df_locations, tour)
+            with col2:
+                plot_route(df_locations, tour)
+        except Exception as e:
+            st.error(f"Error al calcular la ruta: {e}")
 
 def nearest_neighbor(distance_matrix):
     n = distance_matrix.shape[0]
@@ -952,43 +956,47 @@ def nearest_neighbor(distance_matrix):
     return tour
 
 def plot_route(df_locations, tour):
-    # Crear el GeoDataFrame
-    gdf_locations = gpd.GeoDataFrame(df_locations, geometry=gpd.points_from_xy(df_locations.Longitude, df_locations.Latitude), crs="EPSG:4326")
+    try:
+        # Crear el GeoDataFrame
+        gdf_locations = gpd.GeoDataFrame(df_locations, geometry=gpd.points_from_xy(df_locations.Longitude, df_locations.Latitude), crs="EPSG:4326")
 
-    # Crear la ruta
-    route = [(df_locations.Longitude[i], df_locations.Latitude[i]) for i in tour]
+        # Crear la ruta
+        route = [(df_locations.Longitude[i], df_locations.Latitude[i]) for i in tour]
 
-    # Crear la línea de la ruta
-    line = LineString(route)
+        # Crear la línea de la ruta
+        line = LineString(route)
 
-    # Crear un GeoDataFrame para la ruta
-    gdf_route = gpd.GeoDataFrame(geometry=[line], crs="EPSG:4326")
+        # Crear un GeoDataFrame para la ruta
+        gdf_route = gpd.GeoDataFrame(geometry=[line], crs="EPSG:4326")
+        gdf_route = gdf_route.to_crs(epsg=3857)
 
-    # Convertir a la proyección adecuada para contextily
-    gdf_locations = gdf_locations.to_crs(epsg=3857)
-    gdf_route = gdf_route.to_crs(epsg=3857)
+        # Convertir a la proyección adecuada para contextily
+        gdf_locations = gdf_locations.to_crs(epsg=3857)
+        gdf_route = gdf_route.to_crs(epsg=3857)
 
-    # Plotear
-    fig, ax = plt.subplots(figsize=(10, 10))  # Tamaño original del mapa
-    gdf_locations.plot(ax=ax, color='red', marker='o', markersize=5)
+        # Plotear
+        fig, ax = plt.subplots(figsize=(10, 10))  # Tamaño original del mapa
+        gdf_locations.plot(ax=ax, color='red', marker='o', markersize=5)
 
-    # Destacar el punto de inicio
-    gdf_locations.iloc[[0]].plot(ax=ax, color='green', marker='o', markersize=100)
+        # Destacar el punto de inicio
+        gdf_locations.iloc[[0]].plot(ax=ax, color='green', marker='o', markersize=100)
 
-    # Añadir números a los puntos
-    for i, (lon, lat) in enumerate(zip(gdf_locations.geometry.x, gdf_locations.geometry.y)):
-        ax.text(lon, lat, str(i), fontsize=12, ha='right')
+        # Añadir números a los puntos
+        for i, (lon, lat) in enumerate(zip(gdf_locations.geometry.x, gdf_locations.geometry.y)):
+            ax.text(lon, lat, str(i), fontsize=12, ha='right')
 
-    gdf_route.plot(ax=ax, color='blue')
+        gdf_route.plot(ax=ax, color='blue')
 
-    # Añadir el mapa base
-    ctx.add_basemap(ax, source=ctx.providers.CartoDB.Positron)
+        # Añadir el mapa base
+        ctx.add_basemap(ax, source=ctx.providers.CartoDB.Positron)
 
-    # Ocultar las etiquetas de los ejes
-    ax.set_xticks([])
-    ax.set_yticks([])
+        # Ocultar las etiquetas de los ejes
+        ax.set_xticks([])
+        ax.set_yticks([])
 
-    st.pyplot(fig)
+        st.pyplot(fig)
+    except Exception as e:
+        st.error(f"Error al plotear la ruta: {e}")
 
 
 # Función para ajustar la fecha y hora
@@ -1153,37 +1161,40 @@ def cuadre_de_caja(datos_ventas):
         st.write(f"### Efectivo + Transferencia + Dinero Inicial: ${suma_efectivo_transferencia:.2f}")
 
 def visualizar_rutas(direcciones):
-    geolocator = Nominatim(user_agent="tsp_solver")
-    puntos = []
-    for direccion in direcciones:
-        location = geolocator.geocode(direccion)
-        if location:
-            puntos.append(Point(location.longitude, location.latitude))
-        else:
-            st.error(f"No se pudo geocodificar la dirección: {direccion}")
-            return
+    try:
+        geolocator = Nominatim(user_agent="tsp_solver")
+        puntos = []
+        for direccion in direcciones:
+            location = geolocator.geocode(direccion)
+            if location:
+                puntos.append(Point(location.longitude, location.latitude))
+            else:
+                st.error(f"No se pudo geocodificar la dirección: {direccion}")
+                return
 
-    # Crear un GeoDataFrame con los puntos
-    gdf = gpd.GeoDataFrame(geometry=puntos, crs="EPSG:4326")
-    gdf = gdf.to_crs(epsg=3857)  # Convertir a la proyección adecuada para contextily
+        # Crear un GeoDataFrame con los puntos
+        gdf = gpd.GeoDataFrame(geometry=puntos, crs="EPSG:4326")
+        gdf = gdf.to_crs(epsg=3857)  # Convertir a la proyección adecuada para contextily
 
-    # Crear la ruta como una LineString
-    ruta = LineString(puntos)
+        # Crear la ruta como una LineString
+        ruta = LineString(puntos)
 
-    # Crear un GeoDataFrame para la ruta
-    gdf_ruta = gpd.GeoDataFrame(geometry=[ruta], crs="EPSG:4326")
-    gdf_ruta = gdf_ruta.to_crs(epsg=3857)
+        # Crear un GeoDataFrame para la ruta
+        gdf_ruta = gpd.GeoDataFrame(geometry=[ruta], crs="EPSG:4326")
+        gdf_ruta = gdf_ruta.to_crs(epsg=3857)
 
-    # Plotear los puntos y la ruta
-    fig, ax = plt.subplots(figsize=(10, 10))
-    gdf.plot(ax=ax, color='red', marker='o', markersize=5)
-    gdf_ruta.plot(ax=ax, color='blue')
+        # Plotear los puntos y la ruta
+        fig, ax = plt.subplots(figsize=(10, 10))
+        gdf.plot(ax=ax, color='red', marker='o', markersize=5)
+        gdf_ruta.plot(ax=ax, color='blue')
 
-    # Añadir el mapa base
-    ctx.add_basemap(ax, source=ctx.providers.CartoDB.Positron)
+        # Añadir el mapa base
+        ctx.add_basemap(ax, source=ctx.providers.CartoDB.Positron)
 
-    # Mostrar el gráfico en Streamlit
-    st.pyplot(fig)
+        # Mostrar el gráfico en Streamlit
+        st.pyplot(fig)
+    except Exception as e:
+        st.error(f"Error al visualizar las rutas: {e}")
 
 
 
