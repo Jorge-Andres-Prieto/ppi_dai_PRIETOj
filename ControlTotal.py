@@ -38,6 +38,7 @@ import geopandas as gpd
 from shapely.geometry import LineString
 import contextily as ctx
 from datetime import datetime
+import matplotlib.dates as mdates
 import scipy.stats as stats
 
 #Función de streamlit para utilizar la página completa
