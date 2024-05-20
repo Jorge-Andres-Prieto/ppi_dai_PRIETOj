@@ -38,6 +38,7 @@ import geopandas as gpd
 from shapely.geometry import LineString
 import contextily as ctx
 from datetime import datetime
+import scipy.stats as stats
 
 #Función de streamlit para utilizar la página completa
 st.set_page_config(page_title="Control Total", layout="wide", page_icon="🐯")
@@ -149,6 +150,8 @@ def main_menu(user):
             inventory_management_menu()
         elif selected == 'Ventas y Facturación':
             sales_menu()
+        elif selected == 'Análisis estadísticos':
+            analisis_estadisticos()
         elif selected == 'Domicilios':
             dominos_menu()
         elif selected == 'Sobre el Autor':
@@ -997,6 +1000,86 @@ def plot_route(df_locations, tour):
     ax.set_yticks([])
 
     st.pyplot(fig)
+
+
+def ajustar_fecha(fecha):
+    return fecha - pd.Timedelta(hours=5)
+
+
+# Función para cargar los datos de ventas
+def cargar_datos_ventas():
+    session = Session()
+    ventas = session.query(Venta).all()
+    session.close()
+    return pd.DataFrame([{
+        'user_id': venta.user_id,
+        'fecha_hora': ajustar_fecha(venta.fecha_hora),
+        'total_efectivo': float(venta.total_efectivo),
+        'total_transferencia': float(venta.total_transferencia),
+        'total_credito': float(venta.total_credito),
+        'productos_vendidos': venta.productos_vendidos
+    } for venta in ventas])
+
+
+# Función para mostrar el menú de análisis estadísticos
+def analisis_estadisticos():
+    datos_ventas = cargar_datos_ventas()
+
+    selected = option_menu(
+        None,
+        ["Ventas por Día", "Método de Pago", "Análisis de Productos"],
+        icons=["calendar", "credit-card", "box-seam"],
+        menu_icon="graph-up",
+        default_index=0,
+        orientation="horizontal"
+    )
+
+    if selected == "Ventas por Día":
+        ventas_por_dia(datos_ventas)
+    elif selected == "Método de Pago":
+        metodo_de_pago(datos_ventas)
+    elif selected == "Análisis de Productos":
+        analisis_productos(datos_ventas)
+
+
+# Función para análisis de ventas por día
+def ventas_por_dia(datos_ventas):
+    datos_ventas['fecha'] = datos_ventas['fecha_hora'].dt.date
+    ventas_dia = datos_ventas.groupby('fecha').agg({
+        'total_efectivo': 'sum',
+        'total_transferencia': 'sum',
+        'total_credito': 'sum'
+    }).reset_index()
+
+    st.write("## Ventas por Día")
+    st.line_chart(ventas_dia.set_index('fecha'))
+
+
+# Función para análisis de métodos de pago
+def metodo_de_pago(datos_ventas):
+    metodos_pago = datos_ventas[['total_efectivo', 'total_transferencia', 'total_credito']].sum()
+
+    st.write("## Método de Pago")
+    fig, ax = plt.subplots()
+    ax.pie(metodos_pago, labels=metodos_pago.index, autopct='%1.1f%%', startangle=90)
+    ax.axis('equal')
+    st.pyplot(fig)
+
+
+# Función para análisis de productos
+def analisis_productos(datos_ventas):
+    productos = []
+    for _, row in datos_ventas.iterrows():
+        productos_vendidos = row['productos_vendidos'].split(', ')
+        for producto in productos_vendidos:
+            nombre, cantidad = producto.split(':')
+            productos.append({'producto': nombre, 'cantidad': int(cantidad)})
+
+    df_productos = pd.DataFrame(productos)
+    productos_agg = df_productos.groupby('producto').agg({'cantidad': 'sum'}).reset_index()
+
+    st.write("## Análisis de Productos")
+    st.bar_chart(productos_agg.set_index('producto'))
 
 if __name__ == "__main__":
     main()
