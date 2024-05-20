@@ -9,19 +9,21 @@ from models import Base
 
 
 # URL de conexión para la base de datos PostgreSQL alojada en Render
-DATABASE_URL = "postgresql://datos_usuarios_user:NNgnrDUS7HG3zQPuffAWnG3pyDvevRs2@dpg-coe966gl6cac73bvqv3g-a.oregon-postgres.render.com/datos_usuarios"
+DATABASE_URL = (
+    "postgresql://datos_usuarios_user:NNgnrDUS7HG3zQPuffAWnG3pyDvevRs2"
+    "@dpg-coe966gl6cac73bvqv3g-a.oregon-postgres.render.com/datos_usuarios"
+)
 
 # Crea un motor SQLAlchemy que gestiona las conexiones a la base de datos
 engine = create_engine(DATABASE_URL, echo=True)
-
 
 # Crea una fábrica de sesiones de SQLAlchemy vinculada al motor
 Session = sessionmaker(bind=engine)
 
 
-
 def init_db():
-    """Inicializa la base de datos creando todas las tablas definidas en los modelos.
+    """
+    Inicializa la base de datos creando todas las tablas definidas en los modelos.
 
     Args:
         None
