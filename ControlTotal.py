@@ -1803,7 +1803,7 @@ def plot_geopandas_map(df_locations, tour):
         # Mostrar el gráfico en Streamlit
         st.pyplot(fig)
     except Exception as e:
-        st.error(f"Error al visualizar las rutas con geopandas: {e}")
+        st.error(f" Error al visualizar las rutas con geopandas: {e}")
 
 
 if __name__ == "__main__":
