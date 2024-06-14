@@ -1804,7 +1804,7 @@ def plot_geopandas_map(df_locations, tour):
         st.pyplot(fig)
     except Exception as e:
         st.error(f" Error al visualizar las rutas con geopandas: {e}")
-
+hola = "hola"
 
 if __name__ == "__main__":
     main()
